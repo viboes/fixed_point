@@ -28,6 +28,7 @@
 #include <boost/integer.hpp>
 #include <boost/integer/static_log2.hpp>
 #include <boost/ratio/detail/mpl/abs.hpp>
+#include <limits>
 
 #include <boost/config.hpp>
 //#include <boost/fixed_point/config.hpp>
@@ -82,10 +83,10 @@ namespace boost
     namespace round
     {
       struct fastest {
-        //BOOST_STATIC_CONSTEXPR std::round_to_nearest  round_style = std::round_indeterminate;
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_indeterminate;
       };
       struct negative {
-        //BOOST_STATIC_CONSTEXPR std::round_to_nearest  round_style = std::round_toward_infinity;
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_toward_infinity;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -111,7 +112,7 @@ namespace boost
         }
       };
       struct truncated {
-        //BOOST_STATIC_CONSTEXPR std::round_to_nearest  round_style = std::round_toward_zero;
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_toward_zero;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -130,7 +131,7 @@ namespace boost
         }
       };
       struct positive {
-        //BOOST_STATIC_CONSTEXPR std::round_to_nearest  round_style = std::round_toward_neg_infinity;
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_toward_neg_infinity;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -157,14 +158,17 @@ namespace boost
           }
         }
       };
-      struct classic {
-        //BOOST_STATIC_CONSTEXPR std::round_to_nearest  round_style =  std::round_to_nearest;
+      struct nearest_half_up {
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
       };
-      struct near_even {
-        //BOOST_STATIC_CONSTEXPR std::round_to_nearest  round_style =  std::round_to_nearest;
+      struct nearest_half_down {
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
+      };
+      struct nearest_even {
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
       };
       struct nearest_odd {
-        //BOOST_STATIC_CONSTEXPR std::round_to_nearest round_style;
+        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
       };
     }
     namespace overflow
@@ -352,6 +356,55 @@ namespace boost
      */
     template <int Range, int Resolution, typename Rounding=round::negative, typename Overflow=overflow::exception, typename Optimization=optimization::space>
     class signed_number;
+
+    template <
+              typename Res,
+              int R1, int P1, typename RP1, typename OP1, typename Opt1,
+              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    inline
+    Res
+    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs);
+    template <
+              typename Res,
+              int R1, int P1, typename RP1, typename OP1, typename Opt1,
+              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    inline
+    Res
+    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs);
+
+    template <
+              typename Res,
+              int R1, int P1, typename RP1, typename OP1, typename Opt1,
+              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    inline
+    Res
+    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs);
+
+    template <
+              typename Res,
+              int R1, int P1, typename RP1, typename OP1, typename Opt1,
+              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    inline
+    Res
+    divide(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs);
+
+  }
+}
+
+#define BOOST_TYPEOF_SILENT
+#include <boost/typeof/typeof.hpp>
+
+#include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
+
+BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::signed_number, (int)(int)(typename)(typename)(typename))
+BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::unsigned_number, (int)(int)(typename)(typename)(typename))
+
+
+///////////////////////////////////////
+
+namespace boost {
+  namespace fixed_point {
+
 
     // named parameter like class, allowing to make a specific overload when the integer must be taken by the index.
     template <typename T>
@@ -846,10 +899,13 @@ namespace boost
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
+          std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(rhs.count()) <<std::endl;
           // Overflow
           underlying_type indx(((rhs.count()) >> (P2-P1)));
+          std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(indx) <<std::endl;
           if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
           {
+            std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(typename From::underlying_type(To::max_index)<<(P2-P1)) <<std::endl;
             return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
           }
           if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
@@ -1118,18 +1174,6 @@ namespace boost
       BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
 
 
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      static bool positive_overflows(signed_number<R,P,RP,OP,Opt> const& rhs)
-      {
-        return false;
-      }
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      static bool negative_overflows(signed_number<R,P,RP,OP,Opt> const& rhs)
-      {
-        return false;
-      }
-
-
       //! construct/copy/destroy:
       signed_number() {} // = default;
       signed_number(signed_number const& rhs) : value_(rhs.value_) {} // = default;
@@ -1226,6 +1270,10 @@ namespace boost
         return signed_number(index(max_index));
       }
 
+      underlying_type integral_part() const
+      {
+        return count() >> resolution_exp;
+      }
 
 #if 0
 
@@ -1362,22 +1410,26 @@ namespace boost
 #endif
       signed_number& operator += (signed_number const& rhs)
       {
-        value_ += rhs.count();
+        signed_number tmp = number_cast<signed_number>(*this+rhs);
+        value_ = tmp.count();
         return *this;
       }
       signed_number& operator-=(const signed_number& rhs)
       {
-        value_ -= rhs.count();
+        signed_number tmp = number_cast<signed_number>(*this-rhs);
+        value_ = tmp.count();
         return *this;
       }
       signed_number& operator*=(const signed_number& rhs)
       {
-        value_ *= rhs.count();
+        signed_number tmp = number_cast<signed_number>((*this) * rhs);
+        value_ = tmp.count();
         return *this;
       }
       signed_number& operator/=(const signed_number& rhs)
       {
-        value_ /= rhs.count();
+        signed_number tmp = divide<signed_number>(*this , rhs);
+        value_ = tmp.count();
         return *this;
       }
     protected:
@@ -1474,6 +1526,11 @@ namespace boost
       static BOOST_CONSTEXPR unsigned_number max BOOST_PREVENT_MACRO_SUBSTITUTION ()
       {
         return unsigned_number(index(max_index));
+      }
+
+      underlying_type integral_part() const
+      {
+        return count() >> resolution_exp;
       }
 
 #if 0
@@ -1612,22 +1669,26 @@ namespace boost
 #endif
       unsigned_number& operator += (unsigned_number const& rhs)
       {
-        value_ += rhs.count();
+        unsigned_number tmp = number_cast<unsigned_number>((*this) + rhs);
+        value_ = tmp.count();
         return *this;
       }
-      unsigned_number& operator-=(const unsigned_number& rhs)
+      unsigned_number& operator-=(unsigned_number const& rhs)
       {
-        value_ -= rhs.count();
+        unsigned_number tmp = number_cast<unsigned_number>((*this) - rhs);
+        value_ = tmp.count();
         return *this;
       }
-      unsigned_number& operator*=(const unsigned_number& rhs)
+      unsigned_number& operator*=(unsigned_number const& rhs)
       {
-        value_ *= rhs.count();
+        unsigned_number tmp = number_cast<unsigned_number>((*this) * rhs);
+        value_ = tmp.count();
         return *this;
       }
-      unsigned_number& operator/=(const unsigned_number& rhs)
+      unsigned_number& operator/=(unsigned_number const& rhs)
       {
-        value_ /= rhs.count();
+        unsigned_number tmp = divide<unsigned_number>(*this, rhs);
+        value_ += tmp.count();
         return *this;
       }
     protected:
@@ -1960,9 +2021,9 @@ namespace boost
       typedef typename result_type::underlying_type underlying_type;
 
       typedef typename common_type<signed_number<R1,P1,RP1,OP1,Opt1>, signed_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
+      //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
+      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 
@@ -2255,6 +2316,7 @@ namespace boost
     template <typename To, typename From>
     To number_cast(From const& f)
     {
+      //std::cout << __FILE__ << "[" <<__LINE__<<"] "<< f.count() <<std::endl;
       return fixed_point::detail::number_cast<From, To>()(f);
     }
   }
@@ -2302,11 +2364,4 @@ namespace std {
   };
 }
 
-#define BOOST_TYPEOF_SILENT
-#include <boost/typeof/typeof.hpp>
-
-#include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
-
-BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::signed_number, (int)(int)(typename)(typename)(typename))
-BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::unsigned_number, (int)(int)(typename)(typename)(typename))
 #endif // header

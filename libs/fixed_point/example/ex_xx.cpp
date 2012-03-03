@@ -329,6 +329,14 @@ int main()
     signed_number<3,-1> n3 = n1 + n2;
     BOOST_TEST(n3.count()==-14);
   }
+  // +=
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-1> n1((index(3)));
+    signed_number<2,-1> n2((index(3)));
+    n1+=n2;
+    BOOST_TEST(n1.count()==6);
+  }
   // minus
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -343,6 +351,15 @@ int main()
     unsigned_number<2,-2> n2((index(7)));
     signed_number<3,-2> n3 = n1 - n2;
     BOOST_TEST(n3.count()==0);
+  }
+  // -=
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-1> n1((index(7)));
+    signed_number<2,-1> n2((index(7)));
+    n1-=n2;
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==0);
   }
   // multiply
   {
@@ -376,6 +393,48 @@ int main()
     signed_number<4,-4> n3 = n1 * n2;
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count()==49);
+  }
+
+  // *=
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<6,-1, round::truncated> n1((index(7)));
+    signed_number<6,-1, round::truncated> n2((index(3)));
+    n1*=n2;
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<6,-1, round::truncated> n1((index(7)));
+    unsigned_number<6,-1, round::truncated> n2((index(3)));
+    n1*=n2;
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
+  }
+//  {
+//    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+//    unsigned_number<6,-1, round::truncated> n1((index(7)));
+//    signed_number<6,-1, round::truncated> n2((index(3)));
+//    n1*=n2; // compile fails
+//    std::cout << int(n1.count()) << std::endl;
+//    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
+//  }
+  // /=
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<3,-2, round::truncated> n1((index(1)));
+    signed_number<3,-2, round::truncated> n2((index(7)));
+    n1 /= n2;
+    BOOST_TEST(n1.count()==0);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<3,-2, round::truncated> n1((index(7)));
+    signed_number<3,-2, round::truncated> n2((index(3)));
+    n1 /= n2;
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==9); // 7*4/3
   }
   // divide
   {
