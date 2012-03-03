@@ -382,25 +382,145 @@ int main()
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-1> n1((index(1)));
     signed_number<2,-1> n2((index(7)));
-    signed_number<3,-6> n3 = divide<signed_number<3,-6> >(n1,n2);
+    signed_number<3,-2> n3 = divide<signed_number<3,-2, round::truncated> >(n1,n2);
+    BOOST_TEST(n3.count()==0);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-1> n1((index(1)));
+    signed_number<2,-1> n2((index(7)));
+    signed_number<3,-2> n3 = divide<signed_number<3,-2, round::negative> >(n1,n2);
+    BOOST_TEST(n3.count()==0);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-1> n1((index(1)));
+    signed_number<2,-1> n2((index(7)));
+    signed_number<3,-2> n3 = divide<signed_number<3,-2, round::positive> >(n1,n2);
+    BOOST_TEST(n3.count()==1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-2> n2((index(1)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::truncated> >(n1,n2);
+    BOOST_TEST(n3.count()==30);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-2> n2((index(1)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::negative> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==30);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-2> n2((index(1)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::positive> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==30);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(-15)));
+    signed_number<2,-2> n2((index(1)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::negative> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==-30);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(-15)));
+    signed_number<2,-2> n2((index(1)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::positive> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==-30);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-2> n2((index(7)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::negative> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==4);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-2> n2((index(7)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::positive> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==5);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(-15)));
+    signed_number<2,-2> n2((index(7)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::negative> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==-5);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(-15)));
+    signed_number<2,-2> n2((index(7)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::positive> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
+    BOOST_TEST(n3.count()==-4);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-1> n2((index(1)));
+    signed_number<4,-1> n3 = divide<signed_number<4,-1, round::truncated> >(n1,n2);
+    BOOST_TEST(n3.count()==15);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-1> n2((index(1)));
+    signed_number<4,0> n3 = divide<signed_number<4,0, round::truncated> >(n1,n2);
+    BOOST_TEST(n3.count()==7);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-1> n2((index(1)));
+    signed_number<4,1> n3 = divide<signed_number<4,1, round::truncated> >(n1,n2);
+    BOOST_TEST(n3.count()==3);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-2> n1((index(15)));
+    signed_number<2,-1> n2((index(1)));
+    signed_number<4,2> n3 = divide<signed_number<4,2, round::truncated> >(n1,n2);
+    BOOST_TEST(n3.count()==1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<2,-1> n1((index(1)));
+    signed_number<2,-1> n2((index(7)));
+    signed_number<3,-6> n3 = divide<signed_number<3,-6, round::truncated> >(n1,n2);
     BOOST_TEST(n3.count()==9);
   }
   {
     unsigned_number<2,-1> n1((index(1)));
     unsigned_number<2,-2> n2((index(7)));
-    unsigned_number<4,-6> n3 = divide<unsigned_number<4,-6> >(n1,n2);
+    unsigned_number<4,-6> n3 = divide<unsigned_number<4,-6, round::truncated> >(n1,n2);
     BOOST_TEST(n3.count()==18);
   }
   {
     signed_number<2,-1> n1((index(1)));
     unsigned_number<2,-2> n2((index(7)));
-    signed_number<4,-6> n3 = divide<signed_number<4,-6> >(n1,n2);
+    signed_number<4,-6> n3 = divide<signed_number<4,-6, round::truncated> >(n1,n2);
     BOOST_TEST(n3.count()==18);
   }
   {
     unsigned_number<2,-1> n1((index(1)));
     signed_number<2,-2> n2((index(7)));
-    signed_number<4,-6> n3 = divide<signed_number<4,-6> >(n1,n2);
+    signed_number<4,-6> n3 = divide<signed_number<4,-6, round::truncated> >(n1,n2);
     BOOST_TEST(n3.count()==18);
   }
   {
@@ -412,14 +532,14 @@ int main()
   {
     signed_number<2,-1> n1((index(1)));
     signed_number<2,-2> n2((index(7)));
-    signed_number<6,-3> n3 = divide<signed_number<6,-3> >(n1,n2);
+    signed_number<6,-3> n3 = divide<signed_number<6,-3, round::truncated> >(n1,n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count()==2);
   }
   {
     signed_number<2,-1> n1((index(-1)));
     signed_number<2,-1> n2((index(7)));
-    signed_number<3,-6> n3 = divide<signed_number<3,-6> >(n1,n2);
+    signed_number<3,-6> n3 = divide<signed_number<3,-6, round::truncated> >(n1,n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count()==-9);
   }
@@ -432,19 +552,20 @@ int main()
   {
     signed_number<2,-1> n1((index(7)));
     signed_number<2,-1> n2((index(1)));
-    signed_number<3,-6> n3 = divide<signed_number<3,-6> >(n1,n2);
+    signed_number<3,-6> n3 = divide<signed_number<3,-6, round::truncated> >(n1,n2);
+    std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count()==7*64);
   }
   {
     signed_number<4,1> n1((index(1)));
     signed_number<4,1> n2((index(7)));
-    signed_number<3,-6> n3 = divide<signed_number<3,-6> >(n1,n2);
+    signed_number<3,-6> n3 = divide<signed_number<3,-6, round::truncated> >(n1,n2);
     BOOST_TEST(n3.count()==9);
   }
   {
     signed_number<4,1> n1((index(1)));
     signed_number<4,1> n2((index(7)));
-    signed_number<3,-3> n3 = divide<signed_number<3,-3> >(n1,n2);
+    signed_number<3,-3> n3 = divide<signed_number<3,-3, round::truncated> >(n1,n2);
     BOOST_TEST(n3.count()==1);
   }
   {
@@ -452,7 +573,7 @@ int main()
     signed_number<4,1> n2((index(1)));
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << int(n2.count()) << std::endl;
-    signed_number<3,-6> n3 = divide<signed_number<3,-6> >(n1,n2);
+    signed_number<3,-6> n3 = divide<signed_number<3,-6, round::truncated> >(n1,n2);
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count()==7*64);
