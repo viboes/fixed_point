@@ -1432,6 +1432,37 @@ namespace boost {
         value_ = tmp.count();
         return *this;
       }
+
+      // Scaling
+      template <std::size_t N>
+      signed_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>
+      virtual_scale() const
+      {
+        return signed_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>(index(count()));
+      }
+
+      template <std::size_t N>
+      void scale_up()
+      {
+        value_ <<= N;
+      }
+
+      template <int N, typename RP>
+      void scale()
+      {
+        if (N>=0)
+        {
+          value_ <<= N;
+        }
+        else
+        {
+          signed_number tmp=
+              divide<signed_number<Range, Resolution, RP, Overflow, Optimization>>(*this,
+              signed_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
+          value_ = tmp.count();
+        }
+      }
+
     protected:
       underlying_type value_;
     };
@@ -1691,6 +1722,37 @@ namespace boost {
         value_ += tmp.count();
         return *this;
       }
+
+      // Scaling
+      template <std::size_t N>
+      unsigned_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>
+      virtual_scale() const
+      {
+        return unsigned_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>(index(count()));
+      }
+
+      template <std::size_t N>
+      void scale_up()
+      {
+        value_ <<= N;
+      }
+
+      template <int N, typename RP>
+      void scale()
+      {
+        if (N>=0)
+        {
+          value_ <<= N;
+        }
+        else
+        {
+          unsigned_number tmp=
+              divide<unsigned_number<Range, Resolution, RP, Overflow, Optimization>>(*this,
+              unsigned_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
+          value_ = tmp.count();
+        }
+      }
+
     protected:
       underlying_type value_;
     };
@@ -2044,9 +2106,9 @@ namespace boost {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
       typedef typename common_type<unsigned_number<R1,P1,RP1,OP1,Opt1>, unsigned_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
+      //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
+      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 
@@ -2067,9 +2129,9 @@ namespace boost {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
       typedef typename common_type<signed_number<R1,P1,RP1,OP1,Opt1>, unsigned_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
+      //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
+      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 
@@ -2090,9 +2152,9 @@ namespace boost {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
       typedef typename common_type<unsigned_number<R1,P1,RP1,OP1,Opt1>, signed_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
+      //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
+      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 

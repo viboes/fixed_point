@@ -395,6 +395,65 @@ int main()
     BOOST_TEST(n3.count()==49);
   }
 
+  // virtual_scale
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<6,-2> n1((index(7)));
+    signed_number<8,0> n2= n1.virtual_scale<2>();
+    std::cout << int(n2.count()) << std::endl;
+    BOOST_TEST(n1.count()==7);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<6,-2> n1((index(7)));
+    unsigned_number<8,0> n2= n1.virtual_scale<2>();
+    std::cout << int(n2.count()) << std::endl;
+    BOOST_TEST(n1.count()==7);
+  }
+  // scale_up
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<6,-2> n1((index(7)));
+    n1.scale_up<2>();
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==28);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<6,-2> n1((index(7)));
+    n1.scale_up<2>();
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==28);
+  }
+  // scale
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<6,-2> n1((index(7)));
+    n1.scale<2,round::truncated>();
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==28);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<6,-2> n1((index(4)));
+    n1.scale<-2,round::truncated>();
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<6,-2> n1((index(7)));
+    n1.scale<2,round::truncated>();
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==28);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<6,-2> n1((index(4)));
+    n1.scale<-2,round::truncated>();
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==1);
+  }
   // *=
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
