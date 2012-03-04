@@ -29,6 +29,7 @@
 #include <boost/integer/static_log2.hpp>
 #include <boost/ratio/detail/mpl/abs.hpp>
 #include <limits>
+#include <boost/integer_traits.hpp>
 
 #include <boost/config.hpp>
 //#include <boost/fixed_point/config.hpp>
@@ -75,6 +76,19 @@ namespace boost
       typename shift_impl<UT,Bits,P>::result_type shift(UT v) {
         return shift_impl<UT,Bits,P>::apply(v);
       }
+      template <bool IsSigned>
+      struct max_type;
+      template <>
+      struct max_type<true>
+      {
+        typedef boost::intmax_t type;
+      };
+      template <>
+      struct max_type<false>
+      {
+        typedef boost::uintmax_t type;
+      };
+
     }
 
     struct positive_overflow {};
@@ -90,9 +104,15 @@ namespace boost
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
-          BOOST_STATIC_CONSTEXPR typename To::underlying_type d = To::resolution_exp-From::resolution_exp;
+          BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp-From::resolution_exp;
+          typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
+          BOOST_STATIC_ASSERT(d<(8*sizeof(tmp_type)));
+          //BOOST_MPL_ASSERT_MSG(d<(8*sizeof(tmp_type)), OVERFLOW, (mpl::int_<8*sizeof(tmp_type)>, mpl::int_<d>));
 
-          return typename To::underlying_type(rhs.count()) >> d;
+          tmp_type res = tmp_type(rhs.count()) >> d;
+          BOOST_ASSERT(res<=To::max_index);
+          BOOST_ASSERT(res>=To::min_index);
+          return res;
         }
         template <typename To, typename From>
         static typename To::underlying_type round_divide(From const& lhs, From const& rhs)
@@ -116,11 +136,18 @@ namespace boost
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
-          BOOST_STATIC_CONSTEXPR typename To::underlying_type d = To::resolution_exp-From::resolution_exp;
+          BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp-From::resolution_exp;
+          typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
+          BOOST_STATIC_ASSERT(d<(8*sizeof(tmp_type)));
+
           typename To::underlying_type m(((rhs.count()>0)?rhs.count():-rhs.count()));
           typename To::underlying_type s(((rhs.count()>0)?+1:-1));
 
-          return s * (m >> d);
+          tmp_type res = s * (m >> d);
+          BOOST_ASSERT(res<=To::max_index);
+          BOOST_ASSERT(res>=To::min_index);
+          return res;
+          ;
         }
         template <typename To, typename From>
         static typename To::underlying_type round_divide(From const& lhs, From const& rhs)
@@ -135,11 +162,19 @@ namespace boost
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
-          BOOST_STATIC_CONSTEXPR typename To::underlying_type d = To::resolution_exp-From::resolution_exp;
-          typename To::underlying_type w = (1<<d)-1;
-          typename To::underlying_type i = rhs.count();
+          BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp-From::resolution_exp;
+          typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
+          BOOST_STATIC_ASSERT(d<(8*sizeof(tmp_type)));
 
-          return (i+w) >> d;
+          BOOST_STATIC_CONSTEXPR tmp_type w = (1<<d)-1;
+          tmp_type i = rhs.count();
+
+          BOOST_ASSERT(i<=(integer_traits<tmp_type>::const_max-w));
+
+          tmp_type res =  (i+w) >> d;
+          BOOST_ASSERT(res<=To::max_index);
+          BOOST_ASSERT(res>=To::min_index);
+          return res;
         }
         template <typename To, typename From>
         static typename To::underlying_type round_divide(From const& lhs, From const& rhs)
@@ -899,13 +934,10 @@ namespace boost {
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-          std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(rhs.count()) <<std::endl;
           // Overflow
           underlying_type indx(((rhs.count()) >> (P2-P1)));
-          std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(indx) <<std::endl;
           if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
           {
-            std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(typename From::underlying_type(To::max_index)<<(P2-P1)) <<std::endl;
             return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
           }
           if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
@@ -1457,7 +1489,7 @@ namespace boost {
         else
         {
           signed_number tmp=
-              divide<signed_number<Range, Resolution, RP, Overflow, Optimization>>(*this,
+              divide<signed_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
               signed_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
           value_ = tmp.count();
         }
@@ -1747,7 +1779,7 @@ namespace boost {
         else
         {
           unsigned_number tmp=
-              divide<unsigned_number<Range, Resolution, RP, Overflow, Optimization>>(*this,
+              divide<unsigned_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
               unsigned_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
           value_ = tmp.count();
         }
@@ -2378,7 +2410,6 @@ namespace boost {
     template <typename To, typename From>
     To number_cast(From const& f)
     {
-      //std::cout << __FILE__ << "[" <<__LINE__<<"] "<< f.count() <<std::endl;
       return fixed_point::detail::number_cast<From, To>()(f);
     }
   }
