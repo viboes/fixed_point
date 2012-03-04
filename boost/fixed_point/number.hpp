@@ -43,39 +43,34 @@ namespace boost
   namespace fixed_point
   {
     namespace detail {
-      template <typename CT, int Bits, int P, bool IsSigned=is_signed<CT>::value, bool IsPositive=(P>0)>
+
+      template <typename From, typename To, bool IsPositive=(To::resolution_exp>0)>
       struct shift_impl;
-      template <typename CT, int Bits, int P, bool IsSigned>
-      struct shift_impl<CT,Bits, P, IsSigned, true> {
-        BOOST_STATIC_CONSTEXPR std::size_t digits = Bits-P;
-        typedef CT result_type;
-        static  CT apply(CT v)
+      template <typename From, typename To>
+      struct shift_impl<From, To, true> {
+        BOOST_STATIC_ASSERT(From::digits>To::resolution_exp);
+        BOOST_STATIC_CONSTEXPR std::size_t digits = From::digits-To::resolution_exp;
+        typedef typename From::underlying_type result_type;
+        static  result_type apply(typename From::underlying_type v)
         {
-          return v >> P;
+          return v >> To::resolution_exp;
         }
       };
-      template <typename CT, int Bits, int P>
-      struct shift_impl<CT,Bits, P,true,false> {
-        BOOST_STATIC_CONSTEXPR std::size_t digits = Bits-P;
-        typedef typename ::boost::int_t<Bits-P>::fast result_type;
-        static result_type apply(CT v)
+      template <typename From, typename To>
+      struct shift_impl<From,To,false> {
+        BOOST_STATIC_CONSTEXPR std::size_t digits = From::digits-To::resolution_exp;
+        typedef typename ::boost::int_t<digits>::fast result_type;
+        static result_type apply(typename From::underlying_type v)
         {
-          return result_type(v) << -P;
+          return result_type(v) << -To::resolution_exp;
         }
       };
-      template <typename CT, int Bits, int P>
-      struct shift_impl<CT,Bits, P,false,false> {
-        BOOST_STATIC_CONSTEXPR std::size_t digits = Bits-P;
-        typedef typename ::boost::uint_t<Bits-P>::fast result_type;
-        static  result_type apply(CT v)
-        {
-          return result_type(v) << -P;
-        }
-      };
-      template <typename UT, int Bits, int P>
-      typename shift_impl<UT,Bits,P>::result_type shift(UT v) {
-        return shift_impl<UT,Bits,P>::apply(v);
+
+      template <typename From, typename To>
+      typename shift_impl<From,To>::result_type shift(typename From::underlying_type v) {
+        return shift_impl<From,To>::apply(v);
       }
+
       template <bool IsSigned>
       struct max_type;
       template <>
@@ -117,17 +112,26 @@ namespace boost
         template <typename To, typename From>
         static typename To::underlying_type round_divide(From const& lhs, From const& rhs)
         {
-          typedef typename To::underlying_type result_type;
-          result_type ci = detail::shift<typename From::underlying_type, From::digits, To::resolution_exp>(lhs.count()) / rhs.count();
+          typedef typename detail::shift_impl<From, To>::result_type result_type;
+          result_type ci = detail::shift<From, To>(lhs.count()) / rhs.count();
           if (ci>=0 )
           {
+            BOOST_ASSERT(ci<=To::max_index);
+            BOOST_ASSERT(ci>=To::min_index);
             return ci;
           } else {
-            result_type ri = detail::shift<typename From::underlying_type, From::digits, To::resolution_exp>(lhs.count()) % rhs.count();
-            if (ri==0)
+            result_type ri = detail::shift<From, To>(lhs.count()) % rhs.count();
+            if (ri==0) {
+              BOOST_ASSERT(ci<=To::max_index);
+              BOOST_ASSERT(ci>=To::min_index);
               return ci;
+            }
             else
+            {
+              BOOST_ASSERT(ci-1<=To::max_index);
+              BOOST_ASSERT(ci>=(To::min_index+1));
               return ci-1;
+            }
           }
         }
       };
@@ -140,8 +144,8 @@ namespace boost
           typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
           BOOST_STATIC_ASSERT(d<(8*sizeof(tmp_type)));
 
-          typename To::underlying_type m(((rhs.count()>0)?rhs.count():-rhs.count()));
-          typename To::underlying_type s(((rhs.count()>0)?+1:-1));
+          tmp_type m(((rhs.count()>0)?rhs.count():-rhs.count()));
+          tmp_type s(((rhs.count()>0)?+1:-1));
 
           tmp_type res = s * (m >> d);
           BOOST_ASSERT(res<=To::max_index);
@@ -152,8 +156,10 @@ namespace boost
         template <typename To, typename From>
         static typename To::underlying_type round_divide(From const& lhs, From const& rhs)
         {
-          typedef typename To::underlying_type result_type;
-          result_type ci = detail::shift<typename From::underlying_type, From::digits, To::resolution_exp>(lhs.count()) / rhs.count();
+          typedef typename detail::shift_impl<From, To>::result_type result_type;
+          result_type ci = detail::shift<From, To>(lhs.count()) / rhs.count();
+          BOOST_ASSERT(ci<=To::max_index);
+          BOOST_ASSERT(ci>=To::min_index);
           return ci;
         }
       };
@@ -179,17 +185,24 @@ namespace boost
         template <typename To, typename From>
         static typename To::underlying_type round_divide(From const& lhs, From const& rhs)
         {
-          typedef typename To::underlying_type result_type;
-          result_type ci = detail::shift<typename From::underlying_type, From::digits, To::resolution_exp>(lhs.count()) / rhs.count();
+          typedef typename detail::shift_impl<From, To>::result_type result_type;
+          result_type ci = detail::shift<From, To>(lhs.count()) / rhs.count();
           if (ci>=0 )
           {
-            result_type ri = detail::shift<typename From::underlying_type, From::digits, To::resolution_exp>(lhs.count()) % rhs.count();
-            if (ri==0)
+            result_type ri = detail::shift<From, To>(lhs.count()) % rhs.count();
+            if (ri==0) {
+              BOOST_ASSERT(ci<=To::max_index);
+              BOOST_ASSERT(ci>=To::min_index);
               return ci;
-            else
+            } else {
+              BOOST_ASSERT(ci<=To::max_index-1);
+              BOOST_ASSERT(ci+1>=To::min_index);
               return ci+1;
+            }
           } else {
-              return ci;
+            BOOST_ASSERT(ci<=To::max_index);
+            BOOST_ASSERT(ci>=To::min_index);
+            return ci;
           }
         }
       };
@@ -551,8 +564,8 @@ namespace boost {
       template <
         typename From,
         typename To,
-        bool LE_Range=mpl::less_equal < mpl::int_<From::range_exp>, mpl::int_<To::range_exp> >::type::value,
-        bool GE_Resolution=mpl::greater_equal < mpl::int_<From::resolution_exp>, mpl::int_<To::resolution_exp> >::type::value
+        bool LE_Range=      From::range_exp      <= To::range_exp,
+        bool GE_Resolution= From::resolution_exp >= To::resolution_exp
       > struct number_cast;
 
       // LE_Range=true GE_Resolution=true
