@@ -33,6 +33,7 @@
 #include <boost/integer/static_log2.hpp>
 #include <boost/ratio/detail/mpl/abs.hpp>
 #include <limits>
+#include <cmath>
 #include <boost/integer_traits.hpp>
 
 #include <boost/config.hpp>
@@ -52,7 +53,7 @@ namespace boost
       struct shift_impl;
       template <typename From, typename To>
       struct shift_impl<From, To, true> {
-        BOOST_STATIC_ASSERT(From::digits>To::resolution_exp);
+        //BOOST_STATIC_ASSERT(From::digits>To::resolution_exp);
         BOOST_STATIC_CONSTEXPR std::size_t digits = From::digits-To::resolution_exp;
         typedef typename From::underlying_type result_type;
         static  result_type apply(typename From::underlying_type v)
@@ -73,6 +74,28 @@ namespace boost
       template <typename From, typename To>
       typename shift_impl<From,To>::result_type shift(typename From::underlying_type v) {
         return shift_impl<From,To>::apply(v);
+      }
+
+      template <int amt, typename T>
+      T shift_left(T val) {
+        if (amt>0) {
+          unsigned int u_amt = amt;
+          return val<<u_amt;
+        } else {
+          unsigned int u_amt = -amt;
+          return val>>u_amt;
+        }
+      }
+
+      template <int amt, typename T>
+      T shift_right(T val) {
+        if (amt>0) {
+          unsigned int u_amt = amt;
+          return val>>u_amt;
+        } else {
+          unsigned int u_amt = -amt;
+          return val<<u_amt;
+        }
       }
 
       template <bool IsSigned>
@@ -241,27 +264,31 @@ namespace boost
       struct impossible {
         BOOST_STATIC_CONSTEXPR bool is_modulo = false;
         template <typename T, typename U>
-        static typename T::underlying_type on_negative_overflow(U value)
+        static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U value)
         {
+#if defined(BOOST_NO_CONSTEXPR)
           BOOST_ASSERT_MSG(false,"Negative overflow while trying to convert fixed point numbers");
+#endif
           return value;
         }
         template <typename T, typename U>
-        static typename T::underlying_type on_positive_overflow(U value)
+        static BOOST_CONSTEXPR typename T::underlying_type on_positive_overflow(U value)
         {
+#if defined(BOOST_NO_CONSTEXPR)
           BOOST_ASSERT_MSG(false,"Positive overflow while trying to convert fixed point numbers");
+#endif
           return value;
         }
       };
       struct undefined {
         BOOST_STATIC_CONSTEXPR bool is_modulo = false;
         template <typename T, typename U>
-        static typename T::underlying_type on_negative_overflow(U value)
+        static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U value)
         {
           return value;
         }
         template <typename T, typename U>
-        static typename T::underlying_type on_positive_overflow(U value)
+        static BOOST_CONSTEXPR typename T::underlying_type on_positive_overflow(U value)
         {
           return value;
         }
@@ -274,7 +301,7 @@ namespace boost
         template <typename T, typename U>
         struct modulus_on_negative_overflow<T,U, false>
         {
-          static typename T::underlying_type value(U value)
+          static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
             return (value%(T::max_index-T::min_index+1))+(T::max_index-T::min_index+1);
           }
@@ -283,7 +310,7 @@ namespace boost
         template <typename T, typename U>
         struct modulus_on_negative_overflow<T,U, true>
         {
-          static typename T::underlying_type value(U value)
+          static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
             return ((value-T::min_index)%(T::max_index-T::min_index+1))-T::min_index;
           }
@@ -296,7 +323,7 @@ namespace boost
         template <typename T, typename U>
         struct modulus_on_positive_overflow<T,U, true>
         {
-          static typename T::underlying_type value(U value)
+          static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
             return ((value-T::max_index)%(T::max_index-T::min_index+1))-T::max_index;
           }
@@ -304,7 +331,7 @@ namespace boost
         template <typename T, typename U>
         struct modulus_on_positive_overflow<T,U, false>
         {
-          static typename T::underlying_type value(U value)
+          static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
             return value%(T::max_index-T::min_index+1);
           }
@@ -313,12 +340,12 @@ namespace boost
       struct modulus {
         BOOST_STATIC_CONSTEXPR bool is_modulo = true;
         template <typename T, typename U>
-        static typename T::underlying_type on_negative_overflow(U val)
+        static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U val)
         {
           return detail::modulus_on_negative_overflow<T,U>::value(val);
         }
         template <typename T, typename U>
-        static typename T::underlying_type modulus_on_positive_overflow(U val)
+        static BOOST_CONSTEXPR typename T::underlying_type modulus_on_positive_overflow(U val)
         {
           return detail::modulus_on_negative_overflow<T,U>::value(val);
         }
@@ -326,12 +353,12 @@ namespace boost
       struct saturate {
         BOOST_STATIC_CONSTEXPR bool is_modulo = false;
         template <typename T, typename U>
-        static typename T::underlying_type on_negative_overflow(U value)
+        static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U )
         {
           return T::min_index;
         }
         template <typename T, typename U>
-        static typename T::underlying_type on_positive_overflow(U value)
+        static BOOST_CONSTEXPR typename T::underlying_type on_positive_overflow(U )
         {
           return T::max_index;
         }
@@ -340,12 +367,12 @@ namespace boost
       struct exception {
         BOOST_STATIC_CONSTEXPR bool is_modulo = false;
         template <typename T, typename U>
-        static typename T::underlying_type on_negative_overflow(U value)
+        static typename T::underlying_type on_negative_overflow(U )
         {
           throw negative_overflow();
         }
         template <typename T, typename U>
-        static typename T::underlying_type on_positive_overflow(U value)
+        static typename T::underlying_type on_positive_overflow(U )
         {
           throw positive_overflow();
         }
@@ -489,7 +516,7 @@ namespace boost {
      *  helper function to make easier the use of index_tag.
      */
     template <typename T>
-    struct index_tag<T> index(T v) { return index_tag<T>(v); }
+    BOOST_CONSTEXPR index_tag<T> index(T v) { return index_tag<T>(v); }
 
     /**
      *  explicit conversion between fixed_point numbers.
@@ -504,14 +531,14 @@ namespace boost {
         BOOST_STATIC_CONSTEXPR std::size_t digits = (Range-Resolution)+1;
         BOOST_STATIC_ASSERT_MSG((sizeof(T)*8)>=digits, "LLLL");
         //BOOST_MPL_ASSERT_MSG((sizeof(T)*8)>=digits, LLLL, (mpl::int_<sizeof(T)*8>, mpl::int_<digits>));
-        BOOST_STATIC_CONSTEXPR T const_max = (1<<(digits-1)) - 1;
+        BOOST_STATIC_CONSTEXPR T const_max = (1LL<<(digits-1)) - 1;
         BOOST_STATIC_CONSTEXPR T const_min = -const_max;
 
       };
       template <typename T, int Range, int Resolution >
       struct unsigned_integer_traits {
         BOOST_STATIC_CONSTEXPR std::size_t digits = (Range-Resolution);
-        BOOST_STATIC_CONSTEXPR T const_max = (1<<(digits)) - 1;
+        BOOST_STATIC_CONSTEXPR T const_max = (1LL<<(digits)) - 1;
         BOOST_STATIC_CONSTEXPR T const_min = 0;
 
       };
@@ -711,7 +738,8 @@ namespace boost {
 
           // Overflow impossible
           // No round needed
-          return (
+          return
+            (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
             ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
             : (
@@ -1535,8 +1563,12 @@ namespace boost {
       template <typename FP>
       static FP factor()
       {
-        if (Resolution>=0) return FP(1 << Resolution);
-        else return FP(1)/(1 << -Resolution);
+//        if (Resolution>=0) return FP(1 << Resolution);
+//        else return FP(1)/(1 << -Resolution);
+        if (Resolution>=0) return FP(detail::shift_left<Resolution>(1));
+        else return FP(1)/(detail::shift_left<-Resolution>(1));
+
+
       }
       template <typename FP>
       static FP reconstruct(underlying_type k)
@@ -1588,38 +1620,41 @@ namespace boost {
       }
 #endif
 
-#if 0
+#if 1
 
       template <typename FP>
       static underlying_type integer_part(FP x)
       {
-        return underlying_type(floor(x));
+        return underlying_type(std::floor(x));
       }
       template <typename FP>
-      static underlying_type classify(FP x) const
+      static underlying_type classify(FP x)
       {
 
-        underlying_type indx =
-        // Overflow
-        if (x>max().as<FP>())
-        {
-          return overflow_type::template on_positive_overflow<To,underlying_type>(indx)));
-        }
-        if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-        {
-          return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-        }
-
-        // Round
-        return To(index(RP2::template round<From,To>(rhs)));
+//        underlying_type indx =
+//        // Overflow
+//        if (x>max().as<FP>())
+//        {
+//          return overflow_type::template on_positive_overflow<To,underlying_type>(indx)));
+//        }
+//        if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+//        {
+//          return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+//        }
+//
+//        // Round
+//        return To(index(RP2::template round<From,To>(rhs)));
 
         if (x<min().as<FP>())
           return min_index;
         if (x>max().as<FP>())
           return max_index;
-        return integer_part(x/factor());
+        return integer_part(x/factor<FP>());
       }
 
+      //! implicit conversion from float
+      signed_number(int x) : value_(classify(x))
+      {}
       //! implicit conversion from float
       signed_number(float x) : value_(classify(x))
       {}
@@ -1772,7 +1807,8 @@ namespace boost {
       {
         if (N>=0)
         {
-          value_ <<= N;
+          //value_ <<= N;
+          value_ = detail::shift_left<N>(value_);
         }
         else
         {
@@ -1899,7 +1935,7 @@ namespace boost {
         std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(max_index) << std::endl;
         std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(digits) << std::endl;
 
-        BOOST_ASSERT(i.get()>=min_index);
+        //BOOST_ASSERT(i.get()>=min_index);
         BOOST_ASSERT(i.get()<=max_index);
       }
 
@@ -2147,9 +2183,10 @@ namespace boost {
       template <int N, typename RP>
       void scale()
       {
-        if (N>=0)
+        if (N >= 0)
         {
-          value_ <<= N;
+          //value_ <<= N;
+          value_ = detail::shift_left<N>(value_);
         }
         else
         {
@@ -2230,6 +2267,20 @@ namespace boost {
     // signed_number non-member arithmetic
 
     // mixed fixed point arithmetic
+
+    /**
+     * signed + int -> signed.
+     * @Returns <c>lhs+AT(rhs)</c>.
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename Opt1>
+    inline
+    signed_number<R1+1,P1,RP1,OP1,Opt1>
+    operator+(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, int rhs)
+    {
+      typedef signed_number<R1,P1,RP1,OP1,Opt1> arg_type;
+
+      return lhs + arg_type(rhs);
+    }
 
     /**
      * signed + signed -> signed.

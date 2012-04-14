@@ -15,6 +15,8 @@ pixel blend( pixel a, pixel b ) {
   BOOST_AUTO(scale, (to_unsigned_number<255,0>()));
   BOOST_AUTO(a_r, a.r / scale);
   BOOST_AUTO(b_r, b.r / scale);
+  (void)a_r;
+  (void)b_r;
   BOOST_AUTO(aia, b.a * (to_unsigned_number<1,0>() - a.a));
   BOOST_AUTO(c_a, a.a + aia);
   BOOST_AUTO(c_r, (a.r*a.a + b.r*aia) / c_a);
@@ -70,7 +72,7 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-    unsigned_number<1,-32> n1((index(1)));
+    unsigned_number<1,-32> n1((index(1U)));
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<64,31,round::negative> n2(n1);
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -492,7 +494,7 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-    unsigned_number<6,-2> n1((index(4)));
+    unsigned_number<6,-2> n1((index(4U)));
     n1.scale<-2,round::truncated>();
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count()==1);
@@ -961,17 +963,33 @@ int main()
     BOOST_TEST(scale.count()==3);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     typedef unsigned_number<8,0> T;
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << T::min_index << std::endl;
     std::cout << T::max_index << std::endl;
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     typedef signed_number<8,0> T;
     std::cout << T::min_index << std::endl;
     std::cout << T::max_index << std::endl;
     std::cout << sizeof(long int) << std::endl;
   }
 
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    typedef signed_number<15,-16> fp_15__16;  // Signed fixed-point values with 15 bits of integer part
+                         // and 16 bits of fractional part.
+     fp_15__16 f1, f2;
+     f1 = 1.2345;   // Conversion from floating point.
+     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+     f2 = fp_15__16(f1 + 2);   // Mixed arithmetic with integers.
+     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+     f2 = fp_15__16(f1 - fp_15__16(2));   // Mixed arithmetic with integers.
+     f2 = fp_15__16(f1 / f2);  // Arithmetic on fixed-point values.
+  }
   return boost::report_errors();
 }
 
