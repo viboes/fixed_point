@@ -543,75 +543,75 @@ namespace boost {
 
       };
 
-      template <int Range, int Resolution, typename Optimization=optimization::space>
-      class signed_uniform_quantizer
-      {
-        BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
-      public:
-
-        //! The underlying integer type
-        typedef typename Optimization::template  signed_integer_type<Range,Resolution>::type underlying_type;
-
-        // name the template parameters
-        BOOST_STATIC_CONSTEXPR int range_exp = Range;
-        BOOST_STATIC_CONSTEXPR int resolution_exp = Resolution;
-        BOOST_STATIC_CONSTEXPR int digits = range_exp-resolution_exp+1;
-
-        typedef Optimization optimization_type;
-
-        BOOST_STATIC_CONSTEXPR underlying_type min_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_min;
-        BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
-
-        //! conversion factor.
-        template <typename FP>
-        static FP factor()
-        {
-          if (Resolution>=0) return FP(1 << Resolution);
-          else return FP(1)/(1 << -Resolution);
-        }
-        template <typename FP>
-        static underlying_type integer_part(FP x)
-        {
-          return underlying_type(floor(x));
-        }
-      };
-
-
-      template <typename Final, int Range, int Resolution, typename Rounding=round::negative, typename Overflow=overflow::exception,
-          typename Optimization=optimization::space
-          >
-      class signed_quantizer : public signed_uniform_quantizer<Range,Resolution,Optimization>
-      {
-        typedef signed_uniform_quantizer<Range,Resolution,Optimization> base_type;
-      public:
-        typedef typename base_type::underlying_type underlying_type;
-        BOOST_STATIC_CONSTEXPR underlying_type min_index = base_type::const_min;
-        BOOST_STATIC_CONSTEXPR underlying_type max_index = base_type::const_max;
-
-        template <typename FP>
-        static FP reconstruct(underlying_type k)
-        {
-          BOOST_ASSERT(min_index <= k && k <= max_index);
-
-          return Rounding::reconstruct(k, base_type::template factor<FP>());
-        }
-        template <typename FP>
-        static underlying_type classify(FP x)
-        {
-          if (x<Final::min().template as<FP>()) {
-            return Overflow::on_negative_overflow(min_index,x);
-          }
-          if (x>Final::max().template as<FP>()) {
-            return Overflow::on_positive_overflow(max_index,x);
-          }
-          return Rounding::classify(x, base_type::template factor<FP>());
-        }
-        template <typename FP>
-        static Final cast(FP x)
-        {
-          fixed_point::number_cast<Final>(x);
-        }
-      };
+//      template <int Range, int Resolution, typename Optimization=optimization::space>
+//      class signed_uniform_quantizer
+//      {
+//        BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
+//      public:
+//
+//        //! The underlying integer type
+//        typedef typename Optimization::template  signed_integer_type<Range,Resolution>::type underlying_type;
+//
+//        // name the template parameters
+//        BOOST_STATIC_CONSTEXPR int range_exp = Range;
+//        BOOST_STATIC_CONSTEXPR int resolution_exp = Resolution;
+//        BOOST_STATIC_CONSTEXPR int digits = range_exp-resolution_exp+1;
+//
+//        typedef Optimization optimization_type;
+//
+//        BOOST_STATIC_CONSTEXPR underlying_type min_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_min;
+//        BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
+//
+//        //! conversion factor.
+//        template <typename FP>
+//        static FP factor()
+//        {
+//          if (Resolution>=0) return FP(1 << Resolution);
+//          else return FP(1)/(1 << -Resolution);
+//        }
+//        template <typename FP>
+//        static underlying_type integer_part(FP x)
+//        {
+//          return underlying_type(std::floor(x));
+//        }
+//      };
+//
+//
+//      template <typename Final, int Range, int Resolution, typename Rounding=round::negative, typename Overflow=overflow::exception,
+//          typename Optimization=optimization::space
+//          >
+//      class signed_quantizer : public signed_uniform_quantizer<Range,Resolution,Optimization>
+//      {
+//        typedef signed_uniform_quantizer<Range,Resolution,Optimization> base_type;
+//      public:
+//        typedef typename base_type::underlying_type underlying_type;
+//        BOOST_STATIC_CONSTEXPR underlying_type min_index = base_type::const_min;
+//        BOOST_STATIC_CONSTEXPR underlying_type max_index = base_type::const_max;
+//
+//        template <typename FP>
+//        static FP reconstruct(underlying_type k)
+//        {
+//          BOOST_ASSERT(min_index <= k && k <= max_index);
+//
+//          return Rounding::reconstruct(k, base_type::template factor<FP>());
+//        }
+//        template <typename FP>
+//        static underlying_type classify(FP x)
+//        {
+//          if (x<Final::min().template as<FP>()) {
+//            return Overflow::on_negative_overflow(min_index,x);
+//          }
+//          if (x>Final::max().template as<FP>()) {
+//            return Overflow::on_positive_overflow(max_index,x);
+//          }
+//          return Rounding::classify(x, base_type::template factor<FP>());
+//        }
+//        template <typename FP>
+//        static Final cast(FP x)
+//        {
+//          fixed_point::number_cast<Final>(x);
+//        }
+//      };
 
       template <
         typename From,
@@ -1584,6 +1584,11 @@ namespace boost {
       {
         return reconstruct<FP>(this->value_);
       }
+      //! explicit conversion to int.
+      int as_int() const
+      {
+        return detail::shift_right<-Resolution>(value_);
+      }
       //! explicit conversion to float.
       float as_float() const
       {
@@ -1604,6 +1609,11 @@ namespace boost {
 
 #ifndef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
       //! explicit conversion to float.
+      explicit operator int() const
+      {
+        return as_int();
+      }
+      //! explicit conversion to float.
       explicit operator float() const
       {
         return as<float>();
@@ -1619,8 +1629,6 @@ namespace boost {
         return as<long double>();
       }
 #endif
-
-#if 1
 
       template <typename FP>
       static underlying_type integer_part(FP x)
@@ -1652,8 +1660,8 @@ namespace boost {
         return integer_part(x/factor<FP>());
       }
 
-      //! implicit conversion from float
-      signed_number(int x) : value_(classify(x))
+      //! implicit conversion from int
+      signed_number(int x) : value_(detail::shift_left<-Resolution>(x))
       {}
       //! implicit conversion from float
       signed_number(float x) : value_(classify(x))
@@ -1664,9 +1672,6 @@ namespace boost {
       //! implicit conversion from long double
       signed_number(long double x) : value_(classify(x))
       {}
-
-
-#endif
 
       // arithmetic
 
@@ -1685,46 +1690,48 @@ namespace boost {
         // As the range is symmetric the type is preserved
         return signed_number(index(-value_));
       }
-#if 0
-      signed_number& operator++(
-          typename boost::enable_if <
-            is_equal<mpl::int_<Resolution>, mpl::int_<0> >
-          >::type* = 0
-          )
+
+      /**
+       * @Effects Pre-increase this instance as if <c>*this+=1</c>
+       * @Returns this instance.
+       */
+      signed_number& operator++()
       {
-        ++value_;
+        *this+=1;
         return *this;
       }
-      signed_number  operator++(int
-          , typename boost::enable_if <
-            is_equal<mpl::int_<Resolution>, mpl::int_<0> >
-          >::type* = 0
-          )
+
+      /**
+       * @Effects Post-increase this instance as if <c>*this+=1</c>
+       * @Returns a copy of this instance before increasing it.
+       */
+      signed_number  operator++(int)
       {
         signed_number tmp=*this;
-        ++value_;
+        *this+=1;
         return tmp;
       }
-      signed_number& operator--(
-          typename boost::enable_if <
-            is_equal<mpl::int_<Resolution>, mpl::int_<0> >
-          >::type* = 0
-          )
+
+      /**
+       * @Effects Pre-decrease this instance as if <c>*this-=1</c>
+       * @Returns this instance.
+       */
+      signed_number& operator--()
       {
-        --value_;
+        *this-=1;
         return *this;
       }
-      signed_number  operator--(int
-          , typename boost::enable_if <
-          is_equal<mpl::int_<Resolution>, mpl::int_<0> >
-      >::type* = 0
-          )
+
+      /**
+       * @Effects Post-decrease this instance as if <c>*this-=1</c>
+       * @Returns a copy of this instance before decreasing it.
+       */
+      signed_number  operator--(int)
       {
         signed_number tmp=*this;
-        --value_;
+        *this-=1;
         return tmp;
       }
-#endif
 
       /**
        * @Effects As if <c>number_cast<signed_number>(*this+rhs)</c>
@@ -1930,11 +1937,6 @@ namespace boost {
       template <typename UT>
       explicit unsigned_number(index_tag<UT> i) : value_(i.get())
       {
-        std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(i.get()) << std::endl;
-        std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(min_index) << std::endl;
-        std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(max_index) << std::endl;
-        std::cout << __FILE__ << "[" <<__LINE__<<"] "<< int(digits) << std::endl;
-
         //BOOST_ASSERT(i.get()>=min_index);
         BOOST_ASSERT(i.get()<=max_index);
       }
@@ -1980,34 +1982,36 @@ namespace boost {
         return count() >> resolution_exp;
       }
 
-#if 0
-
       //! conversion factor.
       template <typename FP>
-      static FP factor() const
+      static FP factor()
       {
-        if (Resolution>=0) return FP(1 << Resolution);
-        else return FP(1)/(1 << -Resolution);
+        if (Resolution>=0) return FP(detail::shift_left<Resolution>(1));
+        else return FP(1)/(detail::shift_left<-Resolution>(1));
       }
       template <typename FP>
       static underlying_type integer_part(FP x)
       {
-        return underlying_type(floor(x));
+        return underlying_type(std::floor(x));
       }
       template <typename FP>
-      static FP reconstruct(underlying_type index) const
+      static FP reconstruct(underlying_type k)
       {
         BOOST_ASSERT(min_index <= k && k <= max_index);
 
         return k*factor<FP>();
       }
       template <typename FP>
-      static underlying_type classify(FP x) const
+      static underlying_type classify(FP x)
       {
         if (x<min().as<FP>()) return min_index;
         if (x>max().as<FP>()) return max_index;
-        return integer_part(x/factor());
+        return integer_part(x/factor<FP>());
       }
+
+      //! implicit conversion from int
+      unsigned_number(unsigned int x) : value_(detail::shift_left<-Resolution>(x))
+      {}
 
       //! implicit conversion from float
       unsigned_number(float x) : value_(classify(x))
@@ -2024,6 +2028,11 @@ namespace boost {
       FP as() const
       {
         return reconstruct<FP>(this->value_);
+      }
+      //! explicit conversion to int.
+      int as_unsigned_int() const
+      {
+        return detail::shift_right<-Resolution>(value_);
       }
       //! explicit conversion to float.
       float as_float() const
@@ -2043,7 +2052,11 @@ namespace boost {
         return as<long double>();
       }
 
-#ifndef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_NO_EXPLICIT_CONVERSION_OPERATORS      //! explicit conversion to float.
+      explicit operator unsigned int() const
+      {
+        return as_unsigned_int());
+      }
       //! explicit conversion to float.
       explicit operator float() const
       {
@@ -2059,7 +2072,6 @@ namespace boost {
       {
         return as<long double>();
       }
-#endif
 #endif
 
       // arithmetic
@@ -2080,26 +2092,42 @@ namespace boost {
         return signed_number<Range,Resolution,Rounding,Overflow,Optimization>(index(-value_));
       }
 
+      /**
+       * @Effects Pre-increase this instance as if <c>*this+=1</c>
+       * @Returns this instance.
+       */
       unsigned_number& operator++()
       {
-        *this+=1;
+        *this+=1u;
         return *this;
       }
+      /**
+       * @Effects Post-increase this instance as if <c>*this+=1</c>
+       * @Returns a copy of this instance before increasing it.
+       */
       unsigned_number  operator++(int)
       {
         unsigned_number tmp=*this;
-        *this+=1;
+        *this+=1u;
         return tmp;
       }
+      /**
+       * @Effects Pre-decrease this instance as if <c>*this-=1</c>
+       * @Returns this instance.
+       */
       unsigned_number& operator--()
       {
-        *this-=1;
+        *this-=1u;
         return *this;
       }
+      /**
+       * @Effects Post-decrease this instance as if <c>*this-=1</c>
+       * @Returns a copy of this instance before decreasing it.
+       */
       unsigned_number  operator--(int)
       {
         unsigned_number tmp=*this;
-        --value_;
+        *this-=1u;
         return tmp;
       }
 

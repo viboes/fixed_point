@@ -73,12 +73,9 @@ int main()
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<1,-32> n1((index(1U)));
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<64,31,round::negative> n2(n1);
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
   }
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -89,9 +86,7 @@ int main()
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<9,-1> n1((index(-254)));
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<7,0,round::negative> n2(n1);
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     BOOST_TEST(n2.count()==-127);
   }
   {
@@ -117,6 +112,7 @@ int main()
     BOOST_TEST(n2.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2> n1((index(1)));
     signed_number<2,-3,round::negative> n2(n1);
     BOOST_TEST(n1.count()==1);
@@ -124,6 +120,7 @@ int main()
     BOOST_TEST(n2.count()==2);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2> n1((index(1)));
     signed_number<2,-3,round::negative> n2;
     n2=n1;
@@ -132,6 +129,7 @@ int main()
     BOOST_TEST(n2.count()==2);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-2> n1((index(1)));
     unsigned_number<2,-3,round::negative> n2(n1);
     BOOST_TEST(n1.count()==1);
@@ -139,23 +137,26 @@ int main()
     BOOST_TEST(n2.count()==2);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-3> n1((index(1)));
     unsigned_number<2,-2,round::negative> n2(n1);
     BOOST_TEST(n1.count()==1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
   }
-  //  {
-  //    unsigned_number<2,-3> n1((index(1)));
-  //    unsigned_number<2,-2,round::negative> n2;
-  //    n2=n1; // compile must fail as conversion required
-  //  }
+//  {
+//    unsigned_number<2,-3> n1((index(1)));
+//    unsigned_number<2,-2> n2;
+//    n2=n1; // compile must fail as conversion required
+//  }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-3> n1((index(1)));
     unsigned_number<2,-2,round::negative> n2;
     n2=number_cast<unsigned_number<2,-2,round::negative> >(n1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(1)));
     signed_number<2,-2,round::negative> n2(n1);
     BOOST_TEST(n1.count()==1);
@@ -163,30 +164,35 @@ int main()
     BOOST_TEST(n2.count()==0);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(1)));
     signed_number<2,-2,round::positive> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(1)));
     signed_number<2,-2,round::truncated> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(0)));
     signed_number<2,-2,round::negative> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-3> n1((index(0)));
     unsigned_number<2,-2,round::negative> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(2)));
     signed_number<2,-2,round::negative> n2(n1);
     BOOST_TEST(n1.count()==2);
@@ -194,6 +200,7 @@ int main()
     BOOST_TEST(n2.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(2)));
     signed_number<2,-2,round::positive> n2(n1);
     BOOST_TEST(n1.count()==2);
@@ -201,6 +208,7 @@ int main()
     BOOST_TEST(n2.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(2)));
     signed_number<2,-2,round::truncated> n2(n1);
     BOOST_TEST(n1.count()==2);
@@ -218,22 +226,19 @@ int main()
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(-1)));
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::positive> n2(n1);
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
   }
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(-1)));
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::truncated> n2(n1);
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(-2)));
     signed_number<2,-2,round::negative> n2(n1);
     BOOST_TEST(n1.count()==-2);
@@ -241,29 +246,33 @@ int main()
     BOOST_TEST(n2.count()==-1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(-2)));
     signed_number<2,-2,round::positive> n2(n1);
     BOOST_TEST(n1.count()==-2);
-    std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==-1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-3> n1((index(-2)));
     signed_number<2,-2,round::truncated> n2(n1);
     BOOST_TEST(n1.count()==-2);
-    std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==-1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-1> n1((index(-7)));
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-1> n1((index(7)));
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-1> n1((index(7)));
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2> n1((index(15)));
     try {
       signed_number<2,-1> n2(n1);
@@ -271,6 +280,7 @@ int main()
     } catch (positive_overflow &) {}
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-2> n1((index(15)));
     try {
       unsigned_number<2,-1> n2(n1);
@@ -278,6 +288,7 @@ int main()
     } catch (positive_overflow &) {}
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2> n1((index(-15)));
     try {
       signed_number<2,-1> n2(n1);
@@ -285,6 +296,7 @@ int main()
     } catch (negative_overflow &) {}
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<3,-1> n1((index(15)));
     try {
       signed_number<2,-1> n2(n1);
@@ -292,6 +304,7 @@ int main()
     } catch (positive_overflow &) {}
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<3,-1> n1((index(-15)));
     try {
       signed_number<2,-1> n2(n1);
@@ -299,6 +312,7 @@ int main()
     } catch (negative_overflow &) {}
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<3,-2> n1((index(31)));
     try {
       signed_number<2,-1> n2(n1);
@@ -306,12 +320,105 @@ int main()
     } catch (positive_overflow &) {}
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<3,-2> n1((index(-31)));
     try {
       signed_number<2,-1> n2(n1);
       BOOST_TEST(false);
     } catch (negative_overflow &) {}
   }
+  /////////////////////////////////////////////////////////////////
+  // C(int)
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(1);
+    BOOST_TEST(n1.count()==2);
+    BOOST_TEST(n1.as_int()==1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(-1);
+    BOOST_TEST(n1.count()==-2);
+    BOOST_TEST(n1.as_int()==-1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1(1U);
+    BOOST_TEST(n1.count()==2);
+    BOOST_TEST(n1.as_unsigned_int()==1U);
+  }
+//  {
+//    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+//    unsigned_number<4,-1> n1(-1); // compile must fail as ambiguous
+//  }
+  /////////////////////////////////////////////////////////////////
+  // C(float)
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(0.5f);
+    BOOST_TEST(n1.count()==1);
+    BOOST_TEST(n1.as_float()==0.5f);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(-0.5f);
+    BOOST_TEST(n1.count()==-1);
+    BOOST_TEST(n1.as_float()==-0.5f);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1(0.5f);
+    BOOST_TEST(n1.count()==1);
+    BOOST_TEST(n1.as_float()==0.5f);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1(-0.5f);
+    BOOST_TEST(n1.count()==0);
+    BOOST_TEST(n1.as_float()==0.0f);
+  }
+  /////////////////////////////////////////////////////////////////
+  // C(double)
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(0.5);
+    BOOST_TEST(n1.count()==1);
+    BOOST_TEST(n1.as_double()==0.5);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(-0.5);
+    BOOST_TEST(n1.count()==-1);
+    BOOST_TEST(n1.as_double()==-0.5);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1(0.5);
+    BOOST_TEST(n1.count()==1);
+    BOOST_TEST(n1.as_double()==0.5);
+  }
+  /////////////////////////////////////////////////////////////////
+  // C(long double)
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(0.5l);
+    BOOST_TEST(n1.count()==1);
+    BOOST_TEST(n1.as_long_double()==0.5l);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1(-0.5l);
+    BOOST_TEST(n1.count()==-1);
+    BOOST_TEST(n1.as_long_double()==-0.5l);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1(0.5l);
+    BOOST_TEST(n1.count()==1);
+    BOOST_TEST(n1.as_long_double()==0.5l);
+  }
+
+  /////////////////////////////////////////////////////////////////
   // unary plus
   {
     signed_number<2,-1> n1((index(7)));
@@ -323,6 +430,7 @@ int main()
     unsigned_number<2,-1> n2(+n1);
     BOOST_TEST(n2.count()==3);
   }
+  /////////////////////////////////////////////////////////////////
   // unary minus
   {
     signed_number<2,-1> n1((index(7)));
@@ -338,6 +446,7 @@ int main()
     signed_number<2,-1> n3(-n2);
     BOOST_TEST(n3.count()==3);
   }
+  /////////////////////////////////////////////////////////////////
   // plus
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -374,6 +483,7 @@ int main()
     signed_number<3,-1> n3 = n1 + n2;
     BOOST_TEST(n3.count()==-14);
   }
+  /////////////////////////////////////////////////////////////////
   // +=
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -382,6 +492,70 @@ int main()
     n1+=n2;
     BOOST_TEST(n1.count()==6);
   }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1((index(3)));
+    BOOST_TEST(n1.count()==3);
+    n1+=1.0;
+    BOOST_TEST(n1.count()==5);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1((index(3)));
+    n1+=1;
+    BOOST_TEST(n1.count()==5);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1((index(3)));
+    n1+=1u;
+    BOOST_TEST(n1.count()==5);
+  }
+  /////////////////////////////////////////////////////////////////
+  // ++()
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1((index(3)));
+    ++n1;
+    BOOST_TEST(n1.count()==5);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1((index(3)));
+    ++n1;
+    BOOST_TEST(n1.count()==5);
+  }
+  /////////////////////////////////////////////////////////////////
+  // ++(int)
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1((index(3)));
+    signed_number<4,-1> n2 = n1++;
+    BOOST_TEST(n1.count()==5);
+    BOOST_TEST(n2.count()==3);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1((index(3)));
+    unsigned_number<4,-1> n2 = n1++;
+    BOOST_TEST(n1.count()==5);
+    BOOST_TEST(n2.count()==3);
+  }
+  /////////////////////////////////////////////////////////////////
+  // --()
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    signed_number<4,-1> n1((index(3)));
+    --n1;
+    BOOST_TEST(n1.count()==1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<4,-1> n1((index(3)));
+    --n1;
+    BOOST_TEST(n1.count()==1);
+  }
+  /////////////////////////////////////////////////////////////////
   // minus
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -397,6 +571,7 @@ int main()
     signed_number<3,-2> n3 = n1 - n2;
     BOOST_TEST(n3.count()==0);
   }
+  /////////////////////////////////////////////////////////////////
   // -=
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -406,6 +581,7 @@ int main()
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count()==0);
   }
+  /////////////////////////////////////////////////////////////////
   // multiply
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -440,6 +616,7 @@ int main()
     BOOST_TEST(n3.count()==49);
   }
 
+  /////////////////////////////////////////////////////////////////
   // virtual_scale
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -455,6 +632,7 @@ int main()
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n1.count()==7);
   }
+  /////////////////////////////////////////////////////////////////
   // scale_up
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -470,6 +648,7 @@ int main()
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count()==28);
   }
+  /////////////////////////////////////////////////////////////////
   // scale
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -499,6 +678,7 @@ int main()
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count()==1);
   }
+  /////////////////////////////////////////////////////////////////
   // *=
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -516,22 +696,23 @@ int main()
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
   }
-  //  {
-  //    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-  //    unsigned_number<6,-1, round::truncated> n1((index(7)));
-  //    signed_number<6,-1, round::truncated> n2((index(3)));
-  //    n1*=n2; // compile fails
-  //    std::cout << int(n1.count()) << std::endl;
-  //    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
-  //  }
-    {
-      std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-      unsigned_number<6,-1, round::truncated> n1((index(7)));
-      signed_number<6,-1, round::truncated> n2((index(3)));
-      n1*=number_cast<unsigned_number<6,-1, round::truncated> >(n2); // force cast
-      std::cout << int(n1.count()) << std::endl;
-      BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
-    }
+//  {
+//    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+//    unsigned_number<6,-1, round::truncated> n1((index(7)));
+//    signed_number<6,-1, round::truncated> n2((index(3)));
+//    n1*=n2; // compile fails
+//    std::cout << int(n1.count()) << std::endl;
+//    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
+//  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    unsigned_number<6,-1, round::truncated> n1((index(7)));
+    signed_number<6,-1, round::truncated> n2((index(3)));
+    n1*=number_cast<unsigned_number<6,-1, round::truncated> >(n2); // force cast
+    std::cout << int(n1.count()) << std::endl;
+    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
+  }
+  /////////////////////////////////////////////////////////////////
   // /=
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -749,6 +930,7 @@ int main()
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count()==7*64);
   }
+  /////////////////////////////////////////////////////////////////
   // equal
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -762,6 +944,7 @@ int main()
     signed_number<2,-2> n2((index(14)));
     BOOST_TEST(n1==n2);
   }
+  /////////////////////////////////////////////////////////////////
   // not_equal
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -769,6 +952,7 @@ int main()
     signed_number<2,-1> n2((index(1)));
     BOOST_TEST(n1!=n2);
   }
+  /////////////////////////////////////////////////////////////////
   // gt
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -776,6 +960,7 @@ int main()
     signed_number<2,-1> n2((index(1)));
     BOOST_TEST(n1>n2);
   }
+  /////////////////////////////////////////////////////////////////
   // ge
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -789,6 +974,7 @@ int main()
     signed_number<2,-1> n2((index(7)));
     BOOST_TEST(n1>=n2);
   }
+  /////////////////////////////////////////////////////////////////
   // lt
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -863,6 +1049,7 @@ int main()
     std::cout << sizeof(long int) << std::endl;
   }
 
+  /////////////////////////////////////////////////////////////////
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     typedef signed_number<15,-16> fp_15__16;  // Signed fixed-point values with 15 bits of integer part
