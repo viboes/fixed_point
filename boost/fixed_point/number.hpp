@@ -681,7 +681,7 @@ namespace boost {
         unsigned_number<R2,P2,RP2,OP2,Opt2>,
         true, true >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
+        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
         typedef typename To::underlying_type underlying_type;
 

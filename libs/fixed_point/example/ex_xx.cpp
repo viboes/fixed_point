@@ -516,14 +516,22 @@ int main()
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
   }
-//  {
-//    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-//    unsigned_number<6,-1, round::truncated> n1((index(7)));
-//    signed_number<6,-1, round::truncated> n2((index(3)));
-//    n1*=n2; // compile fails
-//    std::cout << int(n1.count()) << std::endl;
-//    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
-//  }
+  //  {
+  //    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+  //    unsigned_number<6,-1, round::truncated> n1((index(7)));
+  //    signed_number<6,-1, round::truncated> n2((index(3)));
+  //    n1*=n2; // compile fails
+  //    std::cout << int(n1.count()) << std::endl;
+  //    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
+  //  }
+    {
+      std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+      unsigned_number<6,-1, round::truncated> n1((index(7)));
+      signed_number<6,-1, round::truncated> n2((index(3)));
+      n1*=number_cast<unsigned_number<6,-1, round::truncated> >(n2); // force cast
+      std::cout << int(n1.count()) << std::endl;
+      BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
+    }
   // /=
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -816,127 +824,6 @@ int main()
 //    std::cout  << ::std::numeric_limits<long>::digits << std::endl;
 //    std::cout  << (int)(sizeof(boost::long_long_type) * CHAR_BIT) << std::endl;
 //  }
-//  {
-//    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-//    short b=3;
-//    std::cout  <<"-b = "<< -b << std::endl;
-//  }
-//  {
-//    unsigned short a=2;
-//    short b=-1;
-//    std::cout  <<"a/b = "<< a/b << std::endl;
-//  }
-//  {
-//    unsigned short a=2;
-//    short b=-1;
-//    std::cout  <<"a*b = "<< a*b << std::endl;
-//  }
-//  {
-//    unsigned short a=2;
-//    short b=-3;
-//    std::cout  <<"a+b = "<< a+b << std::endl;
-//  }
-//  {
-//    unsigned short a=2;
-//    short b=3;
-//    std::cout  <<"a-b = "<< a-b << std::endl;
-//  }
-//  {
-//    unsigned char a=240;
-//    unsigned char b=240;
-//    std::cout  <<"a+b = "<< a+b << std::endl;
-//  }
-//  {
-//    unsigned char a=250;
-//    unsigned char b=50;
-//    unsigned char c=50;
-//    unsigned char r=a-b+c;
-//    std::cout  <<"a-50+50 = "<< int(r) << std::endl;
-//  }
-//  {
-//    unsigned char a=250;
-//    unsigned char b=50;
-//    unsigned char c=50;
-//    unsigned char r=a+b-c;
-//    std::cout  <<"a+50-50 = "<< int(r) << std::endl;
-//  }
-//  {
-//    unsigned short a=128+258;
-//    unsigned char b=a;
-//    std::cout  <<"u->u "<< a << std::endl;
-//    std::cout  <<"a%256 = "<< a%256 << std::endl;
-//    std::cout  <<"b=a = "<< int(b) << std::endl;
-//  }
-//  {
-//    unsigned short a=2;
-//    char b=a;
-//    std::cout  <<"u->s "<< a<< std::endl;
-//    std::cout  <<"a%128 = "<< ((a+128)%256)-128 << std::endl;
-//    std::cout  <<"b=a = "<< int(b) << std::endl;
-//  }
-//  {
-//    unsigned short a=130;
-//    char b=a;
-//    std::cout  <<"u->s "<< a<< std::endl;
-//    std::cout  <<"a%128 = "<< ((a-128)%256)-128 << std::endl;
-//    std::cout  <<"b=a = "<< int(b) << std::endl;
-//  }
-//  {
-//    unsigned short a=258;
-//    char b=a;
-//    std::cout  <<"u->s "<< a<< std::endl;
-//    std::cout  <<"a%128 = "<< ((a-128)%256)-128 << std::endl;
-//    std::cout  <<"b=a = "<< int(b) << std::endl;
-//  }
-//  {
-//    std::cout  <<"s->s "<< std::endl;
-//    for (short a=-(256+2); a<-128; a+=1)
-//    {
-//      char b=a;
-//      std::cout  <<"a = "<< a << std::endl;
-//      std::cout  <<"a% = "<< ((a+128)%256)+128 << std::endl;
-//      std::cout  <<"b=a = "<< int(b) << std::endl;
-//    }
-//    for (short a=-128; a<0; a+=1)
-//    {
-//      char b=a;
-//      std::cout  <<"a = "<< a << std::endl;
-//      std::cout  <<"a% = "<< a << std::endl;
-//      std::cout  <<"b=a = "<< int(b) << std::endl;
-//    }
-//    for (short a=0; a<128; a+=1)
-//    {
-//      char b=a;
-//      std::cout  <<"a = "<< a << std::endl;
-//      std::cout  <<"a% = "<< a << std::endl;
-//      std::cout  <<"b=a = "<< int(b) << std::endl;
-//    }
-//    for (short a=128; a<256+32; a+=1)
-//    {
-//      char b=a;
-//      std::cout  <<"a = "<< a << std::endl;
-//      std::cout  <<"a% = "<< ((a-128)%256)-128 << std::endl;
-//      std::cout  <<"b=a = "<< int(b) << std::endl;
-//    }
-//  }
-//  {
-//    std::cout  <<"s->u "<< std::endl;
-//    for (short a=-(256+2); a<0; a+=1)
-//    {
-//      unsigned char b=a;
-//      std::cout  <<"a = "<< a << std::endl;
-//      std::cout  <<"a% = "<< (a)%256+256 << std::endl;
-//      std::cout  <<"b=a = "<< int(b) << std::endl;
-//    }
-//    for (short a=0; a<256+32; a+=1)
-//    {
-//      unsigned char b=a;
-//      std::cout  <<"a = "<< a << std::endl;
-//      std::cout  <<"a% = "<< a%256 << std::endl;
-//      std::cout  <<"b=a = "<< int(b) << std::endl;
-//    }
-//  }
-
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     BOOST_AUTO(scale, (to_unsigned_number<255,0>()));
@@ -965,10 +852,8 @@ int main()
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     typedef unsigned_number<8,0> T;
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << T::min_index << std::endl;
     std::cout << T::max_index << std::endl;
-    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
   }
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -984,10 +869,7 @@ int main()
                          // and 16 bits of fractional part.
      fp_15__16 f1, f2;
      f1 = 1.2345;   // Conversion from floating point.
-     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
      f2 = fp_15__16(f1 + 2);   // Mixed arithmetic with integers.
-     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-     f2 = fp_15__16(f1 - fp_15__16(2));   // Mixed arithmetic with integers.
      f2 = fp_15__16(f1 / f2);  // Arithmetic on fixed-point values.
   }
   return boost::report_errors();
