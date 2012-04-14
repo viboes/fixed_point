@@ -27,43 +27,56 @@ pixel blend( pixel a, pixel b ) {
 int main()
 {
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-2,round::negative> n;
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::negative> n;
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::truncated> n;
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::positive> n;
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-2,round::negative> n((index(1)));
     BOOST_TEST(n.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<2,-2,round::negative> n=to_unsigned_number<1,0>(); //
     std::cout << int(n.count()) << std::endl;
     BOOST_TEST(n.count()==4);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::negative> n((index(1)));
     BOOST_TEST(n.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::truncated> n((index(1)));
     BOOST_TEST(n.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     signed_number<2,-2,round::positive> n((index(1)));
     BOOST_TEST(n.count()==1);
   }
   {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<1,-32> n1((index(1)));
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     unsigned_number<64,31,round::negative> n2(n1);
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count()==0);
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
   }
   {
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
@@ -931,6 +944,21 @@ int main()
     std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
     BOOST_AUTO(scale, (to_signed_number<255,0>()));
     BOOST_TEST(scale.count()==255);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    BOOST_AUTO(scale, (to_unsigned_number<1,-12>()));
+    BOOST_TEST(scale.count()==1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    BOOST_AUTO(scale, (to_signed_number<1,-12>()));
+    BOOST_TEST(scale.count()==1);
+  }
+  {
+    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
+    BOOST_AUTO(scale, (to_unsigned_number<3,10>()));
+    BOOST_TEST(scale.count()==3);
   }
   {
     typedef unsigned_number<8,0> T;
