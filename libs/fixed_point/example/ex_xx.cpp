@@ -11,7 +11,7 @@ using namespace boost::fixed_point;
 
 struct pixel
 {
-  unsigned_number<8, 0> r, g, b, a;
+  ureal_t<8, 0> r, g, b, a;
 };
 
 pixel blend(pixel a, pixel b)
@@ -25,8 +25,8 @@ pixel blend(pixel a, pixel b)
   BOOST_AUTO(c_a, a.a + aia);
   BOOST_AUTO(c_r, (a.r * a.a + b.r * aia) / c_a);
   pixel c;
-  c.a = number_cast<unsigned_number<8, 0> > (c_a * to_unsigned_number<255, 0> ());
-  c.r = number_cast<unsigned_number<8, 0> > (c_r * to_unsigned_number<255, 0> ());
+  c.a = number_cast<ureal_t<8, 0> > (c_a * to_unsigned_number<255, 0> ());
+  c.r = number_cast<ureal_t<8, 0> > (c_r * to_unsigned_number<255, 0> ());
   return c;
 }
 
@@ -34,99 +34,99 @@ int main()
 {
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2, round::negative> n;
+    ureal_t<2, -2, round::negative> n;
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2, round::negative> n;
+    real_t<2, -2, round::negative> n;
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2, round::truncated> n;
+    real_t<2, -2, round::truncated> n;
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2, round::positive> n;
+    real_t<2, -2, round::positive> n;
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2, round::negative> n( (index(1)));
+    ureal_t<2, -2, round::negative> n( (index(1)));
     BOOST_TEST(n.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2, round::negative> n = to_unsigned_number<1, 0> (); //
+    ureal_t<2, -2, round::negative> n = to_unsigned_number<1, 0> (); //
     std::cout << int(n.count()) << std::endl;
     BOOST_TEST(n.count() == 4);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2, round::negative> n( (index(1)));
+    real_t<2, -2, round::negative> n( (index(1)));
     BOOST_TEST(n.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2, round::truncated> n( (index(1)));
+    real_t<2, -2, round::truncated> n( (index(1)));
     BOOST_TEST(n.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2, round::positive> n( (index(1)));
+    real_t<2, -2, round::positive> n( (index(1)));
     BOOST_TEST(n.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<1, -32> n1( (index(1U)));
-    unsigned_number<64, 31, round::negative> n2(n1);
+    ureal_t<1, -32> n1( (index(1U)));
+    ureal_t<64, 31, round::negative> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<8, 0> n1( (index(255)));
-    unsigned_number<8, 0, round::negative> n2(n1);
+    ureal_t<8, 0> n1( (index(255)));
+    ureal_t<8, 0, round::negative> n2(n1);
     BOOST_TEST(n2.count() == 255);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<9, -1> n1( (index(-254)));
-    signed_number<7, 0, round::negative> n2(n1);
+    real_t<9, -1> n1( (index(-254)));
+    real_t<7, 0, round::negative> n2(n1);
     BOOST_TEST(n2.count() == -127);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(1)));
-    unsigned_number<2, -2, round::negative> n2(n1);
+    ureal_t<2, -2> n1( (index(1)));
+    ureal_t<2, -2, round::negative> n2(n1);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n2.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(1)));
-    signed_number<2, -2, round::negative> n2(n1);
+    real_t<2, -2> n1( (index(1)));
+    real_t<2, -2, round::negative> n2(n1);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n2.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(1)));
-    signed_number<2, -2, round::negative> n2;
+    real_t<2, -2> n1( (index(1)));
+    real_t<2, -2, round::negative> n2;
     n2 = n1;
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n2.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(1)));
-    signed_number<2, -3, round::negative> n2(n1);
+    real_t<2, -2> n1( (index(1)));
+    real_t<2, -3, round::negative> n2(n1);
     BOOST_TEST(n1.count() == 1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 2);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(1)));
-    signed_number<2, -3, round::negative> n2;
+    real_t<2, -2> n1( (index(1)));
+    real_t<2, -3, round::negative> n2;
     n2 = n1;
     BOOST_TEST(n1.count() == 1);
     std::cout << int(n2.count()) << std::endl;
@@ -134,153 +134,153 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(1)));
-    unsigned_number<2, -3, round::negative> n2(n1);
+    ureal_t<2, -2> n1( (index(1)));
+    ureal_t<2, -3, round::negative> n2(n1);
     BOOST_TEST(n1.count() == 1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 2);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -3> n1( (index(1)));
-    unsigned_number<2, -2, round::negative> n2(n1);
+    ureal_t<2, -3> n1( (index(1)));
+    ureal_t<2, -2, round::negative> n2(n1);
     BOOST_TEST(n1.count() == 1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   //  {
-  //    unsigned_number<2,-3> n1((index(1)));
-  //    unsigned_number<2,-2> n2;
+  //    ureal_t<2,-3> n1((index(1)));
+  //    ureal_t<2,-2> n2;
   //    n2=n1; // compile must fail as conversion required
   //  }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -3> n1( (index(1)));
-    unsigned_number<2, -2, round::negative> n2;
-    n2 = number_cast<unsigned_number<2, -2, round::negative> > (n1);
+    ureal_t<2, -3> n1( (index(1)));
+    ureal_t<2, -2, round::negative> n2;
+    n2 = number_cast<ureal_t<2, -2, round::negative> > (n1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(1)));
-    signed_number<2, -2, round::negative> n2(n1);
+    real_t<2, -3> n1( (index(1)));
+    real_t<2, -2, round::negative> n2(n1);
     BOOST_TEST(n1.count() == 1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(1)));
-    signed_number<2, -2, round::positive> n2(n1);
+    real_t<2, -3> n1( (index(1)));
+    real_t<2, -2, round::positive> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(1)));
-    signed_number<2, -2, round::truncated> n2(n1);
+    real_t<2, -3> n1( (index(1)));
+    real_t<2, -2, round::truncated> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(0)));
-    signed_number<2, -2, round::negative> n2(n1);
+    real_t<2, -3> n1( (index(0)));
+    real_t<2, -2, round::negative> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -3> n1( (index(0)));
-    unsigned_number<2, -2, round::negative> n2(n1);
+    ureal_t<2, -3> n1( (index(0)));
+    ureal_t<2, -2, round::negative> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(2)));
-    signed_number<2, -2, round::negative> n2(n1);
+    real_t<2, -3> n1( (index(2)));
+    real_t<2, -2, round::negative> n2(n1);
     BOOST_TEST(n1.count() == 2);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(2)));
-    signed_number<2, -2, round::positive> n2(n1);
+    real_t<2, -3> n1( (index(2)));
+    real_t<2, -2, round::positive> n2(n1);
     BOOST_TEST(n1.count() == 2);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(2)));
-    signed_number<2, -2, round::truncated> n2(n1);
+    real_t<2, -3> n1( (index(2)));
+    real_t<2, -2, round::truncated> n2(n1);
     BOOST_TEST(n1.count() == 2);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(-1)));
-    signed_number<2, -2, round::negative> n2(n1);
+    real_t<2, -3> n1( (index(-1)));
+    real_t<2, -2, round::negative> n2(n1);
     BOOST_TEST(n1.count() == -1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == -1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(-1)));
-    signed_number<2, -2, round::positive> n2(n1);
+    real_t<2, -3> n1( (index(-1)));
+    real_t<2, -2, round::positive> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(-1)));
-    signed_number<2, -2, round::truncated> n2(n1);
+    real_t<2, -3> n1( (index(-1)));
+    real_t<2, -2, round::truncated> n2(n1);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(-2)));
-    signed_number<2, -2, round::negative> n2(n1);
+    real_t<2, -3> n1( (index(-2)));
+    real_t<2, -2, round::negative> n2(n1);
     BOOST_TEST(n1.count() == -2);
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n2.count() == -1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(-2)));
-    signed_number<2, -2, round::positive> n2(n1);
+    real_t<2, -3> n1( (index(-2)));
+    real_t<2, -2, round::positive> n2(n1);
     BOOST_TEST(n1.count() == -2);
     BOOST_TEST(n2.count() == -1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -3> n1( (index(-2)));
-    signed_number<2, -2, round::truncated> n2(n1);
+    real_t<2, -3> n1( (index(-2)));
+    real_t<2, -2, round::truncated> n2(n1);
     BOOST_TEST(n1.count() == -2);
     BOOST_TEST(n2.count() == -1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(-7)));
+    real_t<2, -1> n1( (index(-7)));
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
+    real_t<2, -1> n1( (index(7)));
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -1> n1( (index(7)));
+    ureal_t<2, -1> n1( (index(7)));
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
+    real_t<2, -2> n1( (index(15)));
     try
     {
-      signed_number<2, -1> n2(n1);
+      real_t<2, -1> n2(n1);
       BOOST_TEST(false);
     }
     catch (positive_overflow &)
@@ -289,10 +289,10 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(15)));
+    ureal_t<2, -2> n1( (index(15)));
     try
     {
-      unsigned_number<2, -1> n2(n1);
+      ureal_t<2, -1> n2(n1);
       BOOST_TEST(false);
     }
     catch (positive_overflow &)
@@ -301,10 +301,10 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(-15)));
+    real_t<2, -2> n1( (index(-15)));
     try
     {
-      signed_number<2, -1> n2(n1);
+      real_t<2, -1> n2(n1);
       BOOST_TEST(false);
     }
     catch (negative_overflow &)
@@ -313,10 +313,10 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<3, -1> n1( (index(15)));
+    real_t<3, -1> n1( (index(15)));
     try
     {
-      signed_number<2, -1> n2(n1);
+      real_t<2, -1> n2(n1);
       BOOST_TEST(false);
     }
     catch (positive_overflow &)
@@ -325,10 +325,10 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<3, -1> n1( (index(-15)));
+    real_t<3, -1> n1( (index(-15)));
     try
     {
-      signed_number<2, -1> n2(n1);
+      real_t<2, -1> n2(n1);
       BOOST_TEST(false);
     }
     catch (negative_overflow &)
@@ -337,10 +337,10 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<3, -2> n1( (index(31)));
+    real_t<3, -2> n1( (index(31)));
     try
     {
-      signed_number<2, -1> n2(n1);
+      real_t<2, -1> n2(n1);
       BOOST_TEST(false);
     }
     catch (positive_overflow &)
@@ -349,10 +349,10 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<3, -2> n1( (index(-31)));
+    real_t<3, -2> n1( (index(-31)));
     try
     {
-      signed_number<2, -1> n2(n1);
+      real_t<2, -1> n2(n1);
       BOOST_TEST(false);
     }
     catch (negative_overflow &)
@@ -363,49 +363,49 @@ int main()
   // C(int)
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(1);
+    real_t<4, -1> n1(1);
     BOOST_TEST(n1.count() == 2);
     BOOST_TEST(n1.as_int() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(-1);
+    real_t<4, -1> n1(-1);
     BOOST_TEST(n1.count() == -2);
     BOOST_TEST(n1.as_int() == -1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1(1U);
+    ureal_t<4, -1> n1(1U);
     BOOST_TEST(n1.count() == 2);
     BOOST_TEST(n1.as_unsigned_int() == 1U);
   }
   //  {
   //    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-  //    unsigned_number<4,-1> n1(-1); // compile must fail as ambiguous
+  //    ureal_t<4,-1> n1(-1); // compile must fail as ambiguous
   //  }
   /////////////////////////////////////////////////////////////////
   // C(float)
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(0.5f);
+    real_t<4, -1> n1(0.5f);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n1.as_float() == 0.5f);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(-0.5f);
+    real_t<4, -1> n1(-0.5f);
     BOOST_TEST(n1.count() == -1);
     BOOST_TEST(n1.as_float() == -0.5f);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1(0.5f);
+    ureal_t<4, -1> n1(0.5f);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n1.as_float() == 0.5f);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1(-0.5f);
+    ureal_t<4, -1> n1(-0.5f);
     BOOST_TEST(n1.count() == 0);
     BOOST_TEST(n1.as_float() == 0.0f);
   }
@@ -413,19 +413,19 @@ int main()
   // C(double)
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(0.5);
+    real_t<4, -1> n1(0.5);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n1.as_double() == 0.5);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(-0.5);
+    real_t<4, -1> n1(-0.5);
     BOOST_TEST(n1.count() == -1);
     BOOST_TEST(n1.as_double() == -0.5);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1(0.5);
+    ureal_t<4, -1> n1(0.5);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n1.as_double() == 0.5);
   }
@@ -433,19 +433,19 @@ int main()
   // C(long double)
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(0.5l);
+    real_t<4, -1> n1(0.5l);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n1.as_long_double() == 0.5l);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1(-0.5l);
+    real_t<4, -1> n1(-0.5l);
     BOOST_TEST(n1.count() == -1);
     BOOST_TEST(n1.as_long_double() == -0.5l);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1(0.5l);
+    ureal_t<4, -1> n1(0.5l);
     BOOST_TEST(n1.count() == 1);
     BOOST_TEST(n1.as_long_double() == 0.5l);
   }
@@ -453,93 +453,93 @@ int main()
   /////////////////////////////////////////////////////////////////
   // unary plus
   {
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2(+n1);
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2(+n1);
     BOOST_TEST(n2.count() == 7);
   }
   {
-    unsigned_number<2, -1> n1( (index(3)));
-    unsigned_number<2, -1> n2(+n1);
+    ureal_t<2, -1> n1( (index(3)));
+    ureal_t<2, -1> n2(+n1);
     BOOST_TEST(n2.count() == 3);
   }
   /////////////////////////////////////////////////////////////////
   // unary minus
   {
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2(-n1);
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2(-n1);
     BOOST_TEST(n2.count() == -7);
-    signed_number<2, -1> n3(-n2);
+    real_t<2, -1> n3(-n2);
     BOOST_TEST(n3.count() == 7);
   }
   {
-    unsigned_number<2, -1> n1( (index(3)));
-    signed_number<2, -1> n2(-n1);
+    ureal_t<2, -1> n1( (index(3)));
+    real_t<2, -1> n2(-n1);
     BOOST_TEST(n2.count() == -3);
-    signed_number<2, -1> n3(-n2);
+    real_t<2, -1> n3(-n2);
     BOOST_TEST(n3.count() == 3);
   }
   /////////////////////////////////////////////////////////////////
   // plus
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -1> n3 = n1 + n2;
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -1> n3 = n1 + n2;
     BOOST_TEST(n3.count() == 14);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(7)));
-    unsigned_number<2, -2> n2( (index(7)));
-    signed_number<3, -2> n3 = n1 + n2;
+    ureal_t<2, -2> n1( (index(7)));
+    ureal_t<2, -2> n2( (index(7)));
+    real_t<3, -2> n3 = n1 + n2;
     BOOST_TEST(n3.count() == 14);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(7)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<3, -2> n3 = n2 + n1;
+    ureal_t<2, -2> n1( (index(7)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<3, -2> n3 = n2 + n1;
     BOOST_TEST(n3.count() == 14);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
     BOOST_AUTO(n3, n1 + n2);
     BOOST_TEST(n3.count() == 14);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(-7)));
-    signed_number<2, -1> n2( (index(-7)));
-    signed_number<3, -1> n3 = n1 + n2;
+    real_t<2, -1> n1( (index(-7)));
+    real_t<2, -1> n2( (index(-7)));
+    real_t<3, -1> n3 = n1 + n2;
     BOOST_TEST(n3.count() == -14);
   }
   /////////////////////////////////////////////////////////////////
   // +=
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(3)));
-    signed_number<2, -1> n2( (index(3)));
+    real_t<2, -1> n1( (index(3)));
+    real_t<2, -1> n2( (index(3)));
     n1 += n2;
     BOOST_TEST(n1.count() == 6);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1( (index(3)));
+    real_t<4, -1> n1( (index(3)));
     BOOST_TEST(n1.count() == 3);
     n1 += convert(1.0);
     BOOST_TEST(n1.count() == 5);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1( (index(3)));
+    real_t<4, -1> n1( (index(3)));
     n1 += convert(1);
     BOOST_TEST(n1.count() == 5);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1( (index(3)));
+    ureal_t<4, -1> n1( (index(3)));
     n1 += convert(1u);
     BOOST_TEST(n1.count() == 5);
   }
@@ -547,13 +547,13 @@ int main()
   // ++()
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1( (index(3)));
+    real_t<4, -1> n1( (index(3)));
     ++n1;
     BOOST_TEST(n1.count() == 5);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1( (index(3)));
+    ureal_t<4, -1> n1( (index(3)));
     ++n1;
     BOOST_TEST(n1.count() == 5);
   }
@@ -561,15 +561,15 @@ int main()
   // ++(int)
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1( (index(3)));
-    signed_number<4, -1> n2 = n1++;
+    real_t<4, -1> n1( (index(3)));
+    real_t<4, -1> n2 = n1++;
     BOOST_TEST(n1.count() == 5);
     BOOST_TEST(n2.count() == 3);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1( (index(3)));
-    unsigned_number<4, -1> n2 = n1++;
+    ureal_t<4, -1> n1( (index(3)));
+    ureal_t<4, -1> n2 = n1++;
     BOOST_TEST(n1.count() == 5);
     BOOST_TEST(n2.count() == 3);
   }
@@ -577,13 +577,13 @@ int main()
   // --()
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<4, -1> n1( (index(3)));
+    real_t<4, -1> n1( (index(3)));
     --n1;
     BOOST_TEST(n1.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<4, -1> n1( (index(3)));
+    ureal_t<4, -1> n1( (index(3)));
     --n1;
     BOOST_TEST(n1.count() == 1);
   }
@@ -591,24 +591,24 @@ int main()
   // minus
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -1> n3 = n1 - n2;
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -1> n3 = n1 - n2;
     BOOST_TEST(n3.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(7)));
-    unsigned_number<2, -2> n2( (index(7)));
-    signed_number<3, -2> n3 = n1 - n2;
+    ureal_t<2, -2> n1( (index(7)));
+    ureal_t<2, -2> n2( (index(7)));
+    real_t<3, -2> n3 = n1 - n2;
     BOOST_TEST(n3.count() == 0);
   }
   /////////////////////////////////////////////////////////////////
   // -=
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
     n1 -= n2;
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 0);
@@ -617,33 +617,33 @@ int main()
   // multiply
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<4, -2> n3 = n1 * n2;
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<4, -2> n3 = n1 * n2;
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 49);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(7)));
-    unsigned_number<2, -2> n2( (index(7)));
-    unsigned_number<4, -4> n3 = n1 * n2;
+    ureal_t<2, -2> n1( (index(7)));
+    ureal_t<2, -2> n2( (index(7)));
+    ureal_t<4, -4> n3 = n1 * n2;
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 49);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(7)));
-    unsigned_number<2, -2> n2( (index(7)));
-    signed_number<4, -4> n3 = n1 * n2;
+    real_t<2, -2> n1( (index(7)));
+    ureal_t<2, -2> n2( (index(7)));
+    real_t<4, -4> n3 = n1 * n2;
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 49);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<2, -2> n1( (index(7)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<4, -4> n3 = n1 * n2;
+    ureal_t<2, -2> n1( (index(7)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<4, -4> n3 = n1 * n2;
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 49);
   }
@@ -652,15 +652,15 @@ int main()
   // virtual_scale
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<6, -2> n1( (index(7)));
-    signed_number<8, 0> n2 = n1.virtual_scale<2> ();
+    real_t<6, -2> n1( (index(7)));
+    real_t<8, 0> n2 = n1.virtual_scale<2> ();
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n1.count() == 7);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<6, -2> n1( (index(7)));
-    unsigned_number<8, 0> n2 = n1.virtual_scale<2> ();
+    ureal_t<6, -2> n1( (index(7)));
+    ureal_t<8, 0> n2 = n1.virtual_scale<2> ();
     std::cout << int(n2.count()) << std::endl;
     BOOST_TEST(n1.count() == 7);
   }
@@ -668,14 +668,14 @@ int main()
   // scale_up
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<6, -2> n1( (index(7)));
+    real_t<6, -2> n1( (index(7)));
     n1.scale_up<2> ();
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 28);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<6, -2> n1( (index(7)));
+    ureal_t<6, -2> n1( (index(7)));
     n1.scale_up<2> ();
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 28);
@@ -684,28 +684,28 @@ int main()
   // scale
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<6, -2> n1( (index(7)));
+    real_t<6, -2> n1( (index(7)));
     n1.scale<2, round::truncated> ();
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 28);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<6, -2> n1( (index(4)));
+    real_t<6, -2> n1( (index(4)));
     n1.scale<-2, round::truncated> ();
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<6, -2> n1( (index(7)));
+    ureal_t<6, -2> n1( (index(7)));
     n1.scale<2, round::truncated> ();
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 28);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<6, -2> n1( (index(4U)));
+    ureal_t<6, -2> n1( (index(4U)));
     n1.scale<-2, round::truncated> ();
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 1);
@@ -714,33 +714,33 @@ int main()
   // *=
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<6, -1, round::truncated> n1( (index(7)));
-    signed_number<6, -1, round::truncated> n2( (index(3)));
+    real_t<6, -1, round::truncated> n1( (index(7)));
+    real_t<6, -1, round::truncated> n2( (index(3)));
     n1 *= n2;
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 10); // The exact result 21/4 rounds to 10/2.
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<6, -1, round::truncated> n1( (index(7)));
-    unsigned_number<6, -1, round::truncated> n2( (index(3)));
+    real_t<6, -1, round::truncated> n1( (index(7)));
+    ureal_t<6, -1, round::truncated> n2( (index(3)));
     n1 *= n2;
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 10); // The exact result 21/4 rounds to 10/2.
   }
   //  {
   //    std::cout << __FILE__ << "[" <<__LINE__<<"]"<<std::endl;
-  //    unsigned_number<6,-1, round::truncated> n1((index(7)));
-  //    signed_number<6,-1, round::truncated> n2((index(3)));
+  //    ureal_t<6,-1, round::truncated> n1((index(7)));
+  //    real_t<6,-1, round::truncated> n2((index(3)));
   //    n1*=n2; // compile fails
   //    std::cout << int(n1.count()) << std::endl;
   //    BOOST_TEST(n1.count()==10); // The exact result 21/4 rounds to 10/2.
   //  }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    unsigned_number<6, -1, round::truncated> n1( (index(7)));
-    signed_number<6, -1, round::truncated> n2( (index(3)));
-    n1 *= number_cast<unsigned_number<6, -1, round::truncated> > (n2); // force cast
+    ureal_t<6, -1, round::truncated> n1( (index(7)));
+    real_t<6, -1, round::truncated> n2( (index(3)));
+    n1 *= number_cast<ureal_t<6, -1, round::truncated> > (n2); // force cast
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 10); // The exact result 21/4 rounds to 10/2.
   }
@@ -748,15 +748,15 @@ int main()
   // /=
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<3, -2, round::truncated> n1( (index(1)));
-    signed_number<3, -2, round::truncated> n2( (index(7)));
+    real_t<3, -2, round::truncated> n1( (index(1)));
+    real_t<3, -2, round::truncated> n2( (index(7)));
     n1 /= n2;
     BOOST_TEST(n1.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<3, -2, round::truncated> n1( (index(7)));
-    signed_number<3, -2, round::truncated> n2( (index(3)));
+    real_t<3, -2, round::truncated> n1( (index(7)));
+    real_t<3, -2, round::truncated> n2( (index(3)));
     n1 /= n2;
     std::cout << int(n1.count()) << std::endl;
     BOOST_TEST(n1.count() == 9); // 7*4/3
@@ -764,200 +764,200 @@ int main()
   // divide
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(1)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -2> n3 = divide<signed_number<3, -2, round::truncated> > (n1, n2);
+    real_t<2, -1> n1( (index(1)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -2> n3 = divide<real_t<3, -2, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(1)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -2> n3 = divide<signed_number<3, -2, round::negative> > (n1, n2);
+    real_t<2, -1> n1( (index(1)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -2> n3 = divide<real_t<3, -2, round::negative> > (n1, n2);
     BOOST_TEST(n3.count() == 0);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(1)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -2> n3 = divide<signed_number<3, -2, round::positive> > (n1, n2);
+    real_t<2, -1> n1( (index(1)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -2> n3 = divide<real_t<3, -2, round::positive> > (n1, n2);
     BOOST_TEST(n3.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -2> n2( (index(1)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::truncated> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -2> n2( (index(1)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 30);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -2> n2( (index(1)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::negative> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -2> n2( (index(1)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::negative> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 30);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -2> n2( (index(1)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::positive> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -2> n2( (index(1)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::positive> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 30);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(-15)));
-    signed_number<2, -2> n2( (index(1)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::negative> > (n1, n2);
+    real_t<2, -2> n1( (index(-15)));
+    real_t<2, -2> n2( (index(1)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::negative> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == -30);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(-15)));
-    signed_number<2, -2> n2( (index(1)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::positive> > (n1, n2);
+    real_t<2, -2> n1( (index(-15)));
+    real_t<2, -2> n2( (index(1)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::positive> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == -30);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::negative> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::negative> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 4);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::positive> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::positive> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 5);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(-15)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::negative> > (n1, n2);
+    real_t<2, -2> n1( (index(-15)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::negative> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == -5);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(-15)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::positive> > (n1, n2);
+    real_t<2, -2> n1( (index(-15)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::positive> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == -4);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -1> n2( (index(1)));
-    signed_number<4, -1> n3 = divide<signed_number<4, -1, round::truncated> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -1> n2( (index(1)));
+    real_t<4, -1> n3 = divide<real_t<4, -1, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 15);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -1> n2( (index(1)));
-    signed_number<4, 0> n3 = divide<signed_number<4, 0, round::truncated> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -1> n2( (index(1)));
+    real_t<4, 0> n3 = divide<real_t<4, 0, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 7);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -1> n2( (index(1)));
-    signed_number<4, 1> n3 = divide<signed_number<4, 1, round::truncated> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -1> n2( (index(1)));
+    real_t<4, 1> n3 = divide<real_t<4, 1, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 3);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -2> n1( (index(15)));
-    signed_number<2, -1> n2( (index(1)));
-    signed_number<4, 2> n3 = divide<signed_number<4, 2, round::truncated> > (n1, n2);
+    real_t<2, -2> n1( (index(15)));
+    real_t<2, -1> n2( (index(1)));
+    real_t<4, 2> n3 = divide<real_t<4, 2, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(1)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -6> n3 = divide<signed_number<3, -6, round::truncated> > (n1, n2);
+    real_t<2, -1> n1( (index(1)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -6> n3 = divide<real_t<3, -6, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 9);
   }
   {
-    unsigned_number<2, -1> n1( (index(1)));
-    unsigned_number<2, -2> n2( (index(7)));
-    unsigned_number<4, -6> n3 = divide<unsigned_number<4, -6, round::truncated> > (n1, n2);
+    ureal_t<2, -1> n1( (index(1)));
+    ureal_t<2, -2> n2( (index(7)));
+    ureal_t<4, -6> n3 = divide<ureal_t<4, -6, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 18);
   }
   {
-    signed_number<2, -1> n1( (index(1)));
-    unsigned_number<2, -2> n2( (index(7)));
-    signed_number<4, -6> n3 = divide<signed_number<4, -6, round::truncated> > (n1, n2);
+    real_t<2, -1> n1( (index(1)));
+    ureal_t<2, -2> n2( (index(7)));
+    real_t<4, -6> n3 = divide<real_t<4, -6, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 18);
   }
   {
-    unsigned_number<2, -1> n1( (index(1)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<4, -6> n3 = divide<signed_number<4, -6, round::truncated> > (n1, n2);
+    ureal_t<2, -1> n1( (index(1)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<4, -6> n3 = divide<real_t<4, -6, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 18);
   }
   {
-    unsigned_number<2, -1> n1( (index(1)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<4, -3> n3 = n1 / n2;
+    ureal_t<2, -1> n1( (index(1)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<4, -3> n3 = n1 / n2;
     BOOST_TEST(n3.count() == 2);
   }
   {
-    signed_number<2, -1> n1( (index(1)));
-    signed_number<2, -2> n2( (index(7)));
-    signed_number<6, -3> n3 = divide<signed_number<6, -3, round::truncated> > (n1, n2);
+    real_t<2, -1> n1( (index(1)));
+    real_t<2, -2> n2( (index(7)));
+    real_t<6, -3> n3 = divide<real_t<6, -3, round::truncated> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 2);
   }
   {
-    signed_number<2, -1> n1( (index(-1)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -6> n3 = divide<signed_number<3, -6, round::truncated> > (n1, n2);
+    real_t<2, -1> n1( (index(-1)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -6> n3 = divide<real_t<3, -6, round::truncated> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == -9);
   }
   {
-    signed_number<2, -1> n1( (index(1)));
-    signed_number<2, -1> n2( (index(7)));
-    signed_number<3, -3, round::negative> n3 = n1 / n2;
+    real_t<2, -1> n1( (index(1)));
+    real_t<2, -1> n2( (index(7)));
+    real_t<3, -3, round::negative> n3 = n1 / n2;
     BOOST_TEST(n3.count() == 1);
   }
   {
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(1)));
-    signed_number<3, -6> n3 = divide<signed_number<3, -6, round::truncated> > (n1, n2);
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(1)));
+    real_t<3, -6> n3 = divide<real_t<3, -6, round::truncated> > (n1, n2);
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 7 * 64);
   }
   {
-    signed_number<4, 1> n1( (index(1)));
-    signed_number<4, 1> n2( (index(7)));
-    signed_number<3, -6> n3 = divide<signed_number<3, -6, round::truncated> > (n1, n2);
+    real_t<4, 1> n1( (index(1)));
+    real_t<4, 1> n2( (index(7)));
+    real_t<3, -6> n3 = divide<real_t<3, -6, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 9);
   }
   {
-    signed_number<4, 1> n1( (index(1)));
-    signed_number<4, 1> n2( (index(7)));
-    signed_number<3, -3> n3 = divide<signed_number<3, -3, round::truncated> > (n1, n2);
+    real_t<4, 1> n1( (index(1)));
+    real_t<4, 1> n2( (index(7)));
+    real_t<3, -3> n3 = divide<real_t<3, -3, round::truncated> > (n1, n2);
     BOOST_TEST(n3.count() == 1);
   }
   {
-    signed_number<4, 1> n1( (index(7)));
-    signed_number<4, 1> n2( (index(1)));
+    real_t<4, 1> n1( (index(7)));
+    real_t<4, 1> n2( (index(1)));
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     std::cout << int(n2.count()) << std::endl;
-    signed_number<3, -6> n3 = divide<signed_number<3, -6, round::truncated> > (n1, n2);
+    real_t<3, -6> n3 = divide<real_t<3, -6, round::truncated> > (n1, n2);
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     std::cout << int(n3.count()) << std::endl;
     BOOST_TEST(n3.count() == 7 * 64);
@@ -966,79 +966,79 @@ int main()
   // equal
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
     BOOST_TEST(n1 == n2);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -2> n2( (index(14)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -2> n2( (index(14)));
     BOOST_TEST(n1 == n2);
   }
   /////////////////////////////////////////////////////////////////
   // not_equal
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(1)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(1)));
     BOOST_TEST(n1 != n2);
   }
   /////////////////////////////////////////////////////////////////
   // gt
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(1)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(1)));
     BOOST_TEST(n1 > n2);
   }
   /////////////////////////////////////////////////////////////////
   // ge
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(1)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(1)));
     BOOST_TEST(n1 >= n2);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
     BOOST_TEST(n1 >= n2);
   }
   /////////////////////////////////////////////////////////////////
   // lt
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(1)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(1)));
     BOOST_TEST(n2 < n1);
   }
   // le
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(1)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(1)));
     BOOST_TEST(n2 <= n1);
   }
   //  {
-  //    unsigned_number<2,-1> n1((index(-7))); // assertion failed
+  //    ureal_t<2,-1> n1((index(-7))); // assertion failed
   //  }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<1, -2> n2( (index(1)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<1, -2> n2( (index(1)));
     BOOST_TEST(n2 <= n1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    signed_number<2, -1> n1( (index(7)));
-    signed_number<2, -1> n2( (index(7)));
+    real_t<2, -1> n1( (index(7)));
+    real_t<2, -1> n2( (index(7)));
     BOOST_TEST(n2 <= n1);
   }
   //  {
-  //    signed_number<32,-32> n; // compile fail
-  //    std::cout  << sizeof(signed_number<32,-32>::underlying_type) << std::endl;
+  //    real_t<32,-32> n; // compile fail
+  //    std::cout  << sizeof(real_t<32,-32>::underlying_type) << std::endl;
   //    std::cout  << ::std::numeric_limits<long>::digits << std::endl;
   //    std::cout  << (int)(sizeof(boost::long_long_type) * CHAR_BIT) << std::endl;
   //  }
@@ -1069,13 +1069,13 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    typedef unsigned_number<8, 0> T;
+    typedef ureal_t<8, 0> T;
     std::cout << T::min_index << std::endl;
     std::cout << T::max_index << std::endl;
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    typedef signed_number<8, 0> T;
+    typedef real_t<8, 0> T;
     std::cout << T::min_index << std::endl;
     std::cout << T::max_index << std::endl;
     std::cout << sizeof(long int) << std::endl;
@@ -1084,7 +1084,7 @@ int main()
   /////////////////////////////////////////////////////////////////
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    typedef signed_number<15, -16> fp_15__16; // Signed fixed-point values with 15 bits of integer part
+    typedef real_t<15, -16> fp_15__16; // Signed fixed-point values with 15 bits of integer part
     // and 16 bits of fractional part.
     fp_15__16 f1, f2;
     f1 = convert(1.2345); // Conversion from floating point.

@@ -22,7 +22,7 @@
 #include <boost/mpl/max.hpp>
 #include <boost/mpl/min.hpp>
 #include <boost/mpl/assert.hpp>
-#include <boost/type_traits/common_type.hpp>
+//#include <boost/type_traits/common_type.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -439,15 +439,15 @@ namespace boost
     }
 
     /**
-     * Namespace for optimization policies.
+     * Namespace for storage policies.
      */
-    namespace optimization
+    namespace storage
     {
 
       struct undefined
       {
         /**
-         * signed_integer_type: Gets the signed integer type with enough bits to manage with the Range and Resolution depending on the Opt
+         * signed_integer_type: Gets the signed integer type with enough bits to manage with the Range and Resolution depending on the F
          */
         template <int Range, int Resolution>
         struct signed_integer_type
@@ -456,7 +456,7 @@ namespace boost
         };
 
         /**
-         * unsigned_integer_type: Gets the unsigned integer type with enough bits to manage with the Range and Resolution depending on the Opt
+         * unsigned_integer_type: Gets the unsigned integer type with enough bits to manage with the Range and Resolution depending on the F
          */
         template <int Range, int Resolution>
         struct unsigned_integer_type
@@ -493,32 +493,86 @@ namespace boost
       };
     }
 
-    template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
-        typename Optimization = optimization::space>
-    class unsigned_number;
+
+    /**
+     * Namespace for conversion policies.
+     */
+    namespace conversion
+    {
+      struct explicitly
+      {
+      };
+      struct implicitly
+      {
+      };
+    }
+
+    /**
+     * Namespace for arithmetic operations policies.
+     */
+    namespace arithmetic
+    {
+      struct open
+      {
+      };
+      struct closed
+      {
+      };
+    }
+
+    /**
+     * Namespace for bounding policies.
+     */
+    namespace bound
+    {
+      struct bounded
+      {
+      };
+      struct unbounded
+      {
+      };
+    }
+
+    /**
+     * Namespace for bounding policies.
+     */
+    namespace family
+    {
+      struct f1
+      {
+        typedef storage::space storage_type;
+        typedef conversion::explicitly conversion_type;
+        typedef arithmetic::open arithmetic_type;
+        typedef bound::bounded bound_type;
+      };
+    }
 
     template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
-        typename Optimization = optimization::space>
-    class signed_number;
+        typename Family = family::f1>
+    class ureal_t;
 
-    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
-        typename OP2, typename Opt2>
-    inline Res
-    divide(signed_number<R1, P1, RP1, OP1, Opt1> const& lhs, signed_number<R2, P2, RP2, OP2, Opt2> const& rhs);
-    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
-        typename OP2, typename Opt2>
-    inline Res
-    divide(signed_number<R1, P1, RP1, OP1, Opt1> const& lhs, signed_number<R2, P2, RP2, OP2, Opt2> const& rhs);
+    template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
+        typename Family = family::f1>
+    class real_t;
 
-    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
-        typename OP2, typename Opt2>
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename F1, int R2, int P2, typename RP2,
+        typename OP2, typename F2>
     inline Res
-    divide(signed_number<R1, P1, RP1, OP1, Opt1> const& lhs, unsigned_number<R2, P2, RP2, OP2, Opt2> const& rhs);
+    divide(real_t<R1, P1, RP1, OP1, F1> const& lhs, real_t<R2, P2, RP2, OP2, F2> const& rhs);
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename F1, int R2, int P2, typename RP2,
+        typename OP2, typename F2>
+    inline Res
+    divide(real_t<R1, P1, RP1, OP1, F1> const& lhs, real_t<R2, P2, RP2, OP2, F2> const& rhs);
 
-    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
-        typename OP2, typename Opt2>
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename F1, int R2, int P2, typename RP2,
+        typename OP2, typename F2>
     inline Res
-    divide(unsigned_number<R1, P1, RP1, OP1, Opt1> const& lhs, signed_number<R2, P2, RP2, OP2, Opt2> const& rhs);
+    divide(real_t<R1, P1, RP1, OP1, F1> const& lhs, ureal_t<R2, P2, RP2, OP2, F2> const& rhs);
+
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename F1, int R2, int P2, typename RP2,
+        typename OP2, typename F2>
+    inline Res
+    divide(ureal_t<R1, P1, RP1, OP1, F1> const& lhs, real_t<R2, P2, RP2, OP2, F2> const& rhs);
 
   }
 }
@@ -529,8 +583,8 @@ namespace boost
 
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
 
-BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::signed_number, (int)(int)(typename)(typename)(typename))
-BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::unsigned_number, (int)(int)(typename)(typename)(typename))
+BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::real_t, (int)(int)(typename)(typename)(typename))
+BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::ureal_t, (int)(int)(typename)(typename)(typename))
 
 #endif
 
@@ -612,21 +666,21 @@ namespace boost
 
       };
 
-      //      template <int Range, int Resolution, typename Optimization=optimization::space>
+      //      template <int Range, int Resolution, typename Family=family::space>
       //      class signed_uniform_quantizer
       //      {
       //        BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
       //      public:
       //
       //        //! The underlying integer type
-      //        typedef typename Optimization::template  signed_integer_type<Range,Resolution>::type underlying_type;
+      //        typedef typename Family::template  signed_integer_type<Range,Resolution>::type underlying_type;
       //
       //        // name the template parameters
       //        BOOST_STATIC_CONSTEXPR int range_exp = Range;
       //        BOOST_STATIC_CONSTEXPR int resolution_exp = Resolution;
       //        BOOST_STATIC_CONSTEXPR int digits = range_exp-resolution_exp+1;
       //
-      //        typedef Optimization optimization_type;
+      //        typedef Family family_type;
       //
       //        BOOST_STATIC_CONSTEXPR underlying_type min_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_min;
       //        BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
@@ -647,11 +701,11 @@ namespace boost
       //
       //
       //      template <typename Final, int Range, int Resolution, typename Rounding=round::negative, typename Overflow=overflow::exception,
-      //          typename Optimization=optimization::space
+      //          typename Family=family::space
       //          >
-      //      class signed_quantizer : public signed_uniform_quantizer<Range,Resolution,Optimization>
+      //      class signed_quantizer : public signed_uniform_quantizer<Range,Resolution,Family>
       //      {
-      //        typedef signed_uniform_quantizer<Range,Resolution,Optimization> base_type;
+      //        typedef signed_uniform_quantizer<Range,Resolution,Family> base_type;
       //      public:
       //        typedef typename base_type::underlying_type underlying_type;
       //        BOOST_STATIC_CONSTEXPR underlying_type min_index = base_type::const_min;
@@ -691,15 +745,15 @@ namespace boost
 
       // LE_Range=true GE_Resolution=true
       ///////////////////////////////////
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       true, true >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -708,15 +762,15 @@ namespace boost
           return To(index(underlying_type(rhs.count()) << (P1-P2)));
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       true, true >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -725,15 +779,15 @@ namespace boost
           return To(index(underlying_type(rhs.count()) << (P1-P2)));
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       true, true >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -743,15 +797,15 @@ namespace boost
         }
       };
 
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       true, true >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -777,15 +831,15 @@ namespace boost
 
       // LE_Range=false GE_Resolution=true
       ////////////////////////////////////
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       false, true >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -819,15 +873,15 @@ namespace boost
           );
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       false, true >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -860,15 +914,15 @@ namespace boost
           );
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       false, true >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -892,15 +946,15 @@ namespace boost
           );
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       false, true >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -928,15 +982,15 @@ namespace boost
 
       // LE_Range=true GE_Resolution=false
       ////////////////////////////////////
-      template <int R, int P1, typename RP1, typename OP1, typename Opt1,
-      int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R, int P1, typename RP1, typename OP1, typename F1,
+      int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R,P1,RP1,OP1,Opt1>,
-      signed_number<R,P2,RP2,OP2,Opt2>,
+      real_t<R,P1,RP1,OP1,F1>,
+      real_t<R,P2,RP2,OP2,F2>,
       true, false >
       {
-        typedef signed_number<R,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R,P1,RP1,OP1,F1> From;
+        typedef real_t<R,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -969,15 +1023,15 @@ namespace boost
           );
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       true, false >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -991,15 +1045,15 @@ namespace boost
 
       ////
 
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       true, false >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1032,15 +1086,15 @@ namespace boost
       };
 
       ////
-      template <int R, int P1, typename RP1, typename OP1, typename Opt1,
-      int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R, int P1, typename RP1, typename OP1, typename F1,
+      int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R,P1,RP1,OP1,Opt1>,
-      signed_number<R,P2,RP2,OP2,Opt2>,
+      ureal_t<R,P1,RP1,OP1,F1>,
+      real_t<R,P2,RP2,OP2,F2>,
       true, false >
       {
-        typedef unsigned_number<R,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R,P1,RP1,OP1,F1> From;
+        typedef real_t<R,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1064,15 +1118,15 @@ namespace boost
 
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       true, false >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1086,15 +1140,15 @@ namespace boost
 
       ////
 
-      template <int R, int P1, typename RP1, typename OP1, typename Opt1,
-      int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R, int P1, typename RP1, typename OP1, typename F1,
+      int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R,P1,RP1,OP1,Opt1>,
-      unsigned_number<R,P2,RP2,OP2,Opt2>,
+      ureal_t<R,P1,RP1,OP1,F1>,
+      ureal_t<R,P2,RP2,OP2,F2>,
       true, false >
       {
-        typedef unsigned_number<R,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1118,15 +1172,15 @@ namespace boost
 
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       true, false >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1141,15 +1195,15 @@ namespace boost
       // LE_Range=false GE_Resolution=false
       /////////////////////////////////////
 
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       false, false >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1181,15 +1235,15 @@ namespace boost
 
         }
       };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      signed_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      real_t<R2,P2,RP2,OP2,F2>,
       false, false >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1214,15 +1268,15 @@ namespace boost
         }
       };
 
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      signed_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      real_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       false, false >
       {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef real_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1256,15 +1310,15 @@ namespace boost
         }
       };
 
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      template <int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2>
       struct number_cast<
-      unsigned_number<R1,P1,RP1,OP1,Opt1>,
-      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      ureal_t<R1,P1,RP1,OP1,F1>,
+      ureal_t<R2,P2,RP2,OP2,F2>,
       false, false >
       {
-        typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef ureal_t<R1,P1,RP1,OP1,F1> From;
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
         typedef typename To::underlying_type underlying_type;
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
@@ -1295,155 +1349,164 @@ namespace boost
           );
 
         }
+      };
+      template <typename T, typename U >
+      struct default_type_impl;
+      template <typename T>
+      struct default_type_impl<T,T>
+      {
+        typedef T type;
       };
 
     } // namespace detail
-  } // namespace fixed_point
+
+    template <typename T, typename U >
+    struct default_type
+    {
+      typedef typename detail::default_type_impl<T,U>::type type;
+    };
 
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-  // common_type trait specializations
+  // default_type trait specializations
 
   template <>
-  struct common_type<fixed_point::overflow::undefined, fixed_point::overflow::modulus>
+  struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::modulus>
   {
     typedef fixed_point::overflow::modulus type;
   };
   template <>
-  struct common_type<fixed_point::overflow::modulus, fixed_point::overflow::undefined>
+  struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::undefined>
   {
     typedef fixed_point::overflow::modulus type;
   };
 
   template <>
-  struct common_type<fixed_point::overflow::saturate, fixed_point::overflow::undefined>
+  struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::undefined>
   {
     typedef fixed_point::overflow::saturate type;
   };
   template <>
-  struct common_type<fixed_point::overflow::undefined, fixed_point::overflow::saturate>
+  struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::saturate>
   {
     typedef fixed_point::overflow::saturate type;
   };
 
   template <>
-  struct common_type<fixed_point::overflow::saturate, fixed_point::overflow::modulus>
+  struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::modulus>
   {
     typedef fixed_point::overflow::exception type;
   };
   template <>
-  struct common_type<fixed_point::overflow::modulus, fixed_point::overflow::saturate>
+  struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::saturate>
   {
     typedef fixed_point::overflow::exception type;
   };
   template <>
-  struct common_type<fixed_point::overflow::exception, fixed_point::overflow::exception>
+  struct default_type<fixed_point::overflow::exception, fixed_point::overflow::exception>
   {
     typedef fixed_point::overflow::exception type;
   };
   template <typename Overflow>
-  struct common_type<fixed_point::overflow::exception, Overflow>
+  struct default_type<fixed_point::overflow::exception, Overflow>
   {
     typedef fixed_point::overflow::exception type;
   };
   template <typename Overflow>
-  struct common_type<Overflow,fixed_point::overflow::exception>
+  struct default_type<Overflow,fixed_point::overflow::exception>
   {
     typedef fixed_point::overflow::exception type;
   };
 
   template <>
-  struct common_type<fixed_point::overflow::impossible, fixed_point::overflow::impossible>
+  struct default_type<fixed_point::overflow::impossible, fixed_point::overflow::impossible>
   {
     typedef fixed_point::overflow::impossible type;
   };
   template <typename Overflow>
-  struct common_type<fixed_point::overflow::impossible, Overflow>
+  struct default_type<fixed_point::overflow::impossible, Overflow>
   {
     typedef Overflow type;
   };
   template <typename Overflow>
-  struct common_type<Overflow,fixed_point::overflow::impossible>
+  struct default_type<Overflow,fixed_point::overflow::impossible>
   {
     typedef Overflow type;
   };
 
   template <>
-  struct common_type<fixed_point::round::truncated,fixed_point::round::truncated>
+  struct default_type<fixed_point::round::truncated,fixed_point::round::truncated>
   {
     typedef fixed_point::round::truncated type;
   };
   template <typename Round>
-  struct common_type<Round,fixed_point::round::truncated>
+  struct default_type<Round,fixed_point::round::truncated>
   {
     typedef fixed_point::round::truncated type;
   };
   template <typename Round>
-  struct common_type<fixed_point::round::truncated,Round>
+  struct default_type<fixed_point::round::truncated,Round>
   {
     typedef fixed_point::round::truncated type;
   };
 
-  template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-  int R2, int P2, typename RP2, typename OP2, typename Opt2>
-  struct common_type<
-  fixed_point::unsigned_number<R1,P1,RP1,OP1,Opt1>,
-  fixed_point::unsigned_number<R2,P2,RP2,OP2,Opt2> >
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct default_type<
+  fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
   {
-    typedef fixed_point::unsigned_number<
+    typedef fixed_point::ureal_t<
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
     > type;
   };
 
-  template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-  int R2, int P2, typename RP2, typename OP2, typename Opt2>
-  struct common_type<
-  fixed_point::signed_number<R1,P1,RP1,OP1,Opt1>,
-  fixed_point::signed_number<R2,P2,RP2,OP2,Opt2> >
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct default_type<
+  fixed_point::real_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::real_t<R2,P2,RP2,OP2,F2> >
   {
-    typedef fixed_point::signed_number<
+    typedef fixed_point::real_t<
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
     > type;
   };
-  template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-  int R2, int P2, typename RP2, typename OP2, typename Opt2>
-  struct common_type<
-  fixed_point::signed_number<R1,P1,RP1,OP1,Opt1>,
-  fixed_point::unsigned_number<R2,P2,RP2,OP2,Opt2> >
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct default_type<
+  fixed_point::real_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
   {
-    typedef fixed_point::signed_number<
+    typedef fixed_point::real_t<
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
     > type;
   };
-  template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-  int R2, int P2, typename RP2, typename OP2, typename Opt2>
-  struct common_type<
-  fixed_point::unsigned_number<R1,P1,RP1,OP1,Opt1>,
-  fixed_point::signed_number<R2,P2,RP2,OP2,Opt2> >
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct default_type<
+  fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::real_t<R2,P2,RP2,OP2,F2> >
   {
-    typedef fixed_point::signed_number<
+    typedef fixed_point::real_t<
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
     > type;
   };
 #endif
-
-  namespace fixed_point
-  {
 
     /**
      * @brief Signed fixed point number.
@@ -1453,24 +1516,17 @@ namespace boost
      * @Param{Resolution,resolution specified by an integer. The resolution of a fractional number x is 2^Resolution.}
      * @Param{Rounding,The rounding policy.}
      * @Param{Overflow,The overflow policy.}
-     * @Param{Optimization,The optimization policy.}
+     * @Param{Family,The family traits.}
      *
-     * @Example For example, signed_number<8,-4> has values n such that -256 < n < 256 in increments of 2^(-4) = 1/16.
+     * @Example For example, real_t<8,-4> has values n such that -256 < n < 256 in increments of 2^(-4) = 1/16.
      */
-    template <int Range, int Resolution, typename Rounding, typename Overflow, typename Optimization>
-    class signed_number
+    template <int Range, int Resolution, typename Rounding, typename Overflow, typename Family>
+    class real_t
     {
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
       BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
 #endif
     public:
-
-      //! The underlying integer type
-      typedef typename Optimization::template signed_integer_type<Range,Resolution>::type underlying_type;
-#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution+1), UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
-      BOOST_MPL_ASSERT_MSG(boost::is_signed<underlying_type>::value, UNDERLYING_TYPE_MUST_BE_SIGNED, (underlying_type));
-#endif
 
       // name the template parameters
       //! the Range parameter.
@@ -1481,8 +1537,16 @@ namespace boost
       typedef Rounding rounding_type;
       //! the Overflow parameter.
       typedef Overflow overflow_type;
-      //! the Optimization parameter.
-      typedef Optimization optimization_type;
+      //! the Family parameter.
+      typedef Family family_type;
+
+      //! The underlying integer type
+      typedef typename Family::storage_type storage_type;
+      typedef typename storage_type::template signed_integer_type<Range,Resolution>::type underlying_type;
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution+1), UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
+      BOOST_MPL_ASSERT_MSG(boost::is_signed<underlying_type>::value, UNDERLYING_TYPE_MUST_BE_SIGNED, (underlying_type));
+#endif
 
       //! whether the tyoe is signed (always true).
       BOOST_STATIC_CONSTEXPR bool is_signed = true;
@@ -1498,17 +1562,17 @@ namespace boost
       /**
        * Default constructor.
        */
-      BOOST_CONSTEXPR signed_number()
+      BOOST_CONSTEXPR real_t()
       {} // = default;
       /**
        * Copy constructor.
        */
-      BOOST_CONSTEXPR signed_number(signed_number const& rhs) : value_(rhs.value_)
+      BOOST_CONSTEXPR real_t(real_t const& rhs) : value_(rhs.value_)
       {} // = default;
 
-      //! Implicit constructor from a signed_number with no larger range and no better resolution
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      signed_number(signed_number<R,P,RP,OP,Opt> const& rhs
+      //! Implicit constructor from a real_t with no larger range and no better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      real_t(real_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -1516,12 +1580,12 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number, true, true>()(rhs).count())
+      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
       }
-      //! Implicit constructor from a unsigned_number with no larger range and no better resolution
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      signed_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
+      //! Implicit constructor from a ureal_t with no larger range and no better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      real_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -1529,13 +1593,13 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number, true, true>()(rhs).count())
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
       }
 
-      //! explicit constructor from a signed_number with larger range or better resolution
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      explicit signed_number(signed_number<R,P,RP,OP,Opt> const& rhs
+      //! explicit constructor from a real_t with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      explicit real_t(real_t<R,P,RP,OP,F> const& rhs
           , typename boost::disable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -1543,15 +1607,15 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number,
+      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
       {
       }
-      //! explicit constructor from a signed_number with larger range or better resolution
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      explicit signed_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
+      //! explicit constructor from a real_t with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      explicit real_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::disable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -1559,16 +1623,16 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number,
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
       {
       }
 
-      //! implicit constructor from a signed_number with larger range or better resolution when wrapped by a convert_tag.
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      signed_number(convert_tag<signed_number<R,P,RP,OP,Opt> > rhs
+      //! implicit constructor from a real_t with larger range or better resolution when wrapped by a convert_tag.
+      template <int R, int P, typename RP, typename OP, typename F>
+      real_t(convert_tag<real_t<R,P,RP,OP,F> > rhs
           , typename boost::disable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -1576,15 +1640,15 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number,
+      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs.get()).count())
       {
       }
-      //! implicit constructor from a unsigned_number with larger range or better resolution when wrapped by a convert_tag.
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      signed_number(convert_tag<unsigned_number<R,P,RP,OP,Opt> > rhs
+      //! implicit constructor from a ureal_t with larger range or better resolution when wrapped by a convert_tag.
+      template <int R, int P, typename RP, typename OP, typename F>
+      real_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs
           , typename boost::disable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -1592,7 +1656,7 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number,
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs.get()).count())
@@ -1600,7 +1664,7 @@ namespace boost
       }
 
       //! destructor
-      //~signed_number() {} //= default;
+      //~real_t() {} //= default;
 
 
       /**
@@ -1612,7 +1676,7 @@ namespace boost
        * @Requires <c>min_index<=i<=max_index</c>.
        */
       template <typename UT>
-      BOOST_CONSTEXPR explicit signed_number(index_tag<UT> i) : value_(i.get())
+      BOOST_CONSTEXPR explicit real_t(index_tag<UT> i) : value_(i.get())
       {
 #if defined(BOOST_NO_CONSTEXPR)
         BOOST_ASSERT(i.get()>=min_index);
@@ -1633,23 +1697,23 @@ namespace boost
       /**
        * @Returns the absolute zero.
        */
-      static BOOST_CONSTEXPR signed_number zero()
+      static BOOST_CONSTEXPR real_t zero()
       {
-        return signed_number(index(0));
+        return real_t(index(0));
       }
       /**
        * @Returns the minimal value that can be represented.
        */
-      static BOOST_CONSTEXPR signed_number min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+      static BOOST_CONSTEXPR real_t min BOOST_PREVENT_MACRO_SUBSTITUTION ()
       {
-        return signed_number(index(min_index));
+        return real_t(index(min_index));
       }
       /**
        * @Returns the maximal value that can be represented.
        */
-      static BOOST_CONSTEXPR signed_number max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+      static BOOST_CONSTEXPR real_t max BOOST_PREVENT_MACRO_SUBSTITUTION ()
       {
-        return signed_number(index(max_index));
+        return real_t(index(max_index));
       }
 
       /**
@@ -1761,35 +1825,35 @@ namespace boost
       }
 
       //! implicit conversion from int
-      explicit signed_number(int x) : value_(detail::shift_left<-Resolution>(x))
+      explicit real_t(int x) : value_(detail::shift_left<-Resolution>(x))
       {}
       //! implicit conversion from float
-      explicit signed_number(float x) : value_(classify(x))
+      explicit real_t(float x) : value_(classify(x))
       {}
       //! implicit conversion from double
-      explicit signed_number(double x) : value_(classify(x))
+      explicit real_t(double x) : value_(classify(x))
       {}
       //! implicit conversion from long double
-      explicit signed_number(long double x) : value_(classify(x))
+      explicit real_t(long double x) : value_(classify(x))
       {}
 
       //! implicit conversion from int
-      signed_number(convert_tag<int> x) : value_(detail::shift_left<-Resolution>(x.get()))
+      real_t(convert_tag<int> x) : value_(detail::shift_left<-Resolution>(x.get()))
       {}
       //! implicit conversion from float
-      signed_number(convert_tag<float> x) : value_(classify(x.get()))
+      real_t(convert_tag<float> x) : value_(classify(x.get()))
       {}
       //! implicit conversion from double
-      signed_number(convert_tag<double> x) : value_(classify(x.get()))
+      real_t(convert_tag<double> x) : value_(classify(x.get()))
       {}
       //! implicit conversion from long double
-      signed_number(convert_tag<long double> x) : value_(classify(x.get()))
+      real_t(convert_tag<long double> x) : value_(classify(x.get()))
       {}
 
       template <typename T>
-      signed_number& operator=(convert_tag<T> v)
+      real_t& operator=(convert_tag<T> v)
       {
-        *this=signed_number(v);
+        *this=real_t(v);
         return *this;
       }
 
@@ -1798,24 +1862,24 @@ namespace boost
       /**
        * @Returns this instance.
        */
-      signed_number operator+() const
+      real_t operator+() const
       {
         return *this;
       }
       /**
        * @Returns a new instance with the representation negated.
        */
-      signed_number operator-() const
+      real_t operator-() const
       {
         // As the range is symmetric the type is preserved
-        return signed_number(index(-value_));
+        return real_t(index(-value_));
       }
 
       /**
        * @Effects Pre-increase this instance as if <c>*this+=1</c>
        * @Returns this instance.
        */
-      signed_number& operator++()
+      real_t& operator++()
       {
         *this+=convert(1);
         return *this;
@@ -1825,9 +1889,9 @@ namespace boost
        * @Effects Post-increase this instance as if <c>*this+=1</c>
        * @Returns a copy of this instance before increasing it.
        */
-      signed_number operator++(int)
+      real_t operator++(int)
       {
-        signed_number tmp=*this;
+        real_t tmp=*this;
         *this+=convert(1);
         return tmp;
       }
@@ -1836,7 +1900,7 @@ namespace boost
        * @Effects Pre-decrease this instance as if <c>*this-=1</c>
        * @Returns this instance.
        */
-      signed_number& operator--()
+      real_t& operator--()
       {
         *this-=convert(1);
         return *this;
@@ -1846,57 +1910,57 @@ namespace boost
        * @Effects Post-decrease this instance as if <c>*this-=1</c>
        * @Returns a copy of this instance before decreasing it.
        */
-      signed_number operator--(int)
+      real_t operator--(int)
       {
-        signed_number tmp=*this;
+        real_t tmp=*this;
         *this-=convert(1);
         return tmp;
       }
 
       /**
-       * @Effects As if <c>number_cast<signed_number>(*this+rhs)</c>
+       * @Effects As if <c>number_cast<real_t>(*this+rhs)</c>
        * @Returns this instance.
        * @Throws Any exception the Overflow policy can throw.
        */
-      signed_number& operator += (signed_number const& rhs)
+      real_t& operator += (real_t const& rhs)
       {
-        signed_number tmp = number_cast<signed_number>(*this+rhs);
+        real_t tmp = number_cast<real_t>(*this+rhs);
         value_ = tmp.count();
         return *this;
       }
 
       /**
-       * @Effects As if <c>number_cast<signed_number>(*this-rhs)</c>
+       * @Effects As if <c>number_cast<real_t>(*this-rhs)</c>
        * @Returns this instance.
        * @Throws Any exception the Overflow policy can throw.
        */
-      signed_number& operator-=(const signed_number& rhs)
+      real_t& operator-=(const real_t& rhs)
       {
-        signed_number tmp = number_cast<signed_number>(*this-rhs);
+        real_t tmp = number_cast<real_t>(*this-rhs);
         value_ = tmp.count();
         return *this;
       }
 
       /**
-       * @Effects As if <c>number_cast<signed_number>(*this*rhs)</c>
+       * @Effects As if <c>number_cast<real_t>(*this*rhs)</c>
        * @Returns this instance.
        * @Throws Any exception the Overflow policy can throw.
        */
-      signed_number& operator*=(const signed_number& rhs)
+      real_t& operator*=(const real_t& rhs)
       {
-        signed_number tmp = number_cast<signed_number>((*this) * rhs);
+        real_t tmp = number_cast<real_t>((*this) * rhs);
         value_ = tmp.count();
         return *this;
       }
 
       /**
-       * @Effects As if <c>divide<signed_number>(*this,rhs)</c>
+       * @Effects As if <c>divide<real_t>(*this,rhs)</c>
        * @Returns this instance.
        * @Throws Any exception the Overflow policy can throw.
        */
-      signed_number& operator/=(const signed_number& rhs)
+      real_t& operator/=(const real_t& rhs)
       {
-        signed_number tmp = divide<signed_number>(*this , rhs);
+        real_t tmp = divide<real_t>(*this , rhs);
         value_ = tmp.count();
         return *this;
       }
@@ -1907,10 +1971,10 @@ namespace boost
        * @Returns a new instance with the same data representation and with the range and resolution increased by @c N.
        */
       template <unsigned N>
-      signed_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>
+      real_t<Range+N, Resolution+N, Rounding, Overflow, Family>
       virtual_scale() const
       {
-        return signed_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>(index(count()));
+        return real_t<Range+N, Resolution+N, Rounding, Overflow, Family>(index(count()));
       }
 
       /**
@@ -1939,9 +2003,9 @@ namespace boost
         }
         else
         {
-          signed_number tmp=
-          divide<signed_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
-              signed_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
+          real_t tmp=
+          divide<real_t<Range, Resolution, RP, Overflow, Family> >(*this,
+              real_t<-N+1, -N, Rounding, Overflow, Family>(index(1)));
           value_ = tmp.count();
         }
       }
@@ -1959,24 +2023,16 @@ namespace boost
      * @Param{Resolution,resolution specified by an integer. The resolution of a fractional number x is 2^Resolution.}
      * @Param{Rounding,The rounding policy.}
      * @Param{Overflow,The overflow policy.}
-     * @Param{Optimization,The optimization policy.}
+     * @Param{Family,The family policy.}
      */
-    template <int Range, int Resolution, typename Rounding, typename Overflow, typename Optimization>
-    class unsigned_number
+    template <int Range, int Resolution, typename Rounding, typename Overflow, typename Family>
+    class ureal_t
     {
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
       BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
 #endif
 
     public:
-
-      //! The underlying integer type
-      typedef typename Optimization::template unsigned_integer_type<Range,Resolution>::type underlying_type;
-
-#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution), UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
-      BOOST_MPL_ASSERT_MSG(!boost::is_signed<underlying_type>::value, UNDERLYING_TYPE_MUST_BE_UNSIGNED, (underlying_type));
-#endif
 
       // name the template parameters
       //! the Range parameter.
@@ -1987,8 +2043,18 @@ namespace boost
       typedef Rounding rounding_type;
       //! the Overflow parameter.
       typedef Overflow overflow_type;
-      //! the Optimization parameter.
-      typedef Optimization optimization_type;
+      //! the Family parameter.
+      typedef Family family_type;
+
+      //! The underlying integer type
+      typedef typename Family::storage_type storage_type;
+      typedef typename storage_type::template unsigned_integer_type<Range,Resolution>::type underlying_type;
+
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution), UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
+      BOOST_MPL_ASSERT_MSG(!boost::is_signed<underlying_type>::value, UNDERLYING_TYPE_MUST_BE_UNSIGNED, (underlying_type));
+#endif
+
 
       //! whether the tyoe is signed (always @c false).
       BOOST_STATIC_CONSTEXPR bool is_signed = false;
@@ -2003,18 +2069,18 @@ namespace boost
       /**
        * Default constructor.
        */
-      BOOST_CONSTEXPR unsigned_number()
+      BOOST_CONSTEXPR ureal_t()
       {} // = default;
       /**
        * Copy constructor.
        */
-      BOOST_CONSTEXPR unsigned_number(unsigned_number const& rhs) : value_(rhs.value_)
+      BOOST_CONSTEXPR ureal_t(ureal_t const& rhs) : value_(rhs.value_)
       {} // = default;
 
 
-      //! implicit constructor from a unsigned_number with no larger range and no better resolution
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      unsigned_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
+      //! implicit constructor from a ureal_t with no larger range and no better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -2022,13 +2088,13 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number, true, true>()(rhs).count())
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t, true, true>()(rhs).count())
       {
       }
 
-      //! explicit constructor from a unsigned_number with larger range or better resolution
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      explicit unsigned_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
+      //! explicit constructor from a ureal_t with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      explicit ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::disable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -2036,16 +2102,16 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number,
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
       {
       }
 
-      //! implicit constructor from a unsigned_number with larger range or better resolution
-      template <int R, int P, typename RP, typename OP, typename Opt>
-      unsigned_number(convert_tag<unsigned_number<R,P,RP,OP,Opt> > rhs
+      //! implicit constructor from a ureal_t with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      ureal_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs
           , typename boost::disable_if <
           mpl::and_ <
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
@@ -2053,7 +2119,7 @@ namespace boost
           >
           >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number,
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs.get()).count())
@@ -2061,7 +2127,7 @@ namespace boost
       }
 
       //! destructor
-      //~unsigned_number() {} //= default;
+      //~ureal_t() {} //= default;
 
 
       /**
@@ -2073,7 +2139,7 @@ namespace boost
        * @Requires <c>0<=i<=max_index</c>.
        */
       template <typename UT>
-      explicit unsigned_number(index_tag<UT> i) : value_(i.get())
+      explicit ureal_t(index_tag<UT> i) : value_(i.get())
       {
         //BOOST_ASSERT(i.get()>=min_index);
         BOOST_ASSERT(i.get()<=max_index);
@@ -2092,25 +2158,25 @@ namespace boost
       /**
        * @Returns the absolute zero.
        */
-      static BOOST_CONSTEXPR unsigned_number zero()
+      static BOOST_CONSTEXPR ureal_t zero()
       {
-        return unsigned_number(index(0));
+        return ureal_t(index(0));
       }
 
       /**
        * @Returns the minimal value that can be represented.
        */
-      static BOOST_CONSTEXPR unsigned_number min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+      static BOOST_CONSTEXPR ureal_t min BOOST_PREVENT_MACRO_SUBSTITUTION ()
       {
-        return unsigned_number(index(min_index));
+        return ureal_t(index(min_index));
       }
 
       /**
        * @Returns the maximal value that can be represented.
        */
-      static BOOST_CONSTEXPR unsigned_number max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+      static BOOST_CONSTEXPR ureal_t max BOOST_PREVENT_MACRO_SUBSTITUTION ()
       {
-        return unsigned_number(index(max_index));
+        return ureal_t(index(max_index));
       }
 
       /**
@@ -2149,37 +2215,37 @@ namespace boost
       }
 
       //! implicit conversion from int
-      explicit unsigned_number(unsigned int x) : value_(detail::shift_left<-Resolution>(x))
+      explicit ureal_t(unsigned int x) : value_(detail::shift_left<-Resolution>(x))
       {}
 
       //! implicit conversion from float
-      explicit unsigned_number(float x) : value_(classify(x))
+      explicit ureal_t(float x) : value_(classify(x))
       {}
       //! implicit conversion from double
-      explicit unsigned_number(double x) : value_(classify(x))
+      explicit ureal_t(double x) : value_(classify(x))
       {}
       //! implicit conversion from long double
-      explicit unsigned_number(long double x) : value_(classify(x))
+      explicit ureal_t(long double x) : value_(classify(x))
       {}
 
       //! implicit conversion from int
-      unsigned_number(convert_tag<unsigned int> x) : value_(detail::shift_left<-Resolution>(x.get()))
+      ureal_t(convert_tag<unsigned int> x) : value_(detail::shift_left<-Resolution>(x.get()))
       {}
 
       //! implicit conversion from float
-      unsigned_number(convert_tag<float> x) : value_(classify(x.get()))
+      ureal_t(convert_tag<float> x) : value_(classify(x.get()))
       {}
       //! implicit conversion from double
-      unsigned_number(convert_tag<double> x) : value_(classify(x.get()))
+      ureal_t(convert_tag<double> x) : value_(classify(x.get()))
       {}
       //! implicit conversion from long double
-      unsigned_number(convert_tag<long double> x) : value_(classify(x.get()))
+      ureal_t(convert_tag<long double> x) : value_(classify(x.get()))
       {}
 
       template <typename T>
-      unsigned_number& operator=(convert_tag<T> v)
+      ureal_t& operator=(convert_tag<T> v)
       {
-        *this=unsigned_number(v);
+        *this=ureal_t(v);
         return *this;
       }
 
@@ -2239,24 +2305,24 @@ namespace boost
       /**
        * @Returns this instance.
        */
-      unsigned_number operator+() const
+      ureal_t operator+() const
       {
         return *this;
       }
       /**
        * @Returns an instance of a signed fixed point nummber with the representation the negation of the representation of this.
        */
-      signed_number<Range,Resolution,Rounding,Overflow,Optimization>
+      real_t<Range,Resolution,Rounding,Overflow,Family>
       operator-() const
       {
-        return signed_number<Range,Resolution,Rounding,Overflow,Optimization>(index(-value_));
+        return real_t<Range,Resolution,Rounding,Overflow,Family>(index(-value_));
       }
 
       /**
        * @Effects Pre-increase this instance as if <c>*this+=1</c>
        * @Returns <c>*this</c>.
        */
-      unsigned_number& operator++()
+      ureal_t& operator++()
       {
         *this+=convert(1u);
         return *this;
@@ -2265,9 +2331,9 @@ namespace boost
        * @Effects Post-increase this instance as if <c>*this+=1</c>
        * @Returns a copy of this instance before increasing it.
        */
-      unsigned_number operator++(int)
+      ureal_t operator++(int)
       {
-        unsigned_number tmp=*this;
+        ureal_t tmp=*this;
         *this+=convert(1u);
         return tmp;
       }
@@ -2275,7 +2341,7 @@ namespace boost
        * @Effects Pre-decrease this instance as if <c>*this-=1</c>
        * @Returns <c>*this</c>.
        */
-      unsigned_number& operator--()
+      ureal_t& operator--()
       {
         *this-=convert(1u);
         return *this;
@@ -2284,56 +2350,56 @@ namespace boost
        * @Effects Post-decrease this instance as if <c>*this-=1</c>
        * @Returns a copy of this instance before decreasing it.
        */
-      unsigned_number operator--(int)
+      ureal_t operator--(int)
       {
-        unsigned_number tmp=*this;
+        ureal_t tmp=*this;
         *this-=convert(1u);
         return tmp;
       }
 
       /**
-       * @Effects As if <c>number_cast<unsigned_number>(*this+rhs)</c>
+       * @Effects As if <c>number_cast<ureal_t>(*this+rhs)</c>
        * @Returns <c>*this</c>.
        * @Throws Any exception the Overflow policy can throw.
        */
-      unsigned_number& operator += (unsigned_number const& rhs)
+      ureal_t& operator += (ureal_t const& rhs)
       {
-        unsigned_number tmp = number_cast<unsigned_number>((*this) + rhs);
+        ureal_t tmp = number_cast<ureal_t>((*this) + rhs);
         value_ = tmp.count();
         return *this;
       }
 
       /**
-       * @Effects As if <c>number_cast<unsigned_number>(*this-rhs)</c>
+       * @Effects As if <c>number_cast<ureal_t>(*this-rhs)</c>
        * @Returns <c>*this</c>.
        * @Throws Any exception the Overflow policy can throw.
        */
-      unsigned_number& operator-=(unsigned_number const& rhs)
+      ureal_t& operator-=(ureal_t const& rhs)
       {
-        unsigned_number tmp = number_cast<unsigned_number>((*this) - rhs);
+        ureal_t tmp = number_cast<ureal_t>((*this) - rhs);
         value_ = tmp.count();
         return *this;
       }
       /**
-       * @Effects As if <c>number_cast<unsigned_number>(*this*rhs)</c>
+       * @Effects As if <c>number_cast<ureal_t>(*this*rhs)</c>
        * @Returns <c>*this</c>.
        * @Throws Any exception the Overflow policy can throw.
        */
-      unsigned_number& operator*=(unsigned_number const& rhs)
+      ureal_t& operator*=(ureal_t const& rhs)
       {
-        unsigned_number tmp = number_cast<unsigned_number>((*this) * rhs);
+        ureal_t tmp = number_cast<ureal_t>((*this) * rhs);
         value_ = tmp.count();
         return *this;
       }
 
       /**
-       * @Effects As if <c>divide<unsigned_number>(*this,rhs)</c>
+       * @Effects As if <c>divide<ureal_t>(*this,rhs)</c>
        * @Returns <c>*this</c>.
        * @Throws Any exception the Overflow policy can throw.
        */
-      unsigned_number& operator/=(unsigned_number const& rhs)
+      ureal_t& operator/=(ureal_t const& rhs)
       {
-        unsigned_number tmp = divide<unsigned_number>(*this, rhs);
+        ureal_t tmp = divide<ureal_t>(*this, rhs);
         value_ += tmp.count();
         return *this;
       }
@@ -2346,10 +2412,10 @@ namespace boost
        * @Returns a new instance with the same data representation and with the range and resolution increased by @c N.
        */
       template <std::size_t N>
-      unsigned_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>
+      ureal_t<Range+N, Resolution+N, Rounding, Overflow, Family>
       virtual_scale() const
       {
-        return unsigned_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>(index(count()));
+        return ureal_t<Range+N, Resolution+N, Rounding, Overflow, Family>(index(count()));
       }
 
       /**
@@ -2378,9 +2444,9 @@ namespace boost
         }
         else
         {
-          unsigned_number tmp=
-          divide<unsigned_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
-          unsigned_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
+          ureal_t tmp=
+          divide<ureal_t<Range, Resolution, RP, Overflow, Family> >(*this,
+          ureal_t<-N+1, -N, Rounding, Overflow, Family>(index(1)));
           value_ = tmp.count();
         }
       }
@@ -2391,44 +2457,44 @@ namespace boost
     };
 
     /**
-     * unsigned_number compile time factory.
+     * ureal_t compile time factory.
      *
-     * @Returns an @c unsigned_number enough large to represent <c>Times*(2^Resolution)</c>.
+     * @Returns an @c ureal_t enough large to represent <c>Times*(2^Resolution)</c>.
      */
     template <int Times, int Resolution>
     BOOST_CONSTEXPR
     inline
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    unsigned_number< LOG2(ABS(Times+1)), Resolution>
+    ureal_t< LOG2(ABS(Times+1)), Resolution>
 #else
-    unsigned_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>
+    ureal_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>
 #endif
     to_unsigned_number()
     {
-      return unsigned_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
+      return ureal_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
     }
     /**
-     * signed_number compile time factory.
+     * real_t compile time factory.
      *
-     * @Returns a @c signed_number enough large to represent <c>Times*(2^Resolution)</c>.
+     * @Returns a @c real_t enough large to represent <c>Times*(2^Resolution)</c>.
      */
     template <int Times, int Resolution>
     BOOST_CONSTEXPR
     inline
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    signed_number< LOG2(ABS(Times+1)), Resolution>
+    real_t< LOG2(ABS(Times+1)), Resolution>
 #else
-    signed_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>
+    real_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>
 #endif
     to_signed_number()
     {
-      return signed_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
+      return real_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
     }
 
     //    /**
-    //     * unsigned_number compile time factory from integer and fractional parts
+    //     * ureal_t compile time factory from integer and fractional parts
     //     *
-    //     * @Returns an @c unsigned_number enough large to represent <c>Integral.Fractional</c>.
+    //     * @Returns an @c ureal_t enough large to represent <c>Integral.Fractional</c>.
     //     *
     //     * @Example ratio_to_fp<ratio<314,100>,-32>
     //     */
@@ -2436,23 +2502,23 @@ namespace boost
     //    BOOST_CONSTEXPR
     //    inline
     //#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    //    unsigned_number< LOG2(ABS(Integral+1)), LOG2(ABS(Fractional+1))>
+    //    ureal_t< LOG2(ABS(Integral+1)), LOG2(ABS(Fractional+1))>
     //#else
-    //    unsigned_number<
+    //    ureal_t<
     //      static_log2<mpl::abs<mpl::int_<Integral+1> >::type::value>::value,
     //      static_log2<mpl::abs<mpl::int_<Fractional+1> >::type::value>::value>
     //#endif
     //    ratio_to_fp()
     //    {
     //      BOOST_CONSTEXPR intmax_t Resolution=static_log2<mpl::abs<mpl::int_<Fractional+1> >::type::value>::value;
-    //      return unsigned_number<
+    //      return ureal_t<
     //            static_log2<mpl::abs<mpl::int_<Integral+1> >::type::value>::value,
     //            Resolution
     //            >(index(Times));
     //    }
 
 
-    // signed_number non-member arithmetic
+    // real_t non-member arithmetic
 
     // mixed fixed point arithmetic
 
@@ -2460,12 +2526,12 @@ namespace boost
      * signed + int -> signed.
      * @Returns <c>lhs+AT(rhs)</c>.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1>
     inline
-    signed_number<R1+1,P1,RP1,OP1,Opt1>
-    operator+(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, int rhs)
+    real_t<R1+1,P1,RP1,OP1,F1>
+    operator+(real_t<R1,P1,RP1,OP1,F1> const& lhs, int rhs)
     {
-      typedef signed_number<R1,P1,RP1,OP1,Opt1> arg_type;
+      typedef real_t<R1,P1,RP1,OP1,F1> arg_type;
 
       return lhs + arg_type(rhs);
     }
@@ -2474,32 +2540,32 @@ namespace boost
      * signed + signed -> signed.
      * @Returns <c>RT(incex(RT(lhs).count()+RT(rhs).count())</c>.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator+(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator+(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
@@ -2509,32 +2575,32 @@ namespace boost
      * unsigned + signed -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator+(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator+(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
@@ -2543,32 +2609,32 @@ namespace boost
      * signed + unsigned -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator+(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator+(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
@@ -2577,32 +2643,32 @@ namespace boost
      * unsigned + unsigned -> unsigned.
      * @Returns a unsigned fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    unsigned_number<
+    ureal_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator+(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator+(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef unsigned_number<
+      typedef ureal_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
@@ -2612,32 +2678,32 @@ namespace boost
      * signed - signed -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator-(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator-(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
@@ -2647,32 +2713,32 @@ namespace boost
      * unsigned - signed -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator-(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator-(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
@@ -2682,32 +2748,32 @@ namespace boost
      * signed - unsigned -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator-(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator-(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
@@ -2717,32 +2783,32 @@ namespace boost
      * unsigned - unsigned -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     MAX(R1,R2)+1,
     MIN(P1,P2),
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
     mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
     mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator-(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator-(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
@@ -2752,30 +2818,30 @@ namespace boost
      * signed * signed -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
     R1+R2,
     P1+P2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator*(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator*(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       R1+R2,
       P1+P2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
@@ -2786,30 +2852,30 @@ namespace boost
      * signed * unsigned -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
     R1+R2,
     P1+P2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator*(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator*(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       R1+R2,
       P1+P2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
@@ -2820,30 +2886,30 @@ namespace boost
      * unsigned * signed -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
     R1+R2,
     P1+P2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator*(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator*(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       R1+R2,
       P1+P2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
@@ -2854,30 +2920,30 @@ namespace boost
      * unsigned * unsigned -> unsigned.
      * @Returns a unsigned fixed point enough large to avoid overflow.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    unsigned_number<
+    ureal_t<
     R1+R2,
     P1+P2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator*(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator*(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef unsigned_number<
+      typedef ureal_t<
       R1+R2,
       P1+P2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
@@ -2901,141 +2967,141 @@ namespace boost
 
     /**
      * fixed point division giving the expected result type.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
     typename Res,
-    int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     Res
-    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    divide(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
 
-      typedef typename common_type<signed_number<R1,P1,RP1,OP1,Opt1>, signed_number<R2,P2,RP2,OP2,Opt2> >::type CT;
+      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
-      BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
-      BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
+      //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
+      BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
+      BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
       //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
-      return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
+      return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
 
     /**
      * fixed point division giving the expected result type.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
     typename Res,
-    int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     Res
-    divide(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    divide(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
-      typedef typename common_type<unsigned_number<R1,P1,RP1,OP1,Opt1>, unsigned_number<R2,P2,RP2,OP2,Opt2> >::type CT;
+      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
-      BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
-      BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
+      //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
+      BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
+      BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
       //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
-      return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
+      return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
 
     /**
      * fixed point division giving the expected result type.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
     typename Res,
-    int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     Res
-    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    divide(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
-      typedef typename common_type<signed_number<R1,P1,RP1,OP1,Opt1>, unsigned_number<R2,P2,RP2,OP2,Opt2> >::type CT;
+      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
-      BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
-      BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
+      //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
+      BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
+      BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
       //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
-      return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
+      return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
 
     /**
      * fixed point division giving the expected result type.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
     typename Res,
-    int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     Res
-    divide(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    divide(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
-      typedef typename common_type<unsigned_number<R1,P1,RP1,OP1,Opt1>, signed_number<R2,P2,RP2,OP2,Opt2> >::type CT;
+      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
-      //BOOST_STATIC_ASSERT((Res::digits>=(CT::digits-P)));
-      BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
-      BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
+      //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
+      BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
+      BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
       //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
-      return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
+      return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
 
     /**
      * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
     R1-P2,
     P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator/(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator/(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       R1-P2,
       P1-R2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return divide<result_type>(lhs,rhs);
@@ -3043,32 +3109,32 @@ namespace boost
 
     /**
      * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
     R1-P2,
     P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator/(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator/(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       R1-P2,
       P1-R2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return divide<result_type>(lhs,rhs);
@@ -3076,32 +3142,32 @@ namespace boost
 
     /**
      * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    signed_number<
+    real_t<
     R1-P2,
     P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator/(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator/(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef signed_number<
+      typedef real_t<
       R1-P2,
       P1-R2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return divide<result_type>(lhs,rhs);
@@ -3109,32 +3175,32 @@ namespace boost
 
     /**
      * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
-    unsigned_number<
+    ureal_t<
     R1-P2,
     P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    CT(RP1,RP2),
-    CT(OP1,OP2),
-    CT(Opt1,Opt2)
+    DT(RP1,RP2),
+    DT(OP1,OP2),
+    DT(F1,F2)
 #else
-    typename common_type<RP1,RP2>::type,
-    typename common_type<OP1,OP2>::type,
-    typename common_type<Opt1,Opt2>::type
+    typename default_type<RP1,RP2>::type,
+    typename default_type<OP1,OP2>::type,
+    typename default_type<F1,F2>::type
 #endif
     >
-    operator/(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator/(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef unsigned_number<
+      typedef ureal_t<
       R1-P2,
       P1-R2,
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
       > result_type;
 
       return divide<result_type>(lhs,rhs);
@@ -3143,100 +3209,100 @@ namespace boost
     // comparisons
 
     /**
-     * @Returns As if <c>CT(lhs).count() == CT(rhs).count()</c> where CT is the common_type of the parameters..
+     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the default_type of the parameters..
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator==(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator==(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename common_type<signed_number<R1,P1,RP1,OP1,Opt1>, signed_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      return CT(lhs).count() == CT(rhs).count();
+      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
+      return DT(lhs).count() == DT(rhs).count();
     }
 
     /**
-     * @Returns As if <c>CT(lhs).count() == CT(rhs).count()</c> where CT is the common_type of the parameters..
+     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the default_type of the parameters..
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator==(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator==(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename common_type<unsigned_number<R1,P1,RP1,OP1,Opt1>, unsigned_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      return CT(lhs).count() == CT(rhs).count();
+      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
+      return DT(lhs).count() == DT(rhs).count();
     }
 
     /**
-     * @Returns <c>CT(lhs).count() != CT(rhs).count()</c> where CT is the common_type of the parameters..
+     * @Returns <c>DT(lhs).count() != DT(rhs).count()</c> where DT is the default_type of the parameters..
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator!=(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator!=(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return !(lhs == rhs);
     }
 
     /**
-     * @Returns <c>CT(lhs).count() != CT(rhs).count()</c> where CT is the common_type of the parameters..
+     * @Returns <c>DT(lhs).count() != DT(rhs).count()</c> where DT is the default_type of the parameters..
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator!=(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator!=(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return !(lhs == rhs);
     }
 
     /**
-     * @Returns <c>CT(lhs).count() < CT(rhs).count()</c> where CT is the common_type of the parameters..
+     * @Returns <c>DT(lhs).count() < DT(rhs).count()</c> where DT is the default_type of the parameters..
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator<(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator<(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename common_type<signed_number<R1,P1,RP1,OP1,Opt1>, signed_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      return CT(lhs).count() < CT(rhs).count();
+      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
+      return DT(lhs).count() < DT(rhs).count();
     }
 
     /**
-     * @Returns <c>CT(lhs).count() < CT(rhs).count()</c> where CT is the common_type of the parameters..
+     * @Returns <c>DT(lhs).count() < DT(rhs).count()</c> where DT is the default_type of the parameters..
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator<(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator<(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename common_type<unsigned_number<R1,P1,RP1,OP1,Opt1>, unsigned_number<R2,P2,RP2,OP2,Opt2> >::type CT;
-      return CT(lhs).count() < CT(rhs).count();
+      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
+      return DT(lhs).count() < DT(rhs).count();
     }
 
     /**
      * @Returns <c>rhs < lhs</c>.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator>(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator>(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return rhs < lhs;
     }
     /**
      * @Returns <c>rhs < lhs</c>.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator>(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator>(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return rhs < lhs;
     }
@@ -3244,22 +3310,22 @@ namespace boost
     /**
      * @Returns <c>!(rhs < lhs)</c>.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator<=(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator<=(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return !(rhs < lhs);
     }
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     /**
      * @Returns <c>!(rhs < lhs)</c>.
      */
     inline
     bool
-    operator<=(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator<=(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return !(rhs < lhs);
     }
@@ -3267,22 +3333,22 @@ namespace boost
     /**
      * @Returns <c>!(lhs < rhs)</c>.
      */
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     inline
     bool
-    operator>=(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator>=(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return !(lhs < rhs);
     }
-    template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-    int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
     /**
      * @Returns <c>!(lhs < rhs)</c>.
      */
     inline
     bool
-    operator>=(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    operator>=(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
       return !(lhs < rhs);
     }
@@ -3304,10 +3370,10 @@ namespace boost
 namespace std
 {
   //! numeric limits trait specializations
-  template <int R, int P, typename RP, typename OP, typename Opt>
-  struct numeric_limits<boost::fixed_point::signed_number<R, P, RP, OP, Opt> >
+  template <int R, int P, typename RP, typename OP, typename F>
+  struct numeric_limits<boost::fixed_point::real_t<R, P, RP, OP, F> >
   {
-    typedef boost::fixed_point::signed_number<R, P, RP, OP, Opt> rep;
+    typedef boost::fixed_point::real_t<R, P, RP, OP, F> rep;
   public:
     BOOST_STATIC_CONSTEXPR
     bool is_specialized = true;
