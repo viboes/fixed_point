@@ -47,23 +47,28 @@ namespace boost
 {
   namespace fixed_point
   {
-    namespace detail {
+    namespace detail
+    {
 
-      template <typename From, typename To, bool IsPositive=(To::resolution_exp>0)>
+      template <typename From, typename To, bool IsPositive = (To::resolution_exp > 0)>
       struct shift_impl;
       template <typename From, typename To>
-      struct shift_impl<From, To, true> {
+      struct shift_impl<From, To, true>
+      {
         //BOOST_STATIC_ASSERT(From::digits>To::resolution_exp);
-        BOOST_STATIC_CONSTEXPR std::size_t digits = From::digits-To::resolution_exp;
+        BOOST_STATIC_CONSTEXPR
+        std::size_t digits = From::digits - To::resolution_exp;
         typedef typename From::underlying_type result_type;
-        static  result_type apply(typename From::underlying_type v)
+        static result_type apply(typename From::underlying_type v)
         {
           return v >> To::resolution_exp;
         }
       };
       template <typename From, typename To>
-      struct shift_impl<From,To,false> {
-        BOOST_STATIC_CONSTEXPR std::size_t digits = From::digits-To::resolution_exp;
+      struct shift_impl<From, To, false>
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::size_t digits = From::digits - To::resolution_exp;
         typedef typename ::boost::int_t<digits>::fast result_type;
         static result_type apply(typename From::underlying_type v)
         {
@@ -72,29 +77,38 @@ namespace boost
       };
 
       template <typename From, typename To>
-      typename shift_impl<From,To>::result_type shift(typename From::underlying_type v) {
-        return shift_impl<From,To>::apply(v);
+      typename shift_impl<From, To>::result_type shift(typename From::underlying_type v)
+      {
+        return shift_impl<From, To>::apply(v);
       }
 
       template <int amt, typename T>
-      T shift_left(T val) {
-        if (amt>0) {
+      T shift_left(T val)
+      {
+        if (amt > 0)
+        {
           unsigned int u_amt = amt;
-          return val<<u_amt;
-        } else {
+          return val << u_amt;
+        }
+        else
+        {
           unsigned int u_amt = -amt;
-          return val>>u_amt;
+          return val >> u_amt;
         }
       }
 
       template <int amt, typename T>
-      T shift_right(T val) {
-        if (amt>0) {
+      T shift_right(T val)
+      {
+        if (amt > 0)
+        {
           unsigned int u_amt = amt;
-          return val>>u_amt;
-        } else {
+          return val >> u_amt;
+        }
+        else
+        {
           unsigned int u_amt = -amt;
-          return val<<u_amt;
+          return val << u_amt;
         }
       }
 
@@ -116,33 +130,41 @@ namespace boost
     /**
      * Exception throw when there is a positive overflow.
      */
-    struct positive_overflow {};
+    struct positive_overflow
+    {
+    };
     /**
      * Exception throw when there is a negative overflow.
      */
-    struct negative_overflow {};
+    struct negative_overflow
+    {
+    };
 
     /**
      * Namespace for rounding policies.
      */
     namespace round
     {
-      struct fastest {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_indeterminate;
+      struct fastest
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_indeterminate;
       };
-      struct negative {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_toward_infinity;
+      struct negative
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_toward_infinity;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
           BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp-From::resolution_exp;
           typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
-          BOOST_STATIC_ASSERT(d<(8*sizeof(tmp_type)));
+          BOOST_STATIC_ASSERT(d < (8 * sizeof(tmp_type)));
           //BOOST_MPL_ASSERT_MSG(d<(8*sizeof(tmp_type)), OVERFLOW, (mpl::int_<8*sizeof(tmp_type)>, mpl::int_<d>));
 
           tmp_type res = tmp_type(rhs.count()) >> d;
-          BOOST_ASSERT(res<=To::max_index);
-          BOOST_ASSERT(res>=To::min_index);
+          BOOST_ASSERT(res <= To::max_index);
+          BOOST_ASSERT(res >= To::min_index);
           return res;
         }
         template <typename To, typename From>
@@ -150,72 +172,78 @@ namespace boost
         {
           typedef typename detail::shift_impl<From, To>::result_type result_type;
           result_type ci = detail::shift<From, To>(lhs.count()) / rhs.count();
-          if (ci>=0 )
+          if (ci >= 0)
           {
-            BOOST_ASSERT(ci<=To::max_index);
-            BOOST_ASSERT(ci>=To::min_index);
+            BOOST_ASSERT(ci <= To::max_index);
+            BOOST_ASSERT(ci >= To::min_index);
             return ci;
-          } else {
+          }
+          else
+          {
             result_type ri = detail::shift<From, To>(lhs.count()) % rhs.count();
-            if (ri==0) {
-              BOOST_ASSERT(ci<=To::max_index);
-              BOOST_ASSERT(ci>=To::min_index);
+            if (ri == 0)
+            {
+              BOOST_ASSERT(ci <= To::max_index);
+              BOOST_ASSERT(ci >= To::min_index);
               return ci;
             }
             else
             {
-              BOOST_ASSERT(ci-1<=To::max_index);
-              BOOST_ASSERT(ci>=(To::min_index+1));
-              return ci-1;
+              BOOST_ASSERT(ci - 1 <= To::max_index);
+              BOOST_ASSERT(ci >= (To::min_index + 1));
+              return ci - 1;
             }
           }
         }
       };
-      struct truncated {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_toward_zero;
+      struct truncated
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_toward_zero;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
           BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp-From::resolution_exp;
           typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
-          BOOST_STATIC_ASSERT(d<(8*sizeof(tmp_type)));
+          BOOST_STATIC_ASSERT(d < (8 * sizeof(tmp_type)));
 
-          tmp_type m(((rhs.count()>0)?rhs.count():-rhs.count()));
-          tmp_type s(((rhs.count()>0)?+1:-1));
+          tmp_type m( ( (rhs.count() > 0) ? rhs.count() : -rhs.count()));
+          tmp_type s( ( (rhs.count() > 0) ? +1 : -1));
 
           tmp_type res = s * (m >> d);
-          BOOST_ASSERT(res<=To::max_index);
-          BOOST_ASSERT(res>=To::min_index);
+          BOOST_ASSERT(res <= To::max_index);
+          BOOST_ASSERT(res >= To::min_index);
           return res;
-          ;
         }
         template <typename To, typename From>
         static typename To::underlying_type round_divide(From const& lhs, From const& rhs)
         {
           typedef typename detail::shift_impl<From, To>::result_type result_type;
           result_type ci = detail::shift<From, To>(lhs.count()) / rhs.count();
-          BOOST_ASSERT(ci<=To::max_index);
-          BOOST_ASSERT(ci>=To::min_index);
+          BOOST_ASSERT(ci <= To::max_index);
+          BOOST_ASSERT(ci >= To::min_index);
           return ci;
         }
       };
-      struct positive {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style = std::round_toward_neg_infinity;
+      struct positive
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_toward_neg_infinity;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
           BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp-From::resolution_exp;
           typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
-          BOOST_STATIC_ASSERT(d<(8*sizeof(tmp_type)));
+          BOOST_STATIC_ASSERT(d < (8 * sizeof(tmp_type)));
 
           BOOST_STATIC_CONSTEXPR tmp_type w = (1<<d)-1;
           tmp_type i = rhs.count();
 
-          BOOST_ASSERT(i<=(integer_traits<tmp_type>::const_max-w));
+          BOOST_ASSERT(i <= (integer_traits<tmp_type>::const_max - w));
 
-          tmp_type res =  (i+w) >> d;
-          BOOST_ASSERT(res<=To::max_index);
-          BOOST_ASSERT(res>=To::min_index);
+          tmp_type res = (i + w) >> d;
+          BOOST_ASSERT(res <= To::max_index);
+          BOOST_ASSERT(res >= To::min_index);
           return res;
         }
         template <typename To, typename From>
@@ -223,36 +251,49 @@ namespace boost
         {
           typedef typename detail::shift_impl<From, To>::result_type result_type;
           result_type ci = detail::shift<From, To>(lhs.count()) / rhs.count();
-          if (ci>=0 )
+          if (ci >= 0)
           {
             result_type ri = detail::shift<From, To>(lhs.count()) % rhs.count();
-            if (ri==0) {
-              BOOST_ASSERT(ci<=To::max_index);
-              BOOST_ASSERT(ci>=To::min_index);
+            if (ri == 0)
+            {
+              BOOST_ASSERT(ci <= To::max_index);
+              BOOST_ASSERT(ci >= To::min_index);
               return ci;
-            } else {
-              BOOST_ASSERT(ci<=To::max_index-1);
-              BOOST_ASSERT(ci+1>=To::min_index);
-              return ci+1;
             }
-          } else {
-            BOOST_ASSERT(ci<=To::max_index);
-            BOOST_ASSERT(ci>=To::min_index);
+            else
+            {
+              BOOST_ASSERT(ci <= To::max_index - 1);
+              BOOST_ASSERT(ci + 1 >= To::min_index);
+              return ci + 1;
+            }
+          }
+          else
+          {
+            BOOST_ASSERT(ci <= To::max_index);
+            BOOST_ASSERT(ci >= To::min_index);
             return ci;
           }
         }
       };
-      struct nearest_half_up {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
+      struct nearest_half_up
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_to_nearest;
       };
-      struct nearest_half_down {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
+      struct nearest_half_down
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_to_nearest;
       };
-      struct nearest_even {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
+      struct nearest_even
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_to_nearest;
       };
-      struct nearest_odd {
-        BOOST_STATIC_CONSTEXPR std::float_round_style  round_style =  std::round_to_nearest;
+      struct nearest_odd
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style = std::round_to_nearest;
       };
     }
 
@@ -261,8 +302,11 @@ namespace boost
      */
     namespace overflow
     {
-      struct impossible {
-        BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+      struct impossible
+      {
+        BOOST_STATIC_CONSTEXPR
+        bool is_modulo = false;
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U value)
         {
@@ -271,6 +315,7 @@ namespace boost
 #endif
           return value;
         }
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type on_positive_overflow(U value)
         {
@@ -280,26 +325,30 @@ namespace boost
           return value;
         }
       };
-      struct undefined {
-        BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+      struct undefined
+      {
+        BOOST_STATIC_CONSTEXPR
+        bool is_modulo = false;
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U value)
         {
           return value;
         }
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type on_positive_overflow(U value)
         {
           return value;
         }
       };
-      namespace detail {
-        template <typename T, typename U, bool TisSigned=T::is_signed>
+      namespace detail
+      {
+        template <typename T, typename U, bool TisSigned = T::is_signed>
         struct modulus_on_negative_overflow;
 
-
         template <typename T, typename U>
-        struct modulus_on_negative_overflow<T,U, false>
+        struct modulus_on_negative_overflow<T, U, false>
         {
           static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
@@ -308,7 +357,7 @@ namespace boost
         };
 
         template <typename T, typename U>
-        struct modulus_on_negative_overflow<T,U, true>
+        struct modulus_on_negative_overflow<T, U, true>
         {
           static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
@@ -316,12 +365,11 @@ namespace boost
           }
         };
 
-
-        template <typename T, typename U, bool TisSigned=T::is_signed>
+        template <typename T, typename U, bool TisSigned = T::is_signed>
         struct modulus_on_positive_overflow;
 
         template <typename T, typename U>
-        struct modulus_on_positive_overflow<T,U, true>
+        struct modulus_on_positive_overflow<T, U, true>
         {
           static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
@@ -329,7 +377,7 @@ namespace boost
           }
         };
         template <typename T, typename U>
-        struct modulus_on_positive_overflow<T,U, false>
+        struct modulus_on_positive_overflow<T, U, false>
         {
           static BOOST_CONSTEXPR typename T::underlying_type value(U value)
           {
@@ -337,26 +385,34 @@ namespace boost
           }
         };
       }
-      struct modulus {
-        BOOST_STATIC_CONSTEXPR bool is_modulo = true;
+      struct modulus
+      {
+        BOOST_STATIC_CONSTEXPR
+        bool is_modulo = true;
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U val)
         {
           return detail::modulus_on_negative_overflow<T,U>::value(val);
         }
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type modulus_on_positive_overflow(U val)
         {
           return detail::modulus_on_negative_overflow<T,U>::value(val);
         }
       };
-      struct saturate {
-        BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+      struct saturate
+      {
+        BOOST_STATIC_CONSTEXPR
+        bool is_modulo = false;
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type on_negative_overflow(U )
         {
           return T::min_index;
         }
+
         template <typename T, typename U>
         static BOOST_CONSTEXPR typename T::underlying_type on_positive_overflow(U )
         {
@@ -364,15 +420,17 @@ namespace boost
         }
 
       };
-      struct exception {
-        BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+      struct exception
+      {
+        BOOST_STATIC_CONSTEXPR
+        bool is_modulo = false;
         template <typename T, typename U>
-        static typename T::underlying_type on_negative_overflow(U )
+        static typename T::underlying_type on_negative_overflow(U)
         {
           throw negative_overflow();
         }
         template <typename T, typename U>
-        static typename T::underlying_type on_positive_overflow(U )
+        static typename T::underlying_type on_positive_overflow(U)
         {
           throw positive_overflow();
         }
@@ -386,14 +444,15 @@ namespace boost
     namespace optimization
     {
 
-      struct undefined {
+      struct undefined
+      {
         /**
          * signed_integer_type: Gets the signed integer type with enough bits to manage with the Range and Resolution depending on the Opt
          */
         template <int Range, int Resolution>
         struct signed_integer_type
         {
-          typedef typename ::boost::int_t<Range-Resolution+1>::least type;
+          typedef typename ::boost::int_t<Range - Resolution + 1>::least type;
         };
 
         /**
@@ -402,82 +461,64 @@ namespace boost
         template <int Range, int Resolution>
         struct unsigned_integer_type
         {
-          typedef typename ::boost::uint_t<Range-Resolution>::least type;
+          typedef typename ::boost::uint_t<Range - Resolution>::least type;
         };
       };
-      struct space {
+      struct space
+      {
         template <int Range, int Resolution>
         struct signed_integer_type
         {
-          typedef typename ::boost::int_t<Range-Resolution+1>::least type;
+          typedef typename ::boost::int_t<Range - Resolution + 1>::least type;
         };
         template <int Range, int Resolution>
         struct unsigned_integer_type
         {
-          typedef typename ::boost::uint_t<Range-Resolution>::least type;
+          typedef typename ::boost::uint_t<Range - Resolution>::least type;
         };
       };
-      struct speed {
+      struct speed
+      {
         template <int Range, int Resolution>
         struct signed_integer_type
         {
-          typedef typename ::boost::int_t<Range-Resolution+1>::fast type;
+          typedef typename ::boost::int_t<Range - Resolution + 1>::fast type;
         };
         template <int Range, int Resolution>
         struct unsigned_integer_type
         {
-          typedef typename ::boost::uint_t<Range-Resolution>::fast type;
+          typedef typename ::boost::uint_t<Range - Resolution>::fast type;
         };
 
       };
     }
 
-    template <
-      int Range,
-      int Resolution,
-      typename Rounding=round::negative,
-      typename Overflow=overflow::exception,
-      typename Optimization=optimization::space>
+    template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
+        typename Optimization = optimization::space>
     class unsigned_number;
 
-    template <
-      int Range,
-      int Resolution,
-      typename Rounding=round::negative,
-      typename Overflow=overflow::exception,
-      typename Optimization=optimization::space>
+    template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
+        typename Optimization = optimization::space>
     class signed_number;
 
-    template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
-    inline
-    Res
-    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs);
-    template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
-    inline
-    Res
-    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs);
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
+        typename OP2, typename Opt2>
+    inline Res
+    divide(signed_number<R1, P1, RP1, OP1, Opt1> const& lhs, signed_number<R2, P2, RP2, OP2, Opt2> const& rhs);
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
+        typename OP2, typename Opt2>
+    inline Res
+    divide(signed_number<R1, P1, RP1, OP1, Opt1> const& lhs, signed_number<R2, P2, RP2, OP2, Opt2> const& rhs);
 
-    template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
-    inline
-    Res
-    divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs);
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
+        typename OP2, typename Opt2>
+    inline Res
+    divide(signed_number<R1, P1, RP1, OP1, Opt1> const& lhs, unsigned_number<R2, P2, RP2, OP2, Opt2> const& rhs);
 
-    template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
-    inline
-    Res
-    divide(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs);
+    template <typename Res, int R1, int P1, typename RP1, typename OP1, typename Opt1, int R2, int P2, typename RP2,
+        typename OP2, typename Opt2>
+    inline Res
+    divide(unsigned_number<R1, P1, RP1, OP1, Opt1> const& lhs, signed_number<R2, P2, RP2, OP2, Opt2> const& rhs);
 
   }
 }
@@ -495,9 +536,10 @@ BOOST_TYPEOF_REGISTER_TEMPLATE(boost::fixed_point::unsigned_number, (int)(int)(t
 
 ///////////////////////////////////////
 
-namespace boost {
-  namespace fixed_point {
-
+namespace boost
+{
+  namespace fixed_point
+  {
 
     /**
      *  named parameter like class, allowing to make a specific overload when the integer must be taken by the index.
@@ -507,8 +549,10 @@ namespace boost {
     {
       typedef T type;
       T value;
-      BOOST_CONSTEXPR index_tag(T v) : value(v) {}
-      BOOST_CONSTEXPR T get() { return value; }
+      BOOST_CONSTEXPR index_tag(T v) : value(v)
+      {}
+      BOOST_CONSTEXPR T get()
+      { return value;}
 
     };
 
@@ -516,7 +560,30 @@ namespace boost {
      *  helper function to make easier the use of index_tag.
      */
     template <typename T>
-    BOOST_CONSTEXPR index_tag<T> index(T v) { return index_tag<T>(v); }
+    BOOST_CONSTEXPR index_tag<T> index(T v)
+    { return index_tag<T>(v);}
+
+    /**
+     *  named parameter like class, allowing to make a implicit conversions.
+     */
+    template <typename T>
+    struct convert_tag
+    {
+      typedef T type;
+      T value;
+      BOOST_CONSTEXPR convert_tag(T &v) : value(v)
+      {}
+      BOOST_CONSTEXPR T& get()
+      { return value;}
+
+    };
+
+    /**
+     *  helper function to make easier the use of convert_tag.
+     */
+    template <typename T>
+    BOOST_CONSTEXPR convert_tag<T> convert(T v)
+    { return convert_tag<T>(v);}
 
     /**
      *  explicit conversion between fixed_point numbers.
@@ -527,7 +594,8 @@ namespace boost {
     namespace detail
     {
       template <typename T, int Range, int Resolution >
-      struct signed_integer_traits {
+      struct signed_integer_traits
+      {
         BOOST_STATIC_CONSTEXPR std::size_t digits = (Range-Resolution)+1;
         BOOST_STATIC_ASSERT_MSG((sizeof(T)*8)>=digits, "LLLL");
         //BOOST_MPL_ASSERT_MSG((sizeof(T)*8)>=digits, LLLL, (mpl::int_<sizeof(T)*8>, mpl::int_<digits>));
@@ -536,98 +604,99 @@ namespace boost {
 
       };
       template <typename T, int Range, int Resolution >
-      struct unsigned_integer_traits {
+      struct unsigned_integer_traits
+      {
         BOOST_STATIC_CONSTEXPR std::size_t digits = (Range-Resolution);
         BOOST_STATIC_CONSTEXPR T const_max = (1LL<<(digits)) - 1;
         BOOST_STATIC_CONSTEXPR T const_min = 0;
 
       };
 
-//      template <int Range, int Resolution, typename Optimization=optimization::space>
-//      class signed_uniform_quantizer
-//      {
-//        BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
-//      public:
-//
-//        //! The underlying integer type
-//        typedef typename Optimization::template  signed_integer_type<Range,Resolution>::type underlying_type;
-//
-//        // name the template parameters
-//        BOOST_STATIC_CONSTEXPR int range_exp = Range;
-//        BOOST_STATIC_CONSTEXPR int resolution_exp = Resolution;
-//        BOOST_STATIC_CONSTEXPR int digits = range_exp-resolution_exp+1;
-//
-//        typedef Optimization optimization_type;
-//
-//        BOOST_STATIC_CONSTEXPR underlying_type min_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_min;
-//        BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
-//
-//        //! conversion factor.
-//        template <typename FP>
-//        static FP factor()
-//        {
-//          if (Resolution>=0) return FP(1 << Resolution);
-//          else return FP(1)/(1 << -Resolution);
-//        }
-//        template <typename FP>
-//        static underlying_type integer_part(FP x)
-//        {
-//          return underlying_type(std::floor(x));
-//        }
-//      };
-//
-//
-//      template <typename Final, int Range, int Resolution, typename Rounding=round::negative, typename Overflow=overflow::exception,
-//          typename Optimization=optimization::space
-//          >
-//      class signed_quantizer : public signed_uniform_quantizer<Range,Resolution,Optimization>
-//      {
-//        typedef signed_uniform_quantizer<Range,Resolution,Optimization> base_type;
-//      public:
-//        typedef typename base_type::underlying_type underlying_type;
-//        BOOST_STATIC_CONSTEXPR underlying_type min_index = base_type::const_min;
-//        BOOST_STATIC_CONSTEXPR underlying_type max_index = base_type::const_max;
-//
-//        template <typename FP>
-//        static FP reconstruct(underlying_type k)
-//        {
-//          BOOST_ASSERT(min_index <= k && k <= max_index);
-//
-//          return Rounding::reconstruct(k, base_type::template factor<FP>());
-//        }
-//        template <typename FP>
-//        static underlying_type classify(FP x)
-//        {
-//          if (x<Final::min().template as<FP>()) {
-//            return Overflow::on_negative_overflow(min_index,x);
-//          }
-//          if (x>Final::max().template as<FP>()) {
-//            return Overflow::on_positive_overflow(max_index,x);
-//          }
-//          return Rounding::classify(x, base_type::template factor<FP>());
-//        }
-//        template <typename FP>
-//        static Final cast(FP x)
-//        {
-//          fixed_point::number_cast<Final>(x);
-//        }
-//      };
+      //      template <int Range, int Resolution, typename Optimization=optimization::space>
+      //      class signed_uniform_quantizer
+      //      {
+      //        BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
+      //      public:
+      //
+      //        //! The underlying integer type
+      //        typedef typename Optimization::template  signed_integer_type<Range,Resolution>::type underlying_type;
+      //
+      //        // name the template parameters
+      //        BOOST_STATIC_CONSTEXPR int range_exp = Range;
+      //        BOOST_STATIC_CONSTEXPR int resolution_exp = Resolution;
+      //        BOOST_STATIC_CONSTEXPR int digits = range_exp-resolution_exp+1;
+      //
+      //        typedef Optimization optimization_type;
+      //
+      //        BOOST_STATIC_CONSTEXPR underlying_type min_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_min;
+      //        BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
+      //
+      //        //! conversion factor.
+      //        template <typename FP>
+      //        static FP factor()
+      //        {
+      //          if (Resolution>=0) return FP(1 << Resolution);
+      //          else return FP(1)/(1 << -Resolution);
+      //        }
+      //        template <typename FP>
+      //        static underlying_type integer_part(FP x)
+      //        {
+      //          return underlying_type(std::floor(x));
+      //        }
+      //      };
+      //
+      //
+      //      template <typename Final, int Range, int Resolution, typename Rounding=round::negative, typename Overflow=overflow::exception,
+      //          typename Optimization=optimization::space
+      //          >
+      //      class signed_quantizer : public signed_uniform_quantizer<Range,Resolution,Optimization>
+      //      {
+      //        typedef signed_uniform_quantizer<Range,Resolution,Optimization> base_type;
+      //      public:
+      //        typedef typename base_type::underlying_type underlying_type;
+      //        BOOST_STATIC_CONSTEXPR underlying_type min_index = base_type::const_min;
+      //        BOOST_STATIC_CONSTEXPR underlying_type max_index = base_type::const_max;
+      //
+      //        template <typename FP>
+      //        static FP reconstruct(underlying_type k)
+      //        {
+      //          BOOST_ASSERT(min_index <= k && k <= max_index);
+      //
+      //          return Rounding::reconstruct(k, base_type::template factor<FP>());
+      //        }
+      //        template <typename FP>
+      //        static underlying_type classify(FP x)
+      //        {
+      //          if (x<Final::min().template as<FP>()) {
+      //            return Overflow::on_negative_overflow(min_index,x);
+      //          }
+      //          if (x>Final::max().template as<FP>()) {
+      //            return Overflow::on_positive_overflow(max_index,x);
+      //          }
+      //          return Rounding::classify(x, base_type::template factor<FP>());
+      //        }
+      //        template <typename FP>
+      //        static Final cast(FP x)
+      //        {
+      //          fixed_point::number_cast<Final>(x);
+      //        }
+      //      };
 
       template <
-        typename From,
-        typename To,
-        bool LE_Range=      From::range_exp      <= To::range_exp,
-        bool GE_Resolution= From::resolution_exp >= To::resolution_exp
+      typename From,
+      typename To,
+      bool LE_Range= From::range_exp <= To::range_exp,
+      bool GE_Resolution= From::resolution_exp >= To::resolution_exp
       > struct number_cast;
 
       // LE_Range=true GE_Resolution=true
       ///////////////////////////////////
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        true, true >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      true, true >
       {
         typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -640,11 +709,11 @@ namespace boost {
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        true, true >
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      true, true >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -657,11 +726,11 @@ namespace boost {
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        true, true >
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      true, true >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
@@ -675,11 +744,11 @@ namespace boost {
       };
 
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        true, true >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      true, true >
       {
         typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
@@ -687,20 +756,20 @@ namespace boost {
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-//          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
-//          // Overflow
-//          if (indx < To::min_index)
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//          // No round needed
-//          return To(index(underlying_type(rhs.count()) << (P1-P2)));
+          //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
+          //          // Overflow
+          //          if (indx < To::min_index)
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //          // No round needed
+          //          return To(index(underlying_type(rhs.count()) << (P1-P2)));
 
           return
           (
-            (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
-          ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
-          : To(index(underlying_type(rhs.count()) << (P1-P2)))
+              (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
+              ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              : To(index(underlying_type(rhs.count()) << (P1-P2)))
           );
 
         }
@@ -709,11 +778,11 @@ namespace boost {
       // LE_Range=false GE_Resolution=true
       ////////////////////////////////////
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        false, true >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      false, true >
       {
         typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -722,81 +791,81 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
 
-//          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
-//          // Overflow impossible
-//          if (indx > To::max_index)
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//          if (indx < To::min_index)
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // No round needed
-//          return To(index(indx));
+          //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
+          //          // Overflow impossible
+          //          if (indx > To::max_index)
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //          if (indx < To::min_index)
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // No round needed
+          //          return To(index(indx));
 
           // Overflow impossible
           // No round needed
           return
-            (
+          (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
-            ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
-            : (
-                (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
-              ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
-              : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
-              )
-            );
-        }
-      };
-      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
-      struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        false, true >
-      {
-        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
-        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
-        typedef typename To::underlying_type underlying_type;
-
-        BOOST_CONSTEXPR To operator()(const From& rhs) const
-        {
-
-//          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
-//          // Overflow impossible
-//          if (indx > To::max_index)
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//          if (indx < To::min_index)
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // No round needed
-//          return To(index(indx));
-
-          // Overflow impossible
-          // No round needed
-          return (
-                (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
               ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
               : (
                   (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
                   ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
                   : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
-                )
-              );
+              )
+          );
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        false, true >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      false, true >
+      {
+        typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
+        typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
+        typedef typename To::underlying_type underlying_type;
+
+        BOOST_CONSTEXPR To operator()(const From& rhs) const
+        {
+
+          //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
+          //          // Overflow impossible
+          //          if (indx > To::max_index)
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //          if (indx < To::min_index)
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // No round needed
+          //          return To(index(indx));
+
+          // Overflow impossible
+          // No round needed
+          return (
+              (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              : (
+                  (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
+                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+                  : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
+              )
+          );
+        }
+      };
+      template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      struct number_cast<
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      false, true >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
@@ -805,30 +874,30 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
 
-//          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
-//          // Overflow
-//          if (indx > To::max_index)
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // No round needed
-//          return To(index(indx));
-//
+          //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
+          //          // Overflow
+          //          if (indx > To::max_index)
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // No round needed
+          //          return To(index(indx));
+          //
           return
           (
-            (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
-          : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
+              (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
           );
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        false, true >
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      false, true >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -837,21 +906,21 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
 
-//          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
-//          // Overflow
-//          if (indx > To::max_index)
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // No round needed
-//          return To(index(indx));
+          //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
+          //          // Overflow
+          //          if (indx > To::max_index)
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // No round needed
+          //          return To(index(indx));
 
           return
           (
-            (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
-          : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
+              (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
           );
 
         }
@@ -860,11 +929,11 @@ namespace boost {
       // LE_Range=true GE_Resolution=false
       ////////////////////////////////////
       template <int R, int P1, typename RP1, typename OP1, typename Opt1,
-                       int P2, typename RP2, typename OP2, typename Opt2>
+      int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R,P1,RP1,OP1,Opt1>,
-        signed_number<R,P2,RP2,OP2,Opt2>,
-        true, false >
+      signed_number<R,P1,RP1,OP1,Opt1>,
+      signed_number<R,P2,RP2,OP2,Opt2>,
+      true, false >
       {
         typedef signed_number<R,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R,P2,RP2,OP2,Opt2> To;
@@ -872,40 +941,40 @@ namespace boost {
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-//          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          To res((index(RP2::template round<From,To>(rhs))));
-//          return res;
+          //          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          To res((index(RP2::template round<From,To>(rhs))));
+          //          return res;
 
           // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
           return
           (
-            (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-          : (
-              (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-            ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-            : To((index(RP2::template round<From,To>(rhs))))
-            )
+              (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              : (
+                  (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+                  : To((index(RP2::template round<From,To>(rhs))))
+              )
           );
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        true, false >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      true, false >
       {
         typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -923,11 +992,11 @@ namespace boost {
       ////
 
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        true, false >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      true, false >
       {
         typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
@@ -936,39 +1005,39 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
           // Overflow
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          return To((index(RP2::template round<From,To>(rhs))));
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          return To((index(RP2::template round<From,To>(rhs))));
 
           return
           (
-            (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-          : (
-              (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-            ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-            : To((index(RP2::template round<From,To>(rhs))))
-            )
+              (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              : (
+                  (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+                  : To((index(RP2::template round<From,To>(rhs))))
+              )
           );
         }
       };
 
       ////
       template <int R, int P1, typename RP1, typename OP1, typename Opt1,
-                       int P2, typename RP2, typename OP2, typename Opt2>
+      int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R,P1,RP1,OP1,Opt1>,
-        signed_number<R,P2,RP2,OP2,Opt2>,
-        true, false >
+      unsigned_number<R,P1,RP1,OP1,Opt1>,
+      signed_number<R,P2,RP2,OP2,Opt2>,
+      true, false >
       {
         typedef unsigned_number<R,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R,P2,RP2,OP2,Opt2> To;
@@ -977,30 +1046,30 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
           // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          return To((index(RP2::template round<From,To>(rhs))));
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          return To((index(RP2::template round<From,To>(rhs))));
 
           return
           (
-            (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-          : To((index(RP2::template round<From,To>(rhs))))
+              (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              : To((index(RP2::template round<From,To>(rhs))))
           );
 
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        true, false >
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      true, false >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -1018,11 +1087,11 @@ namespace boost {
       ////
 
       template <int R, int P1, typename RP1, typename OP1, typename Opt1,
-                       int P2, typename RP2, typename OP2, typename Opt2>
+      int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R,P1,RP1,OP1,Opt1>,
-        unsigned_number<R,P2,RP2,OP2,Opt2>,
-        true, false >
+      unsigned_number<R,P1,RP1,OP1,Opt1>,
+      unsigned_number<R,P2,RP2,OP2,Opt2>,
+      true, false >
       {
         typedef unsigned_number<R,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R,P2,RP2,OP2,Opt2> To;
@@ -1030,31 +1099,31 @@ namespace boost {
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-//          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          return To((index(RP2::template round<From,To>(rhs))));
+          //          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          return To((index(RP2::template round<From,To>(rhs))));
 
           return
           (
               (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-          : To((index(RP2::template round<From,To>(rhs))))
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              : To((index(RP2::template round<From,To>(rhs))))
           );
 
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        true, false >
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      true, false >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
@@ -1073,11 +1142,11 @@ namespace boost {
       /////////////////////////////////////
 
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        false, false >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      false, false >
       {
         typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -1085,19 +1154,19 @@ namespace boost {
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-//          // Overflow
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          return To(index(RP2::template round<From,To>(rhs)));
+          //          // Overflow
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          return To(index(RP2::template round<From,To>(rhs)));
 
           return
           (
@@ -1113,11 +1182,11 @@ namespace boost {
         }
       };
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        signed_number<R2,P2,RP2,OP2,Opt2>,
-        false, false >
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      signed_number<R2,P2,RP2,OP2,Opt2>,
+      false, false >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef signed_number<R2,P2,RP2,OP2,Opt2> To;
@@ -1126,31 +1195,31 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
           // Overflow
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          return To(index(RP2::template round<From,To>(rhs)));
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          return To(index(RP2::template round<From,To>(rhs)));
 
           return
           (
-            (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-          : To(index(RP2::template round<From,To>(rhs)))
+              (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              : To(index(RP2::template round<From,To>(rhs)))
           );
 
         }
       };
 
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        signed_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        false, false >
+      signed_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      false, false >
       {
         typedef signed_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
@@ -1159,40 +1228,40 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
           // Overflow
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          return To(index(RP2::template round<From,To>(rhs)));
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          return To(index(RP2::template round<From,To>(rhs)));
 
 
           return
           (
-            (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-          : (
-              (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-            ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-            : To(index(RP2::template round<From,To>(rhs)))
-            )
+              (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              : (
+                  (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+                  : To(index(RP2::template round<From,To>(rhs)))
+              )
           );
 
         }
       };
 
       template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-                int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
       struct number_cast<
-        unsigned_number<R1,P1,RP1,OP1,Opt1>,
-        unsigned_number<R2,P2,RP2,OP2,Opt2>,
-        false, false >
+      unsigned_number<R1,P1,RP1,OP1,Opt1>,
+      unsigned_number<R2,P2,RP2,OP2,Opt2>,
+      false, false >
       {
         typedef unsigned_number<R1,P1,RP1,OP1,Opt1> From;
         typedef unsigned_number<R2,P2,RP2,OP2,Opt2> To;
@@ -1201,28 +1270,28 @@ namespace boost {
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
           // Overflow
-//          underlying_type indx(((rhs.count()) >> (P2-P1)));
-//          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-//          }
-//          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-//          {
-//            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//          }
-//
-//          // Round
-//          return To(index(RP2::template round<From,To>(rhs)));
+          //          underlying_type indx(((rhs.count()) >> (P2-P1)));
+          //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
+          //          }
+          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+          //          {
+          //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+          //          }
+          //
+          //          // Round
+          //          return To(index(RP2::template round<From,To>(rhs)));
 
           return
           (
-            (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-          : (
-              (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-            ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
-            : To(index(RP2::template round<From,To>(rhs)))
-            )
+              (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
+              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              : (
+                  (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+                  : To(index(RP2::template round<From,To>(rhs)))
+              )
           );
 
         }
@@ -1314,70 +1383,67 @@ namespace boost {
     typedef fixed_point::round::truncated type;
   };
 
-
-
-
   template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-            int R2, int P2, typename RP2, typename OP2, typename Opt2>
+  int R2, int P2, typename RP2, typename OP2, typename Opt2>
   struct common_type<
-    fixed_point::unsigned_number<R1,P1,RP1,OP1,Opt1>,
-    fixed_point::unsigned_number<R2,P2,RP2,OP2,Opt2> >
+  fixed_point::unsigned_number<R1,P1,RP1,OP1,Opt1>,
+  fixed_point::unsigned_number<R2,P2,RP2,OP2,Opt2> >
   {
     typedef fixed_point::unsigned_number<
-        mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-        mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-        typename common_type<RP1,RP2>::type,
-        typename common_type<OP1,OP2>::type,
-        typename common_type<Opt1,Opt2>::type
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
     > type;
   };
 
   template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-            int R2, int P2, typename RP2, typename OP2, typename Opt2>
+  int R2, int P2, typename RP2, typename OP2, typename Opt2>
   struct common_type<
-    fixed_point::signed_number<R1,P1,RP1,OP1,Opt1>,
-    fixed_point::signed_number<R2,P2,RP2,OP2,Opt2> >
+  fixed_point::signed_number<R1,P1,RP1,OP1,Opt1>,
+  fixed_point::signed_number<R2,P2,RP2,OP2,Opt2> >
   {
     typedef fixed_point::signed_number<
-        mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-        mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-        typename common_type<RP1,RP2>::type,
-        typename common_type<OP1,OP2>::type,
-        typename common_type<Opt1,Opt2>::type
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
     > type;
   };
   template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-            int R2, int P2, typename RP2, typename OP2, typename Opt2>
+  int R2, int P2, typename RP2, typename OP2, typename Opt2>
   struct common_type<
-    fixed_point::signed_number<R1,P1,RP1,OP1,Opt1>,
-    fixed_point::unsigned_number<R2,P2,RP2,OP2,Opt2> >
+  fixed_point::signed_number<R1,P1,RP1,OP1,Opt1>,
+  fixed_point::unsigned_number<R2,P2,RP2,OP2,Opt2> >
   {
     typedef fixed_point::signed_number<
-        mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-        mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-        typename common_type<RP1,RP2>::type,
-        typename common_type<OP1,OP2>::type,
-        typename common_type<Opt1,Opt2>::type
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
     > type;
   };
   template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-            int R2, int P2, typename RP2, typename OP2, typename Opt2>
+  int R2, int P2, typename RP2, typename OP2, typename Opt2>
   struct common_type<
-    fixed_point::unsigned_number<R1,P1,RP1,OP1,Opt1>,
-    fixed_point::signed_number<R2,P2,RP2,OP2,Opt2> >
+  fixed_point::unsigned_number<R1,P1,RP1,OP1,Opt1>,
+  fixed_point::signed_number<R2,P2,RP2,OP2,Opt2> >
   {
     typedef fixed_point::signed_number<
-        mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-        mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-        typename common_type<RP1,RP2>::type,
-        typename common_type<OP1,OP2>::type,
-        typename common_type<Opt1,Opt2>::type
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
     > type;
   };
 #endif
 
-  namespace fixed_point {
-
+  namespace fixed_point
+  {
 
     /**
      * @brief Signed fixed point number.
@@ -1432,36 +1498,38 @@ namespace boost {
       /**
        * Default constructor.
        */
-      BOOST_CONSTEXPR signed_number() {} // = default;
+      BOOST_CONSTEXPR signed_number()
+      {} // = default;
       /**
        * Copy constructor.
        */
-      BOOST_CONSTEXPR signed_number(signed_number const& rhs) : value_(rhs.value_) {} // = default;
+      BOOST_CONSTEXPR signed_number(signed_number const& rhs) : value_(rhs.value_)
+      {} // = default;
 
       //! Implicit constructor from a signed_number with no larger range and no better resolution
       template <int R, int P, typename RP, typename OP, typename Opt>
       signed_number(signed_number<R,P,RP,OP,Opt> const& rhs
           , typename boost::enable_if <
-              mpl::and_ <
-                mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-                mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-              >
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
           >::type* = 0
-        )
-        : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number, true, true>()(rhs).count())
+      )
+      : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number, true, true>()(rhs).count())
       {
       }
       //! Implicit constructor from a unsigned_number with no larger range and no better resolution
       template <int R, int P, typename RP, typename OP, typename Opt>
       signed_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
           , typename boost::enable_if <
-              mpl::and_ <
-                mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-                mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-              >
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
           >::type* = 0
-        )
-        : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number, true, true>()(rhs).count())
+      )
+      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number, true, true>()(rhs).count())
       {
       }
 
@@ -1469,32 +1537,65 @@ namespace boost {
       template <int R, int P, typename RP, typename OP, typename Opt>
       explicit signed_number(signed_number<R,P,RP,OP,Opt> const& rhs
           , typename boost::disable_if <
-              mpl::and_ <
-                mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-                mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-              >
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
           >::type* = 0
-        )
-        : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number,
-            mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
-            mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
-            >()(rhs).count())
+      )
+      : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs).count())
       {
       }
       //! explicit constructor from a signed_number with larger range or better resolution
       template <int R, int P, typename RP, typename OP, typename Opt>
       explicit signed_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
           , typename boost::disable_if <
-              mpl::and_ <
-                mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-                mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-              >
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
           >::type* = 0
-        )
-        : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number,
-            mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
-            mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
-            >()(rhs).count())
+      )
+      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs).count())
+      {
+      }
+
+      //! implicit constructor from a signed_number with larger range or better resolution when wrapped by a convert_tag.
+      template <int R, int P, typename RP, typename OP, typename Opt>
+      signed_number(convert_tag<signed_number<R,P,RP,OP,Opt> > rhs
+          , typename boost::disable_if <
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
+          >::type* = 0
+      )
+      : value_(fixed_point::detail::number_cast<signed_number<R,P,RP,OP,Opt>, signed_number,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs.get()).count())
+      {
+      }
+      //! implicit constructor from a unsigned_number with larger range or better resolution when wrapped by a convert_tag.
+      template <int R, int P, typename RP, typename OP, typename Opt>
+      signed_number(convert_tag<unsigned_number<R,P,RP,OP,Opt> > rhs
+          , typename boost::disable_if <
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
+          >::type* = 0
+      )
+      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, signed_number,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs.get()).count())
       {
       }
 
@@ -1519,7 +1620,6 @@ namespace boost {
 #endif
       }
 
-
       //observers
 
       /**
@@ -1527,14 +1627,15 @@ namespace boost {
        *
        * @Returns the underlying representation.
        */
-      BOOST_CONSTEXPR underlying_type count() const {return value_;}
+      BOOST_CONSTEXPR underlying_type count() const
+      { return value_;}
 
       /**
        * @Returns the absolute zero.
        */
       static BOOST_CONSTEXPR signed_number zero()
       {
-          return signed_number(index(0));
+        return signed_number(index(0));
       }
       /**
        * @Returns the minimal value that can be represented.
@@ -1563,11 +1664,10 @@ namespace boost {
       template <typename FP>
       static FP factor()
       {
-//        if (Resolution>=0) return FP(1 << Resolution);
-//        else return FP(1)/(1 << -Resolution);
+        //        if (Resolution>=0) return FP(1 << Resolution);
+        //        else return FP(1)/(1 << -Resolution);
         if (Resolution>=0) return FP(detail::shift_left<Resolution>(1));
         else return FP(1)/(detail::shift_left<-Resolution>(1));
-
 
       }
       template <typename FP>
@@ -1639,53 +1739,73 @@ namespace boost {
       static underlying_type classify(FP x)
       {
 
-//        underlying_type indx =
-//        // Overflow
-//        if (x>max().as<FP>())
-//        {
-//          return overflow_type::template on_positive_overflow<To,underlying_type>(indx)));
-//        }
-//        if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-//        {
-//          return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-//        }
-//
-//        // Round
-//        return To(index(RP2::template round<From,To>(rhs)));
+        //        underlying_type indx = rounding_type::template round<To>(x)
+        //        // Overflow
+        //        if (x>max().as<FP>())
+        //        {
+        //          return overflow_type::template on_positive_overflow<To,underlying_type>(indx)));
+        //        }
+        //        if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
+        //        {
+        //          return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
+        //        }
+        //
+        //        // Round
+        //        return To(index(RP2::template round<From,To>(rhs)));
 
         if (x<min().as<FP>())
-          return min_index;
+        return min_index;
         if (x>max().as<FP>())
-          return max_index;
+        return max_index;
         return integer_part(x/factor<FP>());
       }
 
       //! implicit conversion from int
-      signed_number(int x) : value_(detail::shift_left<-Resolution>(x))
+      explicit signed_number(int x) : value_(detail::shift_left<-Resolution>(x))
       {}
       //! implicit conversion from float
-      signed_number(float x) : value_(classify(x))
+      explicit signed_number(float x) : value_(classify(x))
       {}
       //! implicit conversion from double
-      signed_number(double x) : value_(classify(x))
+      explicit signed_number(double x) : value_(classify(x))
       {}
       //! implicit conversion from long double
-      signed_number(long double x) : value_(classify(x))
+      explicit signed_number(long double x) : value_(classify(x))
       {}
+
+      //! implicit conversion from int
+      signed_number(convert_tag<int> x) : value_(detail::shift_left<-Resolution>(x.get()))
+      {}
+      //! implicit conversion from float
+      signed_number(convert_tag<float> x) : value_(classify(x.get()))
+      {}
+      //! implicit conversion from double
+      signed_number(convert_tag<double> x) : value_(classify(x.get()))
+      {}
+      //! implicit conversion from long double
+      signed_number(convert_tag<long double> x) : value_(classify(x.get()))
+      {}
+
+      template <typename T>
+      signed_number& operator=(convert_tag<T> v)
+      {
+        *this=signed_number(v);
+        return *this;
+      }
 
       // arithmetic
 
       /**
        * @Returns this instance.
        */
-      signed_number  operator+() const
+      signed_number operator+() const
       {
         return *this;
       }
       /**
        * @Returns a new instance with the representation negated.
        */
-      signed_number  operator-() const
+      signed_number operator-() const
       {
         // As the range is symmetric the type is preserved
         return signed_number(index(-value_));
@@ -1697,7 +1817,7 @@ namespace boost {
        */
       signed_number& operator++()
       {
-        *this+=1;
+        *this+=convert(1);
         return *this;
       }
 
@@ -1705,10 +1825,10 @@ namespace boost {
        * @Effects Post-increase this instance as if <c>*this+=1</c>
        * @Returns a copy of this instance before increasing it.
        */
-      signed_number  operator++(int)
+      signed_number operator++(int)
       {
         signed_number tmp=*this;
-        *this+=1;
+        *this+=convert(1);
         return tmp;
       }
 
@@ -1718,7 +1838,7 @@ namespace boost {
        */
       signed_number& operator--()
       {
-        *this-=1;
+        *this-=convert(1);
         return *this;
       }
 
@@ -1726,10 +1846,10 @@ namespace boost {
        * @Effects Post-decrease this instance as if <c>*this-=1</c>
        * @Returns a copy of this instance before decreasing it.
        */
-      signed_number  operator--(int)
+      signed_number operator--(int)
       {
         signed_number tmp=*this;
-        *this-=1;
+        *this-=convert(1);
         return tmp;
       }
 
@@ -1746,10 +1866,10 @@ namespace boost {
       }
 
       /**
-      * @Effects As if <c>number_cast<signed_number>(*this-rhs)</c>
-      * @Returns this instance.
-      * @Throws Any exception the Overflow policy can throw.
-      */
+       * @Effects As if <c>number_cast<signed_number>(*this-rhs)</c>
+       * @Returns this instance.
+       * @Throws Any exception the Overflow policy can throw.
+       */
       signed_number& operator-=(const signed_number& rhs)
       {
         signed_number tmp = number_cast<signed_number>(*this-rhs);
@@ -1758,10 +1878,10 @@ namespace boost {
       }
 
       /**
-      * @Effects As if <c>number_cast<signed_number>(*this*rhs)</c>
-      * @Returns this instance.
-      * @Throws Any exception the Overflow policy can throw.
-      */
+       * @Effects As if <c>number_cast<signed_number>(*this*rhs)</c>
+       * @Returns this instance.
+       * @Throws Any exception the Overflow policy can throw.
+       */
       signed_number& operator*=(const signed_number& rhs)
       {
         signed_number tmp = number_cast<signed_number>((*this) * rhs);
@@ -1770,10 +1890,10 @@ namespace boost {
       }
 
       /**
-      * @Effects As if <c>divide<signed_number>(*this,rhs)</c>
-      * @Returns this instance.
-      * @Throws Any exception the Overflow policy can throw.
-      */
+       * @Effects As if <c>divide<signed_number>(*this,rhs)</c>
+       * @Returns this instance.
+       * @Throws Any exception the Overflow policy can throw.
+       */
       signed_number& operator/=(const signed_number& rhs)
       {
         signed_number tmp = divide<signed_number>(*this , rhs);
@@ -1786,7 +1906,7 @@ namespace boost {
        *
        * @Returns a new instance with the same data representation and with the range and resolution increased by @c N.
        */
-      template <std::size_t N>
+      template <unsigned N>
       signed_number<Range+N, Resolution+N, Rounding, Overflow, Optimization>
       virtual_scale() const
       {
@@ -1796,9 +1916,9 @@ namespace boost {
       /**
        * Scales up N bits.
        *
-       * @Effects Scales up this instance as if <c>(*this)*(2^N)</c>
+       * @Effects Scales up this instance as if <c>(*this)=(*this)*(2^N)</c>
        */
-      template <std::size_t N>
+      template <unsigned N>
       void scale_up()
       {
         value_ <<= N;
@@ -1820,7 +1940,7 @@ namespace boost {
         else
         {
           signed_number tmp=
-              divide<signed_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
+          divide<signed_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
               signed_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
           value_ = tmp.count();
         }
@@ -1847,7 +1967,6 @@ namespace boost {
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
       BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
 #endif
-
 
     public:
 
@@ -1884,24 +2003,26 @@ namespace boost {
       /**
        * Default constructor.
        */
-      BOOST_CONSTEXPR unsigned_number() {} // = default;
+      BOOST_CONSTEXPR unsigned_number()
+      {} // = default;
       /**
        * Copy constructor.
        */
-      BOOST_CONSTEXPR unsigned_number(unsigned_number const& rhs) : value_(rhs.value_) {} // = default;
+      BOOST_CONSTEXPR unsigned_number(unsigned_number const& rhs) : value_(rhs.value_)
+      {} // = default;
 
 
       //! implicit constructor from a unsigned_number with no larger range and no better resolution
       template <int R, int P, typename RP, typename OP, typename Opt>
       unsigned_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
           , typename boost::enable_if <
-              mpl::and_ <
-                mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-                mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-              >
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
           >::type* = 0
-        )
-        : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number, true, true>()(rhs).count())
+      )
+      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number, true, true>()(rhs).count())
       {
       }
 
@@ -1909,16 +2030,33 @@ namespace boost {
       template <int R, int P, typename RP, typename OP, typename Opt>
       explicit unsigned_number(unsigned_number<R,P,RP,OP,Opt> const& rhs
           , typename boost::disable_if <
-              mpl::and_ <
-                mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-                mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-              >
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
           >::type* = 0
-        )
-        : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number,
-            mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
-            mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
-            >()(rhs).count())
+      )
+      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs).count())
+      {
+      }
+
+      //! implicit constructor from a unsigned_number with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename Opt>
+      unsigned_number(convert_tag<unsigned_number<R,P,RP,OP,Opt> > rhs
+          , typename boost::disable_if <
+          mpl::and_ <
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
+          >
+          >::type* = 0
+      )
+      : value_(fixed_point::detail::number_cast<unsigned_number<R,P,RP,OP,Opt>, unsigned_number,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs.get()).count())
       {
       }
 
@@ -1948,14 +2086,15 @@ namespace boost {
        *
        * @Returns the underlying representation.
        */
-      BOOST_CONSTEXPR underlying_type count() const {return value_;}
+      BOOST_CONSTEXPR underlying_type count() const
+      { return value_;}
 
       /**
        * @Returns the absolute zero.
        */
       static BOOST_CONSTEXPR unsigned_number zero()
       {
-          return unsigned_number(index(0));
+        return unsigned_number(index(0));
       }
 
       /**
@@ -2010,18 +2149,39 @@ namespace boost {
       }
 
       //! implicit conversion from int
-      unsigned_number(unsigned int x) : value_(detail::shift_left<-Resolution>(x))
+      explicit unsigned_number(unsigned int x) : value_(detail::shift_left<-Resolution>(x))
       {}
 
       //! implicit conversion from float
-      unsigned_number(float x) : value_(classify(x))
+      explicit unsigned_number(float x) : value_(classify(x))
       {}
       //! implicit conversion from double
-      unsigned_number(double x) : value_(classify(x))
+      explicit unsigned_number(double x) : value_(classify(x))
       {}
       //! implicit conversion from long double
-      unsigned_number(long double x) : value_(classify(x))
+      explicit unsigned_number(long double x) : value_(classify(x))
       {}
+
+      //! implicit conversion from int
+      unsigned_number(convert_tag<unsigned int> x) : value_(detail::shift_left<-Resolution>(x.get()))
+      {}
+
+      //! implicit conversion from float
+      unsigned_number(convert_tag<float> x) : value_(classify(x.get()))
+      {}
+      //! implicit conversion from double
+      unsigned_number(convert_tag<double> x) : value_(classify(x.get()))
+      {}
+      //! implicit conversion from long double
+      unsigned_number(convert_tag<long double> x) : value_(classify(x.get()))
+      {}
+
+      template <typename T>
+      unsigned_number& operator=(convert_tag<T> v)
+      {
+        *this=unsigned_number(v);
+        return *this;
+      }
 
       //! explicit conversion to FP.
       template <typename FP>
@@ -2079,7 +2239,7 @@ namespace boost {
       /**
        * @Returns this instance.
        */
-      unsigned_number  operator+() const
+      unsigned_number operator+() const
       {
         return *this;
       }
@@ -2094,46 +2254,46 @@ namespace boost {
 
       /**
        * @Effects Pre-increase this instance as if <c>*this+=1</c>
-       * @Returns this instance.
+       * @Returns <c>*this</c>.
        */
       unsigned_number& operator++()
       {
-        *this+=1u;
+        *this+=convert(1u);
         return *this;
       }
       /**
        * @Effects Post-increase this instance as if <c>*this+=1</c>
        * @Returns a copy of this instance before increasing it.
        */
-      unsigned_number  operator++(int)
+      unsigned_number operator++(int)
       {
         unsigned_number tmp=*this;
-        *this+=1u;
+        *this+=convert(1u);
         return tmp;
       }
       /**
        * @Effects Pre-decrease this instance as if <c>*this-=1</c>
-       * @Returns this instance.
+       * @Returns <c>*this</c>.
        */
       unsigned_number& operator--()
       {
-        *this-=1u;
+        *this-=convert(1u);
         return *this;
       }
       /**
        * @Effects Post-decrease this instance as if <c>*this-=1</c>
        * @Returns a copy of this instance before decreasing it.
        */
-      unsigned_number  operator--(int)
+      unsigned_number operator--(int)
       {
         unsigned_number tmp=*this;
-        *this-=1u;
+        *this-=convert(1u);
         return tmp;
       }
 
       /**
        * @Effects As if <c>number_cast<unsigned_number>(*this+rhs)</c>
-       * @Returns this instance.
+       * @Returns <c>*this</c>.
        * @Throws Any exception the Overflow policy can throw.
        */
       unsigned_number& operator += (unsigned_number const& rhs)
@@ -2145,7 +2305,7 @@ namespace boost {
 
       /**
        * @Effects As if <c>number_cast<unsigned_number>(*this-rhs)</c>
-       * @Returns this instance.
+       * @Returns <c>*this</c>.
        * @Throws Any exception the Overflow policy can throw.
        */
       unsigned_number& operator-=(unsigned_number const& rhs)
@@ -2156,7 +2316,7 @@ namespace boost {
       }
       /**
        * @Effects As if <c>number_cast<unsigned_number>(*this*rhs)</c>
-       * @Returns this instance.
+       * @Returns <c>*this</c>.
        * @Throws Any exception the Overflow policy can throw.
        */
       unsigned_number& operator*=(unsigned_number const& rhs)
@@ -2167,10 +2327,10 @@ namespace boost {
       }
 
       /**
-      * @Effects As if <c>divide<unsigned_number>(*this,rhs)</c>
-      * @Returns this instance.
-      * @Throws Any exception the Overflow policy can throw.
-      */
+       * @Effects As if <c>divide<unsigned_number>(*this,rhs)</c>
+       * @Returns <c>*this</c>.
+       * @Throws Any exception the Overflow policy can throw.
+       */
       unsigned_number& operator/=(unsigned_number const& rhs)
       {
         unsigned_number tmp = divide<unsigned_number>(*this, rhs);
@@ -2219,8 +2379,8 @@ namespace boost {
         else
         {
           unsigned_number tmp=
-              divide<unsigned_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
-              unsigned_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
+          divide<unsigned_number<Range, Resolution, RP, Overflow, Optimization> >(*this,
+          unsigned_number<-N+1, -N, Rounding, Overflow, Optimization>(index(1)));
           value_ = tmp.count();
         }
       }
@@ -2245,7 +2405,7 @@ namespace boost {
 #endif
     to_unsigned_number()
     {
-        return unsigned_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
+      return unsigned_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
     }
     /**
      * signed_number compile time factory.
@@ -2262,34 +2422,34 @@ namespace boost {
 #endif
     to_signed_number()
     {
-        return signed_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
+      return signed_number< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
     }
 
-//    /**
-//     * unsigned_number compile time factory from integer and fractional parts
-//     *
-//     * @Returns an @c unsigned_number enough large to represent <c>Integral.Fractional</c>.
-//     *
-//     * @Example ratio_to_fp<ratio<314,100>,-32>
-//     */
-//    template <typename Ratio, int Resolution>
-//    BOOST_CONSTEXPR
-//    inline
-//#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-//    unsigned_number< LOG2(ABS(Integral+1)), LOG2(ABS(Fractional+1))>
-//#else
-//    unsigned_number<
-//      static_log2<mpl::abs<mpl::int_<Integral+1> >::type::value>::value,
-//      static_log2<mpl::abs<mpl::int_<Fractional+1> >::type::value>::value>
-//#endif
-//    ratio_to_fp()
-//    {
-//      BOOST_CONSTEXPR intmax_t Resolution=static_log2<mpl::abs<mpl::int_<Fractional+1> >::type::value>::value;
-//      return unsigned_number<
-//            static_log2<mpl::abs<mpl::int_<Integral+1> >::type::value>::value,
-//            Resolution
-//            >(index(Times));
-//    }
+    //    /**
+    //     * unsigned_number compile time factory from integer and fractional parts
+    //     *
+    //     * @Returns an @c unsigned_number enough large to represent <c>Integral.Fractional</c>.
+    //     *
+    //     * @Example ratio_to_fp<ratio<314,100>,-32>
+    //     */
+    //    template <typename Ratio, int Resolution>
+    //    BOOST_CONSTEXPR
+    //    inline
+    //#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+    //    unsigned_number< LOG2(ABS(Integral+1)), LOG2(ABS(Fractional+1))>
+    //#else
+    //    unsigned_number<
+    //      static_log2<mpl::abs<mpl::int_<Integral+1> >::type::value>::value,
+    //      static_log2<mpl::abs<mpl::int_<Fractional+1> >::type::value>::value>
+    //#endif
+    //    ratio_to_fp()
+    //    {
+    //      BOOST_CONSTEXPR intmax_t Resolution=static_log2<mpl::abs<mpl::int_<Fractional+1> >::type::value>::value;
+    //      return unsigned_number<
+    //            static_log2<mpl::abs<mpl::int_<Integral+1> >::type::value>::value,
+    //            Resolution
+    //            >(index(Times));
+    //    }
 
 
     // signed_number non-member arithmetic
@@ -2315,7 +2475,7 @@ namespace boost {
      * @Returns <c>RT(incex(RT(lhs).count()+RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2334,13 +2494,13 @@ namespace boost {
     >
     operator+(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     signed_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef signed_number<
+      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
     }
@@ -2350,7 +2510,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2360,22 +2520,22 @@ namespace boost {
     CT(OP1,OP2),
     CT(Opt1,Opt2)
 #else
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
+#endif
+    >
+    operator+(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    {
+      typedef signed_number<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename common_type<RP1,RP2>::type,
       typename common_type<OP1,OP2>::type,
       typename common_type<Opt1,Opt2>::type
-#endif
-    >
-    operator+(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
-    {
-      typedef     signed_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
     }
@@ -2384,7 +2544,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2394,22 +2554,22 @@ namespace boost {
     CT(OP1,OP2),
     CT(Opt1,Opt2)
 #else
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
+#endif
+    >
+    operator+(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    {
+      typedef signed_number<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename common_type<RP1,RP2>::type,
       typename common_type<OP1,OP2>::type,
       typename common_type<Opt1,Opt2>::type
-#endif
-    >
-    operator+(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
-    {
-      typedef     signed_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
     }
@@ -2418,7 +2578,7 @@ namespace boost {
      * @Returns a unsigned fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     unsigned_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2428,22 +2588,22 @@ namespace boost {
     CT(OP1,OP2),
     CT(Opt1,Opt2)
 #else
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
+#endif
+    >
+    operator+(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    {
+      typedef unsigned_number<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename common_type<RP1,RP2>::type,
       typename common_type<OP1,OP2>::type,
       typename common_type<Opt1,Opt2>::type
-#endif
-    >
-    operator+(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
-    {
-      typedef     unsigned_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      > result_type;
 
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
     }
@@ -2453,7 +2613,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2463,22 +2623,22 @@ namespace boost {
     CT(OP1,OP2),
     CT(Opt1,Opt2)
 #else
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
+#endif
+    >
+    operator-(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    {
+      typedef signed_number<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename common_type<RP1,RP2>::type,
       typename common_type<OP1,OP2>::type,
       typename common_type<Opt1,Opt2>::type
-#endif
-    >
-    operator-(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
-    {
-      typedef     signed_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
     }
@@ -2488,7 +2648,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2498,22 +2658,22 @@ namespace boost {
     CT(OP1,OP2),
     CT(Opt1,Opt2)
 #else
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
+#endif
+    >
+    operator-(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    {
+      typedef signed_number<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename common_type<RP1,RP2>::type,
       typename common_type<OP1,OP2>::type,
       typename common_type<Opt1,Opt2>::type
-#endif
-    >
-    operator-(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
-    {
-      typedef     signed_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
     }
@@ -2523,7 +2683,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2533,22 +2693,22 @@ namespace boost {
     CT(OP1,OP2),
     CT(Opt1,Opt2)
 #else
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
+#endif
+    >
+    operator-(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    {
+      typedef signed_number<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename common_type<RP1,RP2>::type,
       typename common_type<OP1,OP2>::type,
       typename common_type<Opt1,Opt2>::type
-#endif
-    >
-    operator-(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
-    {
-      typedef     signed_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
     }
@@ -2558,7 +2718,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2568,22 +2728,22 @@ namespace boost {
     CT(OP1,OP2),
     CT(Opt1,Opt2)
 #else
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
+#endif
+    >
+    operator-(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
+    {
+      typedef signed_number<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename common_type<RP1,RP2>::type,
       typename common_type<OP1,OP2>::type,
       typename common_type<Opt1,Opt2>::type
-#endif
-    >
-    operator-(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
-    {
-      typedef     signed_number<
-          mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
-          mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      > result_type;
 
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
     }
@@ -2593,7 +2753,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
     R1+R2,
@@ -2610,13 +2770,13 @@ namespace boost {
     >
     operator*(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     signed_number<
-          R1+R2,
-          P1+P2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef signed_number<
+      R1+R2,
+      P1+P2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -2627,7 +2787,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
     R1+R2,
@@ -2644,13 +2804,13 @@ namespace boost {
     >
     operator*(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     signed_number<
-          R1+R2,
-          P1+P2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef signed_number<
+      R1+R2,
+      P1+P2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -2661,7 +2821,7 @@ namespace boost {
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
     R1+R2,
@@ -2678,13 +2838,13 @@ namespace boost {
     >
     operator*(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     signed_number<
-          R1+R2,
-          P1+P2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef signed_number<
+      R1+R2,
+      P1+P2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -2695,7 +2855,7 @@ namespace boost {
      * @Returns a unsigned fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     unsigned_number<
     R1+R2,
@@ -2712,13 +2872,13 @@ namespace boost {
     >
     operator*(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     unsigned_number<
-          R1+R2,
-          P1+P2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef unsigned_number<
+      R1+R2,
+      P1+P2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -2744,9 +2904,9 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    typename Res,
+    int R1, int P1, typename RP1, typename OP1, typename Opt1,
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     Res
     divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -2761,8 +2921,8 @@ namespace boost {
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 
-//      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
-//      return result_type(index(ci)); // ....
+      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
     }
@@ -2772,9 +2932,9 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    typename Res,
+    int R1, int P1, typename RP1, typename OP1, typename Opt1,
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     Res
     divide(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -2788,8 +2948,8 @@ namespace boost {
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 
-//      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
-//      return result_type(index(ci)); // ....
+      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
     }
@@ -2799,9 +2959,9 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    typename Res,
+    int R1, int P1, typename RP1, typename OP1, typename Opt1,
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     Res
     divide(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -2815,8 +2975,8 @@ namespace boost {
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 
-//      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
-//      return result_type(index(ci)); // ....
+      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
     }
@@ -2826,9 +2986,9 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the expected result.
      */
     template <
-              typename Res,
-              int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    typename Res,
+    int R1, int P1, typename RP1, typename OP1, typename Opt1,
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     Res
     divide(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -2842,8 +3002,8 @@ namespace boost {
       BOOST_STATIC_ASSERT((Res::is_signed==CT::is_signed));
       BOOST_ASSERT_MSG(CT(rhs).count()!=0, "Division by 0");
 
-//      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
-//      return result_type(index(ci)); // ....
+      //      underlying_type ci = detail::shift<typename CT::underlying_type, CT::digits, P>(CT(lhs).count()) / CT(rhs).count();
+      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(CT(lhs), CT(rhs))));
     }
@@ -2853,30 +3013,30 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
-      R1-P2,
-      P1-R2,
+    R1-P2,
+    P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      CT(RP1,RP2),
-      CT(OP1,OP2),
-      CT(Opt1,Opt2)
+    CT(RP1,RP2),
+    CT(OP1,OP2),
+    CT(Opt1,Opt2)
 #else
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
 #endif
     >
     operator/(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     signed_number<
-          R1-P2,
-          P1-R2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef signed_number<
+      R1-P2,
+      P1-R2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
 
       return divide<result_type>(lhs,rhs);
     }
@@ -2886,30 +3046,30 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
-      R1-P2,
-      P1-R2,
+    R1-P2,
+    P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      CT(RP1,RP2),
-      CT(OP1,OP2),
-      CT(Opt1,Opt2)
+    CT(RP1,RP2),
+    CT(OP1,OP2),
+    CT(Opt1,Opt2)
 #else
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
 #endif
     >
     operator/(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     signed_number<
-          R1-P2,
-          P1-R2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef signed_number<
+      R1-P2,
+      P1-R2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
 
       return divide<result_type>(lhs,rhs);
     }
@@ -2919,15 +3079,15 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     signed_number<
-      R1-P2,
-      P1-R2,
+    R1-P2,
+    P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      CT(RP1,RP2),
-      CT(OP1,OP2),
-      CT(Opt1,Opt2)
+    CT(RP1,RP2),
+    CT(OP1,OP2),
+    CT(Opt1,Opt2)
 #else
     typename common_type<RP1,RP2>::type,
     typename common_type<OP1,OP2>::type,
@@ -2936,13 +3096,13 @@ namespace boost {
     >
     operator/(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     signed_number<
-          R1-P2,
-          P1-R2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef signed_number<
+      R1-P2,
+      P1-R2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
 
       return divide<result_type>(lhs,rhs);
     }
@@ -2952,34 +3112,33 @@ namespace boost {
      * @Returns CT(lhs) / CT(rhs) taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     unsigned_number<
-      R1-P2,
-      P1-R2,
+    R1-P2,
+    P1-R2,
 #if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      CT(RP1,RP2),
-      CT(OP1,OP2),
-      CT(Opt1,Opt2)
+    CT(RP1,RP2),
+    CT(OP1,OP2),
+    CT(Opt1,Opt2)
 #else
-      typename common_type<RP1,RP2>::type,
-      typename common_type<OP1,OP2>::type,
-      typename common_type<Opt1,Opt2>::type
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<Opt1,Opt2>::type
 #endif
     >
     operator/(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
     {
-      typedef     unsigned_number<
-          R1-P2,
-          P1-R2,
-          typename common_type<RP1,RP2>::type,
-          typename common_type<OP1,OP2>::type,
-          typename common_type<Opt1,Opt2>::type
-        > result_type;
+      typedef unsigned_number<
+      R1-P2,
+      P1-R2,
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<Opt1,Opt2>::type
+      > result_type;
 
       return divide<result_type>(lhs,rhs);
     }
-
 
     // comparisons
 
@@ -2987,7 +3146,7 @@ namespace boost {
      * @Returns As if <c>CT(lhs).count() == CT(rhs).count()</c> where CT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator==(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3000,7 +3159,7 @@ namespace boost {
      * @Returns As if <c>CT(lhs).count() == CT(rhs).count()</c> where CT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator==(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3013,7 +3172,7 @@ namespace boost {
      * @Returns <c>CT(lhs).count() != CT(rhs).count()</c> where CT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator!=(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3025,7 +3184,7 @@ namespace boost {
      * @Returns <c>CT(lhs).count() != CT(rhs).count()</c> where CT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator!=(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3037,7 +3196,7 @@ namespace boost {
      * @Returns <c>CT(lhs).count() < CT(rhs).count()</c> where CT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator<(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3050,7 +3209,7 @@ namespace boost {
      * @Returns <c>CT(lhs).count() < CT(rhs).count()</c> where CT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator<(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3063,7 +3222,7 @@ namespace boost {
      * @Returns <c>rhs < lhs</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator>(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3074,7 +3233,7 @@ namespace boost {
      * @Returns <c>rhs < lhs</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator>(unsigned_number<R1,P1,RP1,OP1,Opt1> const& lhs, unsigned_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3086,7 +3245,7 @@ namespace boost {
      * @Returns <c>!(rhs < lhs)</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator<=(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3094,7 +3253,7 @@ namespace boost {
       return !(rhs < lhs);
     }
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     /**
      * @Returns <c>!(rhs < lhs)</c>.
      */
@@ -3109,7 +3268,7 @@ namespace boost {
      * @Returns <c>!(lhs < rhs)</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+      int R2, int P2, typename RP2, typename OP2, typename Opt2>
     inline
     bool
     operator>=(signed_number<R1,P1,RP1,OP1,Opt1> const& lhs, signed_number<R2,P2,RP2,OP2,Opt2> const& rhs)
@@ -3117,7 +3276,7 @@ namespace boost {
       return !(lhs < rhs);
     }
     template <int R1, int P1, typename RP1, typename OP1, typename Opt1,
-              int R2, int P2, typename RP2, typename OP2, typename Opt2>
+    int R2, int P2, typename RP2, typename OP2, typename Opt2>
     /**
      * @Returns <c>!(lhs < rhs)</c>.
      */
@@ -3146,30 +3305,43 @@ namespace std
 {
   //! numeric limits trait specializations
   template <int R, int P, typename RP, typename OP, typename Opt>
-  struct numeric_limits<boost::fixed_point::signed_number<R,P,RP,OP,Opt> >
+  struct numeric_limits<boost::fixed_point::signed_number<R, P, RP, OP, Opt> >
   {
-    typedef boost::fixed_point::signed_number<R,P,RP,OP,Opt> rep;
+    typedef boost::fixed_point::signed_number<R, P, RP, OP, Opt> rep;
   public:
-    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-    inline static rep min() { return rep::min(); }
-    inline static rep max() { return rep::max(); }
-    inline static rep lowest() { return rep::lowest(); }
-    BOOST_STATIC_CONSTEXPR int digits = rep::digits;
+    BOOST_STATIC_CONSTEXPR
+    bool is_specialized = true;
+    inline static rep min()
+    {
+      return rep::min();
+    }
+    inline static rep max()
+    {
+      return rep::max();
+    }
+    inline static rep lowest()
+    {
+      return rep::lowest();
+    }
+    BOOST_STATIC_CONSTEXPR
+    int digits = rep::digits;
     //BOOST_STATIC_CONSTEXPR int digits10 = rep::digits10;
     //BOOST_STATIC_CONSTEXPR int max_digits10 = rep::max_digits10;
-    BOOST_STATIC_CONSTEXPR bool is_signed = true;
-    BOOST_STATIC_CONSTEXPR bool is_integer = false;
-    BOOST_STATIC_CONSTEXPR bool is_exact  = true;
-    BOOST_STATIC_CONSTEXPR int radix = 2;
+    BOOST_STATIC_CONSTEXPR
+    bool is_signed = true;BOOST_STATIC_CONSTEXPR
+    bool is_integer = false;BOOST_STATIC_CONSTEXPR
+    bool is_exact = true;BOOST_STATIC_CONSTEXPR
+    int radix = 2;
     //inline static rep epsilon() { return rep::epsilon(); }
     //inline static rep round_error() { return rep::round_error(); }
     //BOOST_STATIC_CONSTEXPR int min_exponent = rep::min_exponent;
     //BOOST_STATIC_CONSTEXPR int min_exponent10  = rep::min_exponent10;
     //BOOST_STATIC_CONSTEXPR int max_exponent = rep::max_exponent;
     //BOOST_STATIC_CONSTEXPR int max_exponent10 = rep::max_exponent10;
-    BOOST_STATIC_CONSTEXPR bool has_infinity = false;
-    BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
-    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
+    BOOST_STATIC_CONSTEXPR
+    bool has_infinity = false;BOOST_STATIC_CONSTEXPR
+    bool has_quiet_NaN = false;BOOST_STATIC_CONSTEXPR
+    bool has_signaling_NaN = false;
     //BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
     //BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
     //inline static rep infinity() { return rep::infinity(); }
@@ -3177,11 +3349,13 @@ namespace std
     //inline static rep signaling_NaN() { return rep::signaling_NaN(); }
     //inline static rep denorm_min() { return rep::denorm_min<Q>(); }
     //BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
-    BOOST_STATIC_CONSTEXPR bool is_bounded = true;
-    BOOST_STATIC_CONSTEXPR bool is_modulo = RP::is_modulo;
-    BOOST_STATIC_CONSTEXPR bool traps = true;
+    BOOST_STATIC_CONSTEXPR
+    bool is_bounded = true;BOOST_STATIC_CONSTEXPR
+    bool is_modulo = RP::is_modulo;BOOST_STATIC_CONSTEXPR
+    bool traps = true;
     //BOOST_STATIC_CONSTEXPR bool tinyness_before = rep::tinyness_before;
-    BOOST_STATIC_CONSTEXPR float_round_style round_style = RP::round_style;
+    BOOST_STATIC_CONSTEXPR
+    float_round_style round_style = RP::round_style;
   };
 }
 

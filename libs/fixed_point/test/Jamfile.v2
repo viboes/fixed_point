@@ -24,7 +24,7 @@ project
         <toolset>darwin:<cxxflags>-ansi
         <toolset>darwin:<cxxflags>-fpermissive
         <toolset>darwin:<cxxflags>-Wno-long-long
-        <toolset>darwin:<cxxflags>-Wno-type-limits
+        #<toolset>darwin:<cxxflags>-Wno-type-limits
 
         #<toolset>pathscale:<cxxflags>-Wextra
         <toolset>pathscale:<cxxflags>-Wno-long-long
@@ -44,7 +44,10 @@ project
         <toolset>gcc-mingw-4.8.0:<cxxflags>-fdiagnostics-show-option
 
         <toolset>darwin-4.6.2:<cxxflags>-Wno-delete-non-virtual-dtor
+        <toolset>darwin-4.6.2:<cxxflags>-Wno-type-limits
         <toolset>darwin-4.7.0:<cxxflags>-Wno-delete-non-virtual-dtor
+        <toolset>darwin-4.7.0:<cxxflags>-Wno-type-limits
+
 
         #<toolset>clang-2.8:<cxxflags>-Wno-delete-non-virtual-dtor
         #<toolset>clang-2.8:<cxxflags>-Wno-unused-function
