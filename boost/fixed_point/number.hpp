@@ -22,7 +22,6 @@
 #include <boost/mpl/max.hpp>
 #include <boost/mpl/min.hpp>
 #include <boost/mpl/assert.hpp>
-//#include <boost/type_traits/common_type.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -70,6 +69,7 @@ namespace boost
         BOOST_STATIC_CONSTEXPR
         std::size_t digits = From::digits - To::resolution_exp;
         typedef typename ::boost::int_t<digits>::fast result_type;
+        //typedef typename From::underlying_type result_type;
         static result_type apply(typename From::underlying_type v)
         {
           return result_type(v) << -To::resolution_exp;
@@ -493,7 +493,6 @@ namespace boost
       };
     }
 
-
     /**
      * Namespace for conversion policies.
      */
@@ -546,6 +545,19 @@ namespace boost
         typedef bound::bounded bound_type;
       };
     }
+
+    template <typename F>
+    struct is_explicit: public is_same<typename F::conversion_type, conversion::explicitly>
+    {
+    };
+    template <typename F>
+    struct is_bounded: public is_same<typename F::bound_type, bound::bounded>
+    {
+    };
+    template <typename F>
+    struct is_open: public is_same<typename F::arithmetic_type, arithmetic::open>
+    {
+    };
 
     template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
         typename Family = family::f1>
@@ -1367,146 +1379,202 @@ namespace boost
     };
 
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-  // default_type trait specializations
+    // default_type trait specializations
 
-  template <>
-  struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::modulus>
-  {
-    typedef fixed_point::overflow::modulus type;
-  };
-  template <>
-  struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::undefined>
-  {
-    typedef fixed_point::overflow::modulus type;
-  };
+    template <>
+    struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::modulus>
+    {
+      typedef fixed_point::overflow::modulus type;
+    };
+    template <>
+    struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::undefined>
+    {
+      typedef fixed_point::overflow::modulus type;
+    };
 
-  template <>
-  struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::undefined>
-  {
-    typedef fixed_point::overflow::saturate type;
-  };
-  template <>
-  struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::saturate>
-  {
-    typedef fixed_point::overflow::saturate type;
-  };
+    template <>
+    struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::undefined>
+    {
+      typedef fixed_point::overflow::saturate type;
+    };
+    template <>
+    struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::saturate>
+    {
+      typedef fixed_point::overflow::saturate type;
+    };
 
-  template <>
-  struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::modulus>
-  {
-    typedef fixed_point::overflow::exception type;
-  };
-  template <>
-  struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::saturate>
-  {
-    typedef fixed_point::overflow::exception type;
-  };
-  template <>
-  struct default_type<fixed_point::overflow::exception, fixed_point::overflow::exception>
-  {
-    typedef fixed_point::overflow::exception type;
-  };
-  template <typename Overflow>
-  struct default_type<fixed_point::overflow::exception, Overflow>
-  {
-    typedef fixed_point::overflow::exception type;
-  };
-  template <typename Overflow>
-  struct default_type<Overflow,fixed_point::overflow::exception>
-  {
-    typedef fixed_point::overflow::exception type;
-  };
+    template <>
+    struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::modulus>
+    {
+      typedef fixed_point::overflow::exception type;
+    };
+    template <>
+    struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::saturate>
+    {
+      typedef fixed_point::overflow::exception type;
+    };
+    template <>
+    struct default_type<fixed_point::overflow::exception, fixed_point::overflow::exception>
+    {
+      typedef fixed_point::overflow::exception type;
+    };
+    template <typename Overflow>
+    struct default_type<fixed_point::overflow::exception, Overflow>
+    {
+      typedef fixed_point::overflow::exception type;
+    };
+    template <typename Overflow>
+    struct default_type<Overflow,fixed_point::overflow::exception>
+    {
+      typedef fixed_point::overflow::exception type;
+    };
 
-  template <>
-  struct default_type<fixed_point::overflow::impossible, fixed_point::overflow::impossible>
-  {
-    typedef fixed_point::overflow::impossible type;
-  };
-  template <typename Overflow>
-  struct default_type<fixed_point::overflow::impossible, Overflow>
-  {
-    typedef Overflow type;
-  };
-  template <typename Overflow>
-  struct default_type<Overflow,fixed_point::overflow::impossible>
-  {
-    typedef Overflow type;
-  };
+    template <>
+    struct default_type<fixed_point::overflow::impossible, fixed_point::overflow::impossible>
+    {
+      typedef fixed_point::overflow::impossible type;
+    };
+    template <typename Overflow>
+    struct default_type<fixed_point::overflow::impossible, Overflow>
+    {
+      typedef Overflow type;
+    };
+    template <typename Overflow>
+    struct default_type<Overflow,fixed_point::overflow::impossible>
+    {
+      typedef Overflow type;
+    };
 
-  template <>
-  struct default_type<fixed_point::round::truncated,fixed_point::round::truncated>
-  {
-    typedef fixed_point::round::truncated type;
-  };
-  template <typename Round>
-  struct default_type<Round,fixed_point::round::truncated>
-  {
-    typedef fixed_point::round::truncated type;
-  };
-  template <typename Round>
-  struct default_type<fixed_point::round::truncated,Round>
-  {
-    typedef fixed_point::round::truncated type;
-  };
+    template <>
+    struct default_type<fixed_point::round::truncated,fixed_point::round::truncated>
+    {
+      typedef fixed_point::round::truncated type;
+    };
+    template <typename Round>
+    struct default_type<Round,fixed_point::round::truncated>
+    {
+      typedef fixed_point::round::truncated type;
+    };
+    template <typename Round>
+    struct default_type<fixed_point::round::truncated,Round>
+    {
+      typedef fixed_point::round::truncated type;
+    };
 
-  template <int R1, int P1, typename RP1, typename OP1, typename F1,
-  int R2, int P2, typename RP2, typename OP2, typename F2>
-  struct default_type<
-  fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
-  fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
-  {
-    typedef fixed_point::ureal_t<
-    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-    > type;
-  };
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    struct default_type<
+    fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
+    fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
+    {
+      typedef fixed_point::ureal_t<
+      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      > type;
+    };
 
-  template <int R1, int P1, typename RP1, typename OP1, typename F1,
-  int R2, int P2, typename RP2, typename OP2, typename F2>
-  struct default_type<
-  fixed_point::real_t<R1,P1,RP1,OP1,F1>,
-  fixed_point::real_t<R2,P2,RP2,OP2,F2> >
-  {
-    typedef fixed_point::real_t<
-    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-    > type;
-  };
-  template <int R1, int P1, typename RP1, typename OP1, typename F1,
-  int R2, int P2, typename RP2, typename OP2, typename F2>
-  struct default_type<
-  fixed_point::real_t<R1,P1,RP1,OP1,F1>,
-  fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
-  {
-    typedef fixed_point::real_t<
-    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-    > type;
-  };
-  template <int R1, int P1, typename RP1, typename OP1, typename F1,
-  int R2, int P2, typename RP2, typename OP2, typename F2>
-  struct default_type<
-  fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
-  fixed_point::real_t<R2,P2,RP2,OP2,F2> >
-  {
-    typedef fixed_point::real_t<
-    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-    > type;
-  };
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    struct default_type<
+    fixed_point::real_t<R1,P1,RP1,OP1,F1>,
+    fixed_point::real_t<R2,P2,RP2,OP2,F2> >
+    {
+      typedef fixed_point::real_t<
+      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      > type;
+    };
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    struct default_type<
+    fixed_point::real_t<R1,P1,RP1,OP1,F1>,
+    fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
+    {
+      typedef fixed_point::real_t<
+      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      > type;
+    };
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    struct default_type<
+    fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
+    fixed_point::real_t<R2,P2,RP2,OP2,F2> >
+    {
+      typedef fixed_point::real_t<
+      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      > type;
+    };
 #endif
+
+    template <typename T, typename U>
+    struct is_more_precisse;
+
+    template <
+    int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2
+    >
+    struct is_more_precisse<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> > :
+    mpl::and_ <
+    mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
+    mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
+    >
+    {};
+
+    template <
+    int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2
+    >
+    struct is_more_precisse<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> > :
+    mpl::and_ <
+    mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
+    mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
+    >
+    {};
+
+    template <
+    int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2
+    >
+    struct is_more_precisse<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> > :
+    mpl::and_ <
+    mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
+    mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
+    >
+    {};
+
+    template <typename S, typename T>
+    struct is_convertible : is_more_precisse<T,S>
+    {};
+
+    template <typename S, typename T>
+    struct is_explicitly_convertible :
+    mpl::and_<
+    is_explicit<typename T::family_type>,
+    mpl::not_<is_more_precisse<T,S> >
+    >
+    {};
+
+    template <typename S, typename T>
+    struct is_implicitly_convertible :
+    mpl::and_<
+    mpl::not_<is_explicit<typename T::family_type> >,
+    mpl::not_<is_more_precisse<T,S> >
+    >
+    {};
 
     /**
      * @brief Signed fixed point number.
@@ -1573,12 +1641,7 @@ namespace boost
       //! Implicit constructor from a real_t with no larger range and no better resolution
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(real_t<R,P,RP,OP,F> const& rhs
-          , typename boost::enable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
+          , typename boost::enable_if<is_convertible<real_t<R,P,RP,OP,F>, real_t > >::type* = 0
       )
       : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
@@ -1586,12 +1649,7 @@ namespace boost
       //! Implicit constructor from a ureal_t with no larger range and no better resolution
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(ureal_t<R,P,RP,OP,F> const& rhs
-          , typename boost::enable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
+          , typename boost::enable_if<is_convertible<ureal_t<R,P,RP,OP,F>, real_t > >::type* = 0
       )
       : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
@@ -1600,12 +1658,18 @@ namespace boost
       //! explicit constructor from a real_t with larger range or better resolution
       template <int R, int P, typename RP, typename OP, typename F>
       explicit real_t(real_t<R,P,RP,OP,F> const& rhs
-          , typename boost::disable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
+          , typename boost::enable_if <is_explicitly_convertible<real_t<R,P,RP,OP,F>,real_t> >::type* = 0
+      )
+      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs).count())
+      {
+      }
+      //! constructor from a real_t with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      real_t(real_t<R,P,RP,OP,F> const& rhs
+          , typename boost::enable_if <is_implicitly_convertible<real_t<R,P,RP,OP,F>,real_t> >::type* = 0
       )
       : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
@@ -1616,12 +1680,19 @@ namespace boost
       //! explicit constructor from a real_t with larger range or better resolution
       template <int R, int P, typename RP, typename OP, typename F>
       explicit real_t(ureal_t<R,P,RP,OP,F> const& rhs
-          , typename boost::disable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
+          , typename boost::enable_if <is_explicitly_convertible<ureal_t<R,P,RP,OP,F>,real_t> >::type* = 0
+      )
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs).count())
+      {
+      }
+
+      //! constructor from a real_t with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      real_t(ureal_t<R,P,RP,OP,F> const& rhs
+          , typename boost::enable_if <is_implicitly_convertible<ureal_t<R,P,RP,OP,F>,real_t> >::type* = 0
       )
       : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
@@ -1632,14 +1703,7 @@ namespace boost
 
       //! implicit constructor from a real_t with larger range or better resolution when wrapped by a convert_tag.
       template <int R, int P, typename RP, typename OP, typename F>
-      real_t(convert_tag<real_t<R,P,RP,OP,F> > rhs
-          , typename boost::disable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
-      )
+      real_t(convert_tag<real_t<R,P,RP,OP,F> > rhs)
       : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
@@ -1648,14 +1712,7 @@ namespace boost
       }
       //! implicit constructor from a ureal_t with larger range or better resolution when wrapped by a convert_tag.
       template <int R, int P, typename RP, typename OP, typename F>
-      real_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs
-          , typename boost::disable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
-      )
+      real_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs)
       : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
@@ -1676,7 +1733,8 @@ namespace boost
        * @Requires <c>min_index<=i<=max_index</c>.
        */
       template <typename UT>
-      BOOST_CONSTEXPR explicit real_t(index_tag<UT> i) : value_(i.get())
+      BOOST_CONSTEXPR explicit real_t(index_tag<UT> i)
+      : value_(i.get())
       {
 #if defined(BOOST_NO_CONSTEXPR)
         BOOST_ASSERT(i.get()>=min_index);
@@ -2055,7 +2113,6 @@ namespace boost
       BOOST_MPL_ASSERT_MSG(!boost::is_signed<underlying_type>::value, UNDERLYING_TYPE_MUST_BE_UNSIGNED, (underlying_type));
 #endif
 
-
       //! whether the tyoe is signed (always @c false).
       BOOST_STATIC_CONSTEXPR bool is_signed = false;
       //! The standard std::number_traits<>::digits.
@@ -2081,12 +2138,7 @@ namespace boost
       //! implicit constructor from a ureal_t with no larger range and no better resolution
       template <int R, int P, typename RP, typename OP, typename F>
       ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
-          , typename boost::enable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
+          , typename boost::enable_if<is_convertible<ureal_t<R,P,RP,OP,F>, ureal_t > >::type* = 0
       )
       : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t, true, true>()(rhs).count())
       {
@@ -2095,12 +2147,19 @@ namespace boost
       //! explicit constructor from a ureal_t with larger range or better resolution
       template <int R, int P, typename RP, typename OP, typename F>
       explicit ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
-          , typename boost::disable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
+          , typename boost::enable_if<is_explicitly_convertible<ureal_t<R,P,RP,OP,F>, ureal_t > >::type* = 0
+      )
+      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
+          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
+          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
+          >()(rhs).count())
+      {
+      }
+
+      //! constructor from a ureal_t with larger range or better resolution
+      template <int R, int P, typename RP, typename OP, typename F>
+      ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
+          , typename boost::enable_if<is_implicitly_convertible<ureal_t<R,P,RP,OP,F>, ureal_t > >::type* = 0
       )
       : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
@@ -2111,14 +2170,7 @@ namespace boost
 
       //! implicit constructor from a ureal_t with larger range or better resolution
       template <int R, int P, typename RP, typename OP, typename F>
-      ureal_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs
-          , typename boost::disable_if <
-          mpl::and_ <
-          mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >,
-          mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >
-          >
-          >::type* = 0
-      )
+      ureal_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs)
       : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
@@ -2535,7 +2587,19 @@ namespace boost
 
       return lhs + arg_type(rhs);
     }
+    /**
+     * unsigned + unsigned int -> signed.
+     * @Returns <c>lhs+AT(rhs)</c>.
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1>
+    inline
+    ureal_t<R1+1,P1,RP1,OP1,F1>
+    operator+(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, unsigned int rhs)
+    {
+      typedef ureal_t<R1,P1,RP1,OP1,F1> arg_type;
 
+      return lhs + arg_type(rhs);
+    }
     /**
      * signed + signed -> signed.
      * @Returns <c>RT(incex(RT(lhs).count()+RT(rhs).count())</c>.

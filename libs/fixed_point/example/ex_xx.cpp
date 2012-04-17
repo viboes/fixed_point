@@ -1090,7 +1090,19 @@ int main()
     f1 = convert(1.2345); // Conversion from floating point.
     f2 = convert(f1 + 2); // Mixed arithmetic with integers.
     f2 = convert(f1 / f2); // Arithmetic on fixed-point values.
+    //std::cout<< float(f1) << std::endl;
   }
+  {
+    std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+    typedef ureal_t<15, -16> ufp_15__16; // Signed fixed-point values with 15 bits of integer part
+    // and 16 bits of fractional part.
+    ufp_15__16 f1, f2;
+    f1 = convert(1.2345); // Conversion from floating point.
+    f2 = convert(f1 + 2U); // Mixed arithmetic with integers.
+    f2 = convert(f1 / f2); // Arithmetic on fixed-point values.
+    //std::cout<< float(f1) << std::endl;
+  }
+
   return boost::report_errors();
 }
 
