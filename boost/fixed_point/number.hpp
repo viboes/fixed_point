@@ -548,7 +548,19 @@ namespace boost
     }
 
     template <typename F>
-    struct is_explicit: public is_same<typename F::conversion_from_fixed_point_type, conversion::explicitly>
+    struct allows_explicit_conversion_from_fp: public is_same<typename F::conversion_from_fixed_point_type, conversion::explicitly>
+    {
+    };
+    template <typename F>
+    struct allows_explicit_conversion_from_builtin: public is_same<typename F::conversion_from_builtin_type, conversion::explicitly>
+    {
+    };
+    template <typename F>
+    struct allows_implicit_conversion_from_fp: public is_same<typename F::conversion_from_fixed_point_type, conversion::implicitly>
+    {
+    };
+    template <typename F>
+    struct allows_implicit_conversion_from_builtin: public is_same<typename F::conversion_from_builtin_type, conversion::implicitly>
     {
     };
     template <typename F>
@@ -830,11 +842,9 @@ namespace boost
           //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
           //          // Overflow
           //          if (indx < To::min_index)
-          //          {
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //          // No round needed
-          //          return To(index(underlying_type(rhs.count()) << (P1-P2)));
+          //          else // No round needed
+          //            return To(index(underlying_type(rhs.count()) << (P1-P2)));
 
           return
           (
@@ -861,23 +871,15 @@ namespace boost
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-
           //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
           //          // Overflow impossible
           //          if (indx > To::max_index)
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //          if (indx < To::min_index)
-          //          {
+          //          else if (indx < To::min_index)
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // No round needed
-          //          return To(index(indx));
+          //          else // No round needed
+          //            return To(index(indx));
 
-          // Overflow impossible
-          // No round needed
           return
           (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
@@ -907,19 +909,12 @@ namespace boost
           //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
           //          // Overflow impossible
           //          if (indx > To::max_index)
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //          if (indx < To::min_index)
-          //          {
+          //          else if (indx < To::min_index)
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // No round needed
-          //          return To(index(indx));
+          //          else // No round needed
+          //            return To(index(indx));
 
-          // Overflow impossible
-          // No round needed
           return (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
               ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
@@ -948,12 +943,9 @@ namespace boost
           //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
           //          // Overflow
           //          if (indx > To::max_index)
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // No round needed
-          //          return To(index(indx));
+          //          else // No round needed
+          //            return To(index(indx));
           //
           return
           (
@@ -980,12 +972,9 @@ namespace boost
           //          underlying_type indx((underlying_type(rhs.count()) << (P1-P2)));
           //          // Overflow
           //          if (indx > To::max_index)
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // No round needed
-          //          return To(index(indx));
+          //          else // No round needed
+          //            return To(index(indx));
 
           return
           (
@@ -1015,19 +1004,13 @@ namespace boost
           //          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-          //          {
+          //          else if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
+          //          else // Round
           //          To res((index(RP2::template round<From,To>(rhs))));
           //          return res;
 
-          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
           return
           (
               (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
@@ -1054,7 +1037,6 @@ namespace boost
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
           // No overflow check needed as the case for the same range exponent is explicit above
-
           // Round
           return To(index(RP2::template round<From,To>(rhs)));
         }
@@ -1075,18 +1057,13 @@ namespace boost
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-          // Overflow
+          //          // Overflow
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-          //          {
+          //          else if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
+          //          else // Round
           //          return To((index(RP2::template round<From,To>(rhs))));
 
           return
@@ -1116,14 +1093,11 @@ namespace boost
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
+          //          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
+          //          else // Round
           //          return To((index(RP2::template round<From,To>(rhs))));
 
           return
@@ -1173,12 +1147,9 @@ namespace boost
           //          // Overflow could be possible because more resolution implies a bigger range when the range exponents are the same.
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
-          //          return To((index(RP2::template round<From,To>(rhs))));
+          //          else // Round
+          //            return To((index(RP2::template round<From,To>(rhs))));
 
           return
           (
@@ -1203,7 +1174,6 @@ namespace boost
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
           // No overflow check needed as the case for the same range exponent is explicit above
-
           // Round
           return To(index(RP2::template round<From,To>(rhs)));
         }
@@ -1228,16 +1198,11 @@ namespace boost
           //          // Overflow
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-          //          {
+          //          else if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
-          //          return To(index(RP2::template round<From,To>(rhs)));
+          //          else // Round
+          //            return To(index(RP2::template round<From,To>(rhs)));
 
           return
           (
@@ -1265,15 +1230,12 @@ namespace boost
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-          // Overflow
+          //          // Overflow
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
-          //          return To(index(RP2::template round<From,To>(rhs)));
+          //          else // Round
+          //            return To(index(RP2::template round<From,To>(rhs)));
 
           return
           (
@@ -1298,19 +1260,14 @@ namespace boost
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-          // Overflow
+          //          // Overflow
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-          //          {
+          //          else if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
-          //          return To(index(RP2::template round<From,To>(rhs)));
+          //          else // Round
+          //            return To(index(RP2::template round<From,To>(rhs)));
 
 
           return
@@ -1340,19 +1297,14 @@ namespace boost
 
         BOOST_CONSTEXPR To operator()(const From& rhs) const
         {
-          // Overflow
+          //          // Overflow
           //          underlying_type indx(((rhs.count()) >> (P2-P1)));
           //          if (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-          //          {
           //            return To(index(OP2::template on_positive_overflow<To,underlying_type>(indx)));
-          //          }
-          //          if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-          //          {
+          //          else if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
           //            return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-          //          }
-          //
-          //          // Round
-          //          return To(index(RP2::template round<From,To>(rhs)));
+          //          else  // Round
+          //            return To(index(RP2::template round<From,To>(rhs)));
 
           return
           (
@@ -1569,7 +1521,7 @@ namespace boost
     template <typename S, typename T>
     struct is_explicitly_convertible :
     mpl::and_<
-    is_explicit<T>,
+    mpl::not_<allows_implicit_conversion_from_fp<T> >,
     mpl::not_<is_more_precisse<T,S> >
     >
     {};
@@ -1577,7 +1529,7 @@ namespace boost
     template <typename S, typename T>
     struct is_implicitly_convertible :
     mpl::and_<
-    mpl::not_<is_explicit<T> >,
+    allows_implicit_conversion_from_fp<T>,
     mpl::not_<is_more_precisse<T,S> >
     >
     {};
@@ -1619,6 +1571,8 @@ namespace boost
       typedef typename family_type::storage_type storage_type;
       //! the conversion policy
       typedef typename family_type::conversion_from_fixed_point_type conversion_from_fixed_point_type;
+      typedef typename family_type::conversion_from_builtin_type conversion_from_builtin_type;
+
       //! the arithmetic policy
       typedef typename family_type::arithmetic_type arithmetic_type;
       //! the arithmetic policy
@@ -1898,7 +1852,14 @@ namespace boost
       }
 
       //! implicit conversion from int
-      explicit real_t(int x) : value_(detail::shift_left<-Resolution>(x))
+//      real_t(int x
+//           typename boost::enable_if<allows_implicit_conversion_from_builtin<real_t>       >::type* = 0
+//          ) : value_(detail::shift_left<-Resolution>(x))
+//      {}
+      //! explicit conversion from int
+      explicit real_t(int x
+          //, typename boost::disable_if<allows_implicit_conversion_from_builtin<real_t> >::type* = 0
+          ) : value_(detail::shift_left<-Resolution>(x))
       {}
       //! implicit conversion from float
       explicit real_t(float x) : value_(classify(x))
@@ -2123,6 +2084,7 @@ namespace boost
       typedef typename family_type::storage_type storage_type;
       //! the conversion policy
       typedef typename family_type::conversion_from_fixed_point_type conversion_from_fixed_point_type;
+      typedef typename family_type::conversion_from_builtin_type conversion_from_builtin_type;
       //! the arithmetic policy
       typedef typename family_type::arithmetic_type arithmetic_type;
       //! the arithmetic policy
