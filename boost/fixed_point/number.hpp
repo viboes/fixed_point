@@ -449,7 +449,8 @@ namespace boost
       struct undefined
       {
         /**
-         * signed_integer_type: Gets the signed integer type with enough bits to manage with the Range and Resolution depending on the F
+         * signed_integer_type: Gets the signed integer type with enough bits to manage with
+         * the Range and Resolution depending on the F
          */
         template <int Range, int Resolution>
         struct signed_integer_type
@@ -458,7 +459,8 @@ namespace boost
         };
 
         /**
-         * unsigned_integer_type: Gets the unsigned integer type with enough bits to manage with the Range and Resolution depending on the F
+         * unsigned_integer_type: Gets the unsigned integer type with enough bits to manage with
+         * the Range and Resolution depending on the F
          */
         template <int Range, int Resolution>
         struct unsigned_integer_type
@@ -855,7 +857,11 @@ namespace boost
           return
           (
               (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
-              ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              ? To(index(
+                  OP2::template on_negative_overflow<To,underlying_type>(
+                      ((underlying_type(rhs.count()) << (P1-P2)))
+                      )
+                  ))
               : To(index(underlying_type(rhs.count()) << (P1-P2)))
           );
 
@@ -889,10 +895,18 @@ namespace boost
           return
           (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
-              ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              ? To(index(
+                  OP2::template on_positive_overflow<To,underlying_type>(
+                      ((underlying_type(rhs.count()) << (P1-P2)))
+                      )
+                  ))
               : (
                   (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
-                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+                  ? To(index(
+                      OP2::template on_negative_overflow<To,underlying_type>(
+                          ((underlying_type(rhs.count()) << (P1-P2)))
+                          )
+                      ))
                   : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
               )
           );
@@ -923,10 +937,18 @@ namespace boost
 
           return (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
-              ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              ? To(index(
+                      OP2::template on_positive_overflow<To,underlying_type>(
+                          ((underlying_type(rhs.count()) << (P1-P2)))
+                      )
+                  ))
               : (
                   (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
-                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+                  ? To(index(
+                          OP2::template on_negative_overflow<To,underlying_type>(
+                              ((underlying_type(rhs.count()) << (P1-P2)))
+                          )
+                      ))
                   : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
               )
           );
@@ -956,7 +978,11 @@ namespace boost
           return
           (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
-              ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              ? To(index(
+                      OP2::template on_positive_overflow<To,underlying_type>(
+                          ((underlying_type(rhs.count()) << (P1-P2)))
+                      )
+                  ))
               : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
           );
         }
@@ -985,7 +1011,9 @@ namespace boost
           return
           (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
-              ? To(index(OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))))
+              ? To(index(
+                      OP2::template on_positive_overflow<To,underlying_type>(((underlying_type(rhs.count()) << (P1-P2))))
+                  ))
               : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
           );
 
@@ -1075,10 +1103,14 @@ namespace boost
           return
           (
               (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
-              ? To(index(OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+              ? To(index(
+                  OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))
+                  ))
               : (
                   (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-                  ? To(index(OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))))
+                  ? To(index(
+                      OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))
+                      ))
                   : To((index(RP2::template round<From,To>(rhs))))
               )
           );
@@ -1658,7 +1690,8 @@ namespace boost
     class real_t
     {
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      BOOST_MPL_ASSERT_MSG(Range>=Resolution, RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
+      BOOST_MPL_ASSERT_MSG(Range>=Resolution,
+          RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
 #endif
     public:
 
@@ -1688,18 +1721,23 @@ namespace boost
       //! The underlying integer type
       typedef typename storage_type::template signed_integer_type<Range,Resolution>::type underlying_type;
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution+1), UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
-      BOOST_MPL_ASSERT_MSG(boost::is_signed<underlying_type>::value, UNDERLYING_TYPE_MUST_BE_SIGNED, (underlying_type));
+      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution+1),
+          UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
+      BOOST_MPL_ASSERT_MSG(boost::is_signed<underlying_type>::value,
+          UNDERLYING_TYPE_MUST_BE_SIGNED, (underlying_type));
 #endif
 
       //! whether the tyoe is signed (always true).
       BOOST_STATIC_CONSTEXPR bool is_signed = true;
       //! The standard std::number_traits<>::digits.
-      BOOST_STATIC_CONSTEXPR std::size_t digits = detail::signed_integer_traits<underlying_type,Range,Resolution>::digits;
+      BOOST_STATIC_CONSTEXPR std::size_t digits =
+      detail::signed_integer_traits<underlying_type,Range,Resolution>::digits;
       //! The standard std::number_traits<>::min_index
-      BOOST_STATIC_CONSTEXPR underlying_type min_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_min;
+      BOOST_STATIC_CONSTEXPR underlying_type min_index =
+      detail::signed_integer_traits<underlying_type,Range,Resolution>::const_min;
       //! The standard std::number_traits<>::max_index
-      BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
+      BOOST_STATIC_CONSTEXPR underlying_type max_index =
+      detail::signed_integer_traits<underlying_type,Range,Resolution>::const_max;
 
       // construct/copy/destroy:
 
@@ -2192,18 +2230,23 @@ namespace boost
       typedef typename storage_type::template unsigned_integer_type<Range,Resolution>::type underlying_type;
 
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution), UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
-      BOOST_MPL_ASSERT_MSG(!boost::is_signed<underlying_type>::value, UNDERLYING_TYPE_MUST_BE_UNSIGNED, (underlying_type));
+      BOOST_MPL_ASSERT_MSG((sizeof(underlying_type)*8) >= (Range-Resolution),
+          UNDERLYING_TYPE_MUST_BE_LARGE_ENOUGH, (underlying_type));
+      BOOST_MPL_ASSERT_MSG(!boost::is_signed<underlying_type>::value,
+          UNDERLYING_TYPE_MUST_BE_UNSIGNED, (underlying_type));
 #endif
 
       //! whether the tyoe is signed (always @c false).
       BOOST_STATIC_CONSTEXPR bool is_signed = false;
       //! The standard std::number_traits<>::digits.
-      BOOST_STATIC_CONSTEXPR std::size_t digits = detail::unsigned_integer_traits<underlying_type,Range,Resolution>::digits;
+      BOOST_STATIC_CONSTEXPR std::size_t digits =
+      detail::unsigned_integer_traits<underlying_type,Range,Resolution>::digits;
       //! The standard std::number_traits<>::min_index
-      BOOST_STATIC_CONSTEXPR underlying_type min_index = detail::unsigned_integer_traits<underlying_type,Range,Resolution>::const_min;
+      BOOST_STATIC_CONSTEXPR underlying_type min_index =
+      detail::unsigned_integer_traits<underlying_type,Range,Resolution>::const_min;
       //! The standard std::number_traits<>::max_index
-      BOOST_STATIC_CONSTEXPR underlying_type max_index = detail::unsigned_integer_traits<underlying_type,Range,Resolution>::const_max;
+      BOOST_STATIC_CONSTEXPR underlying_type max_index =
+      detail::unsigned_integer_traits<underlying_type,Range,Resolution>::const_max;
 
       // construct/copy/destroy:
       /**
@@ -2444,7 +2487,8 @@ namespace boost
         return *this;
       }
       /**
-       * @Returns an instance of a signed fixed point nummber with the representation the negation of the representation of this.
+       * @Returns an instance of a signed fixed point number with
+       * the representation the negation of the representation of this.
        */
       real_t<Range,Resolution,Rounding,Overflow,Family>
       operator-() const
@@ -2605,7 +2649,9 @@ namespace boost
 #endif
     to_unsigned_number()
     {
-      return ureal_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
+      return ureal_t<
+      static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution
+      >(index(Times));
     }
     /**
      * real_t compile time factory.
@@ -2622,7 +2668,9 @@ namespace boost
 #endif
     to_signed_number()
     {
-      return real_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>(index(Times));
+      return real_t<
+      static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution
+      > (index(Times));
     }
 
     //    /**
@@ -3028,21 +3076,6 @@ namespace boost
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
     }
 
-    /*
-     * N = C*D+R
-     * P*N = P*C*D+P*R
-     * X=INT(P*N/D)=P*C
-     * X/P <= N/D < (X+1)/P
-     * 2X/2P <= N/D < 2(X+1)/2P
-     *
-     * exact    : X/P == N/D
-     * near_down: X/P < N/D < (2X+1)/2P
-     * half     :             (2X+1)/2P == N/D
-     * near_up  :             (2X+1)/2P < N/D < (X+1)/P
-     *
-     *
-     */
-
     /**
      * fixed point division giving the expected result type.
      * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
@@ -3065,8 +3098,6 @@ namespace boost
       BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
       BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
-      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
@@ -3092,8 +3123,6 @@ namespace boost
       BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
       BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
-      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
@@ -3119,8 +3148,6 @@ namespace boost
       BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
       BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
-      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
@@ -3146,8 +3173,6 @@ namespace boost
       BOOST_STATIC_ASSERT((Res::is_signed==DT::is_signed));
       BOOST_ASSERT_MSG(DT(rhs).count()!=0, "Division by 0");
 
-      //      underlying_type ci = detail::shift<typename DT::underlying_type, DT::digits, P>(DT(lhs).count()) / DT(rhs).count();
-      //      return result_type(index(ci)); // ....
       typedef typename result_type::rounding_type rounding_type;
       return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
@@ -3291,7 +3316,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator==(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3304,7 +3329,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator==(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3317,7 +3342,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator!=(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3329,7 +3354,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator!=(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3341,7 +3366,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator<(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3354,7 +3379,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator<(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3367,7 +3392,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator>(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3378,7 +3403,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator>(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3390,7 +3415,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator<=(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3401,7 +3426,7 @@ namespace boost
     /**
      * @Returns <c>!(rhs < lhs)</c>.
      */
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator<=(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3413,7 +3438,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator>=(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3424,7 +3449,7 @@ namespace boost
     /**
      * @Returns <c>!(lhs < rhs)</c>.
      */
-    inline
+    inline BOOST_CONSTEXPR
     bool
     operator>=(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -3437,6 +3462,7 @@ namespace boost
      * @Returns the conversion with possible reduced range and loss of resolution.
      */
     template <typename To, typename From>
+    BOOST_CONSTEXPR
     To number_cast(From const& f)
     {
       return fixed_point::detail::number_cast<From, To>()(f);

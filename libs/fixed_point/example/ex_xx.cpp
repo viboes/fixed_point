@@ -968,7 +968,8 @@ int main()
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
     real_t<2, -1> n1( (index(7)));
     real_t<2, -1> n2( (index(7)));
-    BOOST_TEST(n1 == n2);
+    BOOST_STATIC_CONSTEXPR bool b = n1 == n2;
+    BOOST_TEST(b);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
@@ -1102,6 +1103,7 @@ int main()
     f2 = convert(f1 / f2); // Arithmetic on fixed-point values.
     //std::cout<< float(f1) << std::endl;
   }
+
 
   return boost::report_errors();
 }
