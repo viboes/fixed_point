@@ -24,6 +24,8 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_signed.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
+#include <boost/type_traits/is_integral.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
@@ -548,19 +550,23 @@ namespace boost
     }
 
     template <typename F>
-    struct allows_explicit_conversion_from_fp: public is_same<typename F::conversion_from_fixed_point_type, conversion::explicitly>
+    struct allows_explicit_conversion_from_fp: public is_same<typename F::conversion_from_fixed_point_type,
+        conversion::explicitly>
     {
     };
     template <typename F>
-    struct allows_explicit_conversion_from_builtin: public is_same<typename F::conversion_from_builtin_type, conversion::explicitly>
+    struct allows_explicit_conversion_from_builtin: public is_same<typename F::conversion_from_builtin_type,
+        conversion::explicitly>
     {
     };
     template <typename F>
-    struct allows_implicit_conversion_from_fp: public is_same<typename F::conversion_from_fixed_point_type, conversion::implicitly>
+    struct allows_implicit_conversion_from_fp: public is_same<typename F::conversion_from_fixed_point_type,
+        conversion::implicitly>
     {
     };
     template <typename F>
-    struct allows_implicit_conversion_from_builtin: public is_same<typename F::conversion_from_builtin_type, conversion::implicitly>
+    struct allows_implicit_conversion_from_builtin: public is_same<typename F::conversion_from_builtin_type,
+        conversion::implicitly>
     {
     };
     template <typename F>
@@ -770,13 +776,13 @@ namespace boost
       typename To,
       bool LE_Range= From::range_exp <= To::range_exp,
       bool GE_Resolution= From::resolution_exp >= To::resolution_exp
-      > struct number_cast;
+      > struct fxp_number_cast;
 
       // LE_Range=true GE_Resolution=true
       ///////////////////////////////////
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       true, true >
@@ -793,7 +799,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       true, true >
@@ -810,7 +816,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       true, true >
@@ -828,7 +834,7 @@ namespace boost
 
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       true, true >
@@ -860,7 +866,7 @@ namespace boost
       ////////////////////////////////////
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       false, true >
@@ -894,7 +900,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       false, true >
@@ -928,7 +934,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       false, true >
@@ -957,7 +963,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       false, true >
@@ -990,7 +996,7 @@ namespace boost
       ////////////////////////////////////
       template <int R, int P1, typename RP1, typename OP1, typename F1,
       int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R,P1,RP1,OP1,F1>,
       real_t<R,P2,RP2,OP2,F2>,
       true, false >
@@ -1025,7 +1031,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       true, false >
@@ -1046,7 +1052,7 @@ namespace boost
 
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       true, false >
@@ -1082,7 +1088,7 @@ namespace boost
       ////
       template <int R, int P1, typename RP1, typename OP1, typename F1,
       int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R,P1,RP1,OP1,F1>,
       real_t<R,P2,RP2,OP2,F2>,
       true, false >
@@ -1111,7 +1117,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       true, false >
@@ -1133,7 +1139,7 @@ namespace boost
 
       template <int R, int P1, typename RP1, typename OP1, typename F1,
       int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R,P1,RP1,OP1,F1>,
       ureal_t<R,P2,RP2,OP2,F2>,
       true, false >
@@ -1162,7 +1168,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       true, false >
@@ -1184,7 +1190,7 @@ namespace boost
 
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       false, false >
@@ -1219,7 +1225,7 @@ namespace boost
       };
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       real_t<R2,P2,RP2,OP2,F2>,
       false, false >
@@ -1249,7 +1255,7 @@ namespace boost
 
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       real_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       false, false >
@@ -1286,7 +1292,7 @@ namespace boost
 
       template <int R1, int P1, typename RP1, typename OP1, typename F1,
       int R2, int P2, typename RP2, typename OP2, typename F2>
-      struct number_cast<
+      struct fxp_number_cast<
       ureal_t<R1,P1,RP1,OP1,F1>,
       ureal_t<R2,P2,RP2,OP2,F2>,
       false, false >
@@ -1319,6 +1325,100 @@ namespace boost
 
         }
       };
+
+      // arthm_number_cast
+      /////////////////////////////////////
+
+      template <
+      typename From,
+      typename To,
+      bool IsIntegral = is_integral<From>::value
+      >
+      struct arthm_number_cast;
+
+      template <
+      typename From,
+      int R2, int P2, typename RP2, typename OP2, typename F2
+      >
+      struct arthm_number_cast<From,real_t<R2,P2,RP2,OP2,F2>,true>
+      {
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
+        typedef typename To::underlying_type underlying_type;
+
+        BOOST_CONSTEXPR To operator()(const From& rhs) const
+        {
+          return
+          To(index(detail::shift_left<-To::resolution_exp>(rhs)));
+        }
+      };
+      template <
+      typename From,
+      int R2, int P2, typename RP2, typename OP2, typename F2
+      >
+      struct arthm_number_cast<From,ureal_t<R2,P2,RP2,OP2,F2>,true>
+      {
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
+        typedef typename To::underlying_type underlying_type;
+
+        BOOST_CONSTEXPR To operator()(const From& rhs) const
+        {
+          return
+          To(index(detail::shift_left<-To::resolution_exp>(rhs)));
+        }
+      };
+      template <
+      typename From,
+      int R2, int P2, typename RP2, typename OP2, typename F2
+      >
+      struct arthm_number_cast<From,real_t<R2,P2,RP2,OP2,F2>,false>
+      {
+
+        typedef real_t<R2,P2,RP2,OP2,F2> To;
+        typedef typename To::underlying_type underlying_type;
+
+        BOOST_CONSTEXPR To operator()(const From& rhs) const
+        {
+          return
+          To(index(To::classify(rhs)));
+        }
+
+      };
+      template <
+      typename From,
+      int R2, int P2, typename RP2, typename OP2, typename F2
+      >
+      struct arthm_number_cast<From,ureal_t<R2,P2,RP2,OP2,F2>,false>
+      {
+
+        typedef ureal_t<R2,P2,RP2,OP2,F2> To;
+        typedef typename To::underlying_type underlying_type;
+
+        BOOST_CONSTEXPR To operator()(const From& rhs) const
+        {
+          return
+          To(index(To::classify(rhs)));
+        }
+
+      };
+
+      template <
+      typename From,
+      typename To,
+      bool IsArithmetic= is_arithmetic<From>::value
+      > struct number_cast;
+
+      template <
+      typename From,
+      typename To
+      > struct number_cast<From,To,true>: public arthm_number_cast<From,To>
+      {};
+
+      template <
+      typename From,
+      typename To
+      > struct number_cast<From,To,false>: public fxp_number_cast<From,To>
+      {};
+
       template <typename T, typename U >
       struct default_type_impl;
       template <typename T>
@@ -1526,12 +1626,19 @@ namespace boost
     >
     {};
 
-    template <typename S, typename T>
-    struct is_implicitly_convertible :
+    template <typename S, typename T, bool IsArithmetic=is_arithmetic<S>::value >
+    struct is_implicitly_convertible;
+    template <typename S, typename T >
+    struct is_implicitly_convertible<S,T,false> :
     mpl::and_<
     allows_implicit_conversion_from_fp<T>,
     mpl::not_<is_more_precisse<T,S> >
     >
+    {};
+
+    template <typename S, typename T>
+    struct is_implicitly_convertible<S,T,true> :
+    allows_implicit_conversion_from_builtin<T>
     {};
 #endif
 
@@ -1612,7 +1719,7 @@ namespace boost
       real_t(real_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if<is_convertible<real_t<R,P,RP,OP,F>, real_t > >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
+      : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
       }
       //! Implicit constructor from a ureal_t with no larger range and no better resolution
@@ -1620,7 +1727,7 @@ namespace boost
       real_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if<is_convertible<ureal_t<R,P,RP,OP,F>, real_t > >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
       }
 
@@ -1629,7 +1736,7 @@ namespace boost
       explicit real_t(real_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if <is_explicitly_convertible<real_t<R,P,RP,OP,F>,real_t> >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
+      : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
@@ -1640,7 +1747,7 @@ namespace boost
       real_t(real_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if <is_implicitly_convertible<real_t<R,P,RP,OP,F>,real_t> >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
+      : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
@@ -1651,7 +1758,7 @@ namespace boost
       explicit real_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if <is_explicitly_convertible<ureal_t<R,P,RP,OP,F>,real_t> >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
@@ -1663,7 +1770,7 @@ namespace boost
       real_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if <is_implicitly_convertible<ureal_t<R,P,RP,OP,F>,real_t> >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
@@ -1673,7 +1780,7 @@ namespace boost
       //! implicit constructor from a real_t with larger range or better resolution when wrapped by a convert_tag.
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(convert_tag<real_t<R,P,RP,OP,F> > rhs)
-      : value_(fixed_point::detail::number_cast<real_t<R,P,RP,OP,F>, real_t,
+      : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs.get()).count())
@@ -1682,7 +1789,7 @@ namespace boost
       //! implicit constructor from a ureal_t with larger range or better resolution when wrapped by a convert_tag.
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs)
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, real_t,
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs.get()).count())
@@ -1755,8 +1862,6 @@ namespace boost
       template <typename FP>
       static FP factor()
       {
-        //        if (Resolution>=0) return FP(1 << Resolution);
-        //        else return FP(1)/(1 << -Resolution);
         if (Resolution>=0) return FP(detail::shift_left<Resolution>(1));
         else return FP(1)/(detail::shift_left<-Resolution>(1));
 
@@ -1852,23 +1957,16 @@ namespace boost
       }
 
       //! implicit conversion from int
-//      real_t(int x
-//           typename boost::enable_if<allows_implicit_conversion_from_builtin<real_t>       >::type* = 0
-//          ) : value_(detail::shift_left<-Resolution>(x))
-//      {}
+      template <typename T>
+      real_t(T x,
+          typename boost::enable_if<is_implicitly_convertible<T, real_t> >::type* = 0
+      ) : value_(fixed_point::detail::arthm_number_cast<T, real_t>()(x).count())
+      {}
       //! explicit conversion from int
-      explicit real_t(int x
-          //, typename boost::disable_if<allows_implicit_conversion_from_builtin<real_t> >::type* = 0
-          ) : value_(detail::shift_left<-Resolution>(x))
-      {}
-      //! implicit conversion from float
-      explicit real_t(float x) : value_(classify(x))
-      {}
-      //! implicit conversion from double
-      explicit real_t(double x) : value_(classify(x))
-      {}
-      //! implicit conversion from long double
-      explicit real_t(long double x) : value_(classify(x))
+      template <typename T>
+      explicit real_t(T x
+          , typename boost::disable_if<is_implicitly_convertible<T ,real_t> >::type* = 0
+      ) : value_(fixed_point::detail::arthm_number_cast<T, real_t>()(x).count())
       {}
 
       //! implicit conversion from int
@@ -2125,7 +2223,7 @@ namespace boost
       ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if<is_convertible<ureal_t<R,P,RP,OP,F>, ureal_t > >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t, true, true>()(rhs).count())
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, ureal_t, true, true>()(rhs).count())
       {
       }
 
@@ -2134,7 +2232,7 @@ namespace boost
       explicit ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if<is_explicitly_convertible<ureal_t<R,P,RP,OP,F>, ureal_t > >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
@@ -2146,7 +2244,7 @@ namespace boost
       ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if<is_implicitly_convertible<ureal_t<R,P,RP,OP,F>, ureal_t > >::type* = 0
       )
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs).count())
@@ -2156,7 +2254,7 @@ namespace boost
       //! implicit constructor from a ureal_t with larger range or better resolution
       template <int R, int P, typename RP, typename OP, typename F>
       ureal_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs)
-      : value_(fixed_point::detail::number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, ureal_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
           mpl::greater_equal < mpl::int_<P>, mpl::int_<Resolution> >::value
           >()(rhs.get()).count())
@@ -2252,17 +2350,16 @@ namespace boost
       }
 
       //! implicit conversion from int
-      explicit ureal_t(unsigned int x) : value_(detail::shift_left<-Resolution>(x))
+      template <typename T>
+      ureal_t(T x,
+          typename boost::enable_if<is_implicitly_convertible<T, ureal_t> >::type* = 0
+      ) : value_(fixed_point::detail::arthm_number_cast<T, ureal_t>()(x).count())
       {}
-
-      //! implicit conversion from float
-      explicit ureal_t(float x) : value_(classify(x))
-      {}
-      //! implicit conversion from double
-      explicit ureal_t(double x) : value_(classify(x))
-      {}
-      //! implicit conversion from long double
-      explicit ureal_t(long double x) : value_(classify(x))
+      //! explicit conversion from int
+      template <typename T>
+      explicit ureal_t(T x
+          , typename boost::disable_if<is_implicitly_convertible<T, ureal_t> >::type* = 0
+      ) : value_(fixed_point::detail::arthm_number_cast<T, ureal_t>()(x).count())
       {}
 
       //! implicit conversion from int
@@ -2669,16 +2766,16 @@ namespace boost
      * signed + signed -> signed.
      * @Returns <c>RT(index(RT(lhs).count()+RT(rhs).count())</c>.
      */
-//    template <typename T, int R1, int P1, typename RP1, typename OP1, typename F1,
-//    int R2, int P2, typename RP2, typename OP2, typename F2>
-//    inline
-//    T
-//    add(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
-//    {
-//      typedef T result_type;
-//
-//      return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
-//    }
+    //    template <typename T, int R1, int P1, typename RP1, typename OP1, typename F1,
+    //    int R2, int P2, typename RP2, typename OP2, typename F2>
+    //    inline
+    //    T
+    //    add(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
+    //    {
+    //      typedef T result_type;
+    //
+    //      return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
+    //    }
     /**
      * signed + signed -> signed.
      * @Returns <c>RT(index(RT(lhs).count()+RT(rhs).count())</c>.
