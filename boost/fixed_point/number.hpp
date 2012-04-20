@@ -147,15 +147,22 @@ namespace boost
      */
     namespace round
     {
+      /**
+       * Use the fastest rounding.
+       */
       struct fastest
       {
         BOOST_STATIC_CONSTEXPR
         std::float_round_style round_style = std::round_indeterminate;
       };
+
+      /**
+       * Rounds toward negative infinity.
+       */
       struct negative
       {
         BOOST_STATIC_CONSTEXPR
-        std::float_round_style round_style = std::round_toward_infinity;
+        std::float_round_style round_style = std::round_toward_neg_infinity;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -198,6 +205,9 @@ namespace boost
           }
         }
       };
+      /**
+       * Rounds toward zero.
+       */
       struct truncated
       {
         BOOST_STATIC_CONSTEXPR
@@ -227,10 +237,13 @@ namespace boost
           return ci;
         }
       };
+      /**
+       * Rounds toward positive infinity.
+       */
       struct positive
       {
         BOOST_STATIC_CONSTEXPR
-        std::float_round_style round_style = std::round_toward_neg_infinity;
+        std::float_round_style round_style = std::round_toward_infinity;
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -277,21 +290,33 @@ namespace boost
           }
         }
       };
+      /**
+       * Rounds to nearest half up.
+       */
       struct nearest_half_up
       {
         BOOST_STATIC_CONSTEXPR
         std::float_round_style round_style = std::round_to_nearest;
       };
+      /**
+       * Rounds to nearest half down.
+       */
       struct nearest_half_down
       {
         BOOST_STATIC_CONSTEXPR
         std::float_round_style round_style = std::round_to_nearest;
       };
+      /**
+       * Rounds to nearest even.
+       */
       struct nearest_even
       {
         BOOST_STATIC_CONSTEXPR
         std::float_round_style round_style = std::round_to_nearest;
       };
+      /**
+       * Rounds to nearest odd.
+       */
       struct nearest_odd
       {
         BOOST_STATIC_CONSTEXPR
@@ -304,6 +329,11 @@ namespace boost
      */
     namespace overflow
     {
+      /**
+       * Overflow is impossible and ensured by the user.
+       *
+       * An assertion is raised on debug mode.
+       */
       struct impossible
       {
         BOOST_STATIC_CONSTEXPR
@@ -327,6 +357,11 @@ namespace boost
           return value;
         }
       };
+      /**
+       * Overflow is undefined.
+       *
+       * Usually uses the fastest overflow approach.
+       */
       struct undefined
       {
         BOOST_STATIC_CONSTEXPR
@@ -387,6 +422,9 @@ namespace boost
           }
         };
       }
+      /**
+       * Overflow results are wrapped.
+       */
       struct modulus
       {
         BOOST_STATIC_CONSTEXPR
@@ -404,6 +442,9 @@ namespace boost
           return detail::modulus_on_negative_overflow<T,U>::value(val);
         }
       };
+      /**
+       * On overflow the results is the nearest.
+       */
       struct saturate
       {
         BOOST_STATIC_CONSTEXPR
@@ -422,6 +463,9 @@ namespace boost
         }
 
       };
+      /**
+       * On overflow an exception is thrown.
+       */
       struct exception
       {
         BOOST_STATIC_CONSTEXPR
@@ -446,6 +490,9 @@ namespace boost
     namespace storage
     {
 
+      /**
+       * The storage is undefined.
+       */
       struct undefined
       {
         /**
@@ -468,6 +515,9 @@ namespace boost
           typedef typename ::boost::uint_t<Range - Resolution>::least type;
         };
       };
+      /**
+       * The storage is chosen to be least wide possible.
+       */
       struct space
       {
         template <int Range, int Resolution>
@@ -481,6 +531,9 @@ namespace boost
           typedef typename ::boost::uint_t<Range - Resolution>::least type;
         };
       };
+      /**
+       * The storage is chosen to be fastest possible.
+       */
       struct speed
       {
         template <int Range, int Resolution>
@@ -648,7 +701,8 @@ namespace boost
     };
 
     /**
-     *  helper function to make easier the use of index_tag.
+     *  Helper function to make easier the use of @c index_tag.
+     *  @returns @c index_tag<T>(v).
      */
     template <typename T>
     BOOST_CONSTEXPR index_tag<T> index(T v)
@@ -670,17 +724,29 @@ namespace boost
     };
 
     /**
-     *  helper function to make easier the use of convert_tag.
+     *  Helper function to make easier the use of @c convert_tag.
+     *  @returns @c convert_tag<T>(v).
      */
     template <typename T>
     BOOST_CONSTEXPR convert_tag<T> convert(T v)
     { return convert_tag<T>(v);}
 
     /**
-     *  explicit conversion between fixed_point numbers.
+     * Explicit conversion between fixed_point numbers.
+     *
+     * @TParams
+     * @Param{From,the source type of the conversion}
+     * @Param{To,the target type of the conversion}
+     *
+     * @Params
+     * @Param{from,the number from which the conversion is done}
+     *
+     * @Requires @c From is a fixed_point number or a builtin type and @c To is a fixed_point number.
+     * @Returns the conversion with possible reduced range and loss of resolution.
+     *
      */
     template <class From, class To>
-    To number_cast(From const&);
+    To number_cast(From const& from);
 
     namespace detail
     {
@@ -1461,6 +1527,11 @@ namespace boost
 
     } // namespace detail
 
+    /**
+     * @c common_type alike allowing to have a different type as result.
+     *
+     *
+     */
     template <typename T, typename U >
     struct default_type
     {
@@ -1650,12 +1721,19 @@ namespace boost
     struct is_convertible : is_more_precisse<T,S>
     {};
 
-    template <typename S, typename T>
-    struct is_explicitly_convertible :
+    template <typename S, typename T, bool IsArithmetic=is_arithmetic<S>::value >
+    struct is_explicitly_convertible;
+    template <typename S, typename T >
+    struct is_explicitly_convertible<S,T,false> :
     mpl::and_<
     mpl::not_<allows_implicit_conversion_from_fp<T> >,
     mpl::not_<is_more_precisse<T,S> >
     >
+    {};
+
+    template <typename S, typename T>
+    struct is_explicitly_convertible<S,T,true> :
+    allows_explicit_conversion_from_builtin<T>
     {};
 
     template <typename S, typename T, bool IsArithmetic=is_arithmetic<S>::value >
@@ -1678,11 +1756,11 @@ namespace boost
      * @brief Signed fixed point number.
      *
      * @TParams
-     * @Param{Range,Range specified by an integer. The range of a signed number x is 2^Range < x < 2^Range. Note that the range interval is open for signed numbers.}
-     * @Param{Resolution,resolution specified by an integer. The resolution of a fractional number x is 2^Resolution.}
-     * @Param{Rounding,The rounding policy.}
-     * @Param{Overflow,The overflow policy.}
-     * @Param{Family,The family traits.}
+     * @Param{Range,Range specified by an integer. The range of a signed number x is 2^Range < x < 2^Range. Note that the range interval is open for signed numbers}
+     * @Param{Resolution,resolution specified by an integer. The resolution of a fractional number x is 2^Resolution}
+     * @Param{Rounding,The rounding policy}
+     * @Param{Overflow,The overflow policy}
+     * @Param{Family,The family traits}
      *
      * @Example For example, real_t<8,-4> has values n such that -256 < n < 256 in increments of 2^(-4) = 1/16.
      */
@@ -1746,33 +1824,67 @@ namespace boost
        */
       BOOST_CONSTEXPR real_t()
       {} // = default;
+
       /**
        * Copy constructor.
        */
       BOOST_CONSTEXPR real_t(real_t const& rhs) : value_(rhs.value_)
       {} // = default;
 
-      //! Implicit constructor from a real_t with no larger range and no better resolution
+      /**
+       * Implicit constructor from a real_t no larger range and no better resolution.
+       *
+       * @Params
+       * @Param{rhs,a real_t with no larger range and no better resolution}
+       *
+       * @Effects Adapt the resolution of @c rhs to this resolution.
+       * @Throws Nothing.
+       * @Notes This overload participates in overload resolution only if the source @c is_convertible to the target.
+       */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(real_t<R,P,RP,OP,F> const& rhs
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
           , typename boost::enable_if<is_convertible<real_t<R,P,RP,OP,F>, real_t > >::type* = 0
+#endif
       )
       : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
       }
-      //! Implicit constructor from a ureal_t with no larger range and no better resolution
+      /**
+       * Implicit constructor from a ureal_t with no larger range and no better resolution.
+       *
+       * @Params
+       * @Param{rhs,a ureal_t with no larger range and no better resolution}
+       *
+       * @Effects Adapt the resolution of @c rhs to this resolution.
+       * @Throws Nothing.
+       * @Notes This overload participates in overload resolution only if the source @c is_convertible to the target.
+       */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(ureal_t<R,P,RP,OP,F> const& rhs
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
           , typename boost::enable_if<is_convertible<ureal_t<R,P,RP,OP,F>, real_t > >::type* = 0
+#endif
       )
       : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
       {
       }
 
-      //! explicit constructor from a real_t with larger range or better resolution
+      /**
+       * Explicit constructor from a real_t with larger range or better resolution.
+       *
+       * @Params
+       * @Param{rhs,a real_t with larger range and better resolution}
+       *
+       * @Effects Rounds and check overflow if needed.
+       * @Throws Whatever the target overflow policy can throw.
+       * @Notes This overload participates in overload resolution only if the source @c is_explicitly_convertible to the target.
+       */
       template <int R, int P, typename RP, typename OP, typename F>
       explicit real_t(real_t<R,P,RP,OP,F> const& rhs
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
           , typename boost::enable_if <is_explicitly_convertible<real_t<R,P,RP,OP,F>,real_t> >::type* = 0
+#endif
       )
       : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
@@ -1780,10 +1892,22 @@ namespace boost
           >()(rhs).count())
       {
       }
-      //! constructor from a real_t with larger range or better resolution
+
+      /**
+       * Constructor from a real_t with larger range or better resolution.
+       *
+       * @Params
+       * @Param{rhs,a real_t with larger range and better resolution}
+       *
+       * @Effects Rounds and check overflow if needed.
+       * @Throws Whatever the target overflow policy can throw.
+       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(real_t<R,P,RP,OP,F> const& rhs
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
           , typename boost::enable_if <is_implicitly_convertible<real_t<R,P,RP,OP,F>,real_t> >::type* = 0
+#endif
       )
       : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
@@ -1791,10 +1915,22 @@ namespace boost
           >()(rhs).count())
       {
       }
-      //! explicit constructor from a real_t with larger range or better resolution
+
+      /**
+       * Explicit constructor from a ureal_t with larger range or better resolution.
+       *
+       * @Params
+       * @Param{rhs,a ureal_t with larger range and better resolution}
+       *
+       * @Throws Whatever the target overflow policy can throw.
+       * @Effects Rounds and check overflow if needed.
+       * @Notes This overload participates in overload resolution only if the source @c is_explicitly_convertible to the target.
+       */
       template <int R, int P, typename RP, typename OP, typename F>
       explicit real_t(ureal_t<R,P,RP,OP,F> const& rhs
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
           , typename boost::enable_if <is_explicitly_convertible<ureal_t<R,P,RP,OP,F>,real_t> >::type* = 0
+#endif
       )
       : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
@@ -1803,10 +1939,21 @@ namespace boost
       {
       }
 
-      //! constructor from a real_t with larger range or better resolution
+      /**
+       * Constructor from a ureal_t with larger range or better resolution.
+       *
+       * @Params
+       * @Param{rhs,a ureal_t with larger range and better resolution}
+       *
+       * @Effects Rounds and check overflow if needed.
+       * @Throws Whatever the target overflow policy can throw.
+       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(ureal_t<R,P,RP,OP,F> const& rhs
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
           , typename boost::enable_if <is_implicitly_convertible<ureal_t<R,P,RP,OP,F>,real_t> >::type* = 0
+#endif
       )
       : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t,
           mpl::less_equal < mpl::int_<R>, mpl::int_<Range> >::value,
@@ -1815,7 +1962,17 @@ namespace boost
       {
       }
 
-      //! implicit constructor from a real_t with larger range or better resolution when wrapped by a convert_tag.
+      /**
+       * Implicit constructor from a real_t wrapped by a convert_tag.
+       *
+       * @Params
+       * @Param{rhs,a real_t wrapped by @c convert_tag }
+       *
+       * @Effects Rounds and check overflow if needed.
+       * @Throws Whatever the target overflow policy can throw.
+       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       */
+
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(convert_tag<real_t<R,P,RP,OP,F> > rhs)
       : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t,
@@ -1824,7 +1981,16 @@ namespace boost
           >()(rhs.get()).count())
       {
       }
-      //! implicit constructor from a ureal_t with larger range or better resolution when wrapped by a convert_tag.
+      /**
+       * Implicit constructor from a ureal_t wrapped by a convert_tag.
+       *
+       * @Params
+       * @Param{rhs,a ureal_t wrapped by @c convert_tag }
+       *
+       * @Effects Rounds and check overflow if needed.
+       * @Throws Whatever the target overflow policy can throw.
+       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs)
       : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t,
@@ -1842,7 +2008,7 @@ namespace boost
        * Explicit construction from an index.
        *
        * @Params
-       * @Param{i,the index.}
+       * @Param{i,the index}
        *
        * @Requires <c>min_index<=i<=max_index</c>.
        */
@@ -1896,7 +2062,7 @@ namespace boost
         return count() >> resolution_exp;
       }
 
-      //! conversion factor.
+      //! @Returns the conversion factor.
       template <typename FP>
       static FP factor()
       {
@@ -1904,6 +2070,10 @@ namespace boost
         else return FP(1)/(detail::shift_left<-Resolution>(1));
 
       }
+
+      /**
+       * Reconstructs a floating point type from the underlying type.
+       */
       template <typename FP>
       static FP reconstruct(underlying_type k)
       {
@@ -1913,6 +2083,7 @@ namespace boost
       }
 
       //! explicit conversion to FP.
+      //! @Returns the @c FP represented by @c *this.
       template <typename FP>
       FP as() const
       {
@@ -1994,16 +2165,22 @@ namespace boost
         return integer_part(x/factor<FP>());
       }
 
-      //! implicit conversion from int
+      /**
+       * Implicit conversion from arithmetic @T.
+       */
       template <typename T>
-      real_t(T x,
-          typename boost::enable_if<is_implicitly_convertible<T, real_t> >::type* = 0
+      real_t(T x
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+          , typename boost::enable_if<is_implicitly_convertible<T, real_t> >::type* = 0
+#endif
       ) : value_(fixed_point::detail::arthm_number_cast<T, real_t>()(x).count())
       {}
-      //! explicit conversion from int
+      //! explicit conversion from arithmetic @T.
       template <typename T>
       explicit real_t(T x
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
           , typename boost::disable_if<is_implicitly_convertible<T ,real_t> >::type* = 0
+#endif
       ) : value_(fixed_point::detail::arthm_number_cast<T, real_t>()(x).count())
       {}
 
@@ -2190,10 +2367,10 @@ namespace boost
      *
      * @TParams
      * @Param{Range,Range specified by an integer. The range of a signed number x is 0<=x<2^Range},
-     * @Param{Resolution,resolution specified by an integer. The resolution of a fractional number x is 2^Resolution.}
-     * @Param{Rounding,The rounding policy.}
-     * @Param{Overflow,The overflow policy.}
-     * @Param{Family,The family policy.}
+     * @Param{Resolution,resolution specified by an integer. The resolution of a fractional number x is 2^Resolution}
+     * @Param{Rounding,The rounding policy}
+     * @Param{Overflow,The overflow policy}
+     * @Param{Family,The family policy}
      */
     template <int Range, int Resolution, typename Rounding, typename Overflow, typename Family>
     class ureal_t
@@ -2312,7 +2489,7 @@ namespace boost
        * Explicit construction from an index.
        *
        * @Params
-       * @Param{i,the index.}
+       * @Param{i,the index}
        *
        * @Requires <c>0<=i<=max_index</c>.
        */
@@ -2636,6 +2813,9 @@ namespace boost
 
     /**
      * ureal_t compile time factory.
+     * @TParams
+     * @Param{Times,an @c int representing the number of times}
+     * @Param{Resolution,the binary resolution}
      *
      * @Returns an @c ureal_t enough large to represent <c>Times*(2^Resolution)</c>.
      */
@@ -2653,8 +2833,12 @@ namespace boost
       static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution
       >(index(Times));
     }
+
     /**
      * real_t compile time factory.
+     * @TParams
+     * @Param{Times,an @c int representing the number of times}
+     * @Param{Resolution,the binary resolution}
      *
      * @Returns a @c real_t enough large to represent <c>Times*(2^Resolution)</c>.
      */
@@ -2673,7 +2857,7 @@ namespace boost
       > (index(Times));
     }
 
-    //    /**
+    //    /*
     //     * ureal_t compile time factory from integer and fractional parts
     //     *
     //     * @Returns an @c ureal_t enough large to represent <c>Integral.Fractional</c>.
@@ -2709,7 +2893,11 @@ namespace boost
      * Add type metafunction.
      *
      * The result type depends on whether the types are open/closed.
-     * The specializations must define a nested typedef type.
+     *
+     * - Both are closed: The nested typedef type is only defined if @c is_same<T1,T2> and is @c T1.
+     * - One of them is Open:
+     *     - if one of them is signed : real_t<MAX(R1,R2)+1, MIN(P1,P2), DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>.
+     *     - if both are unsigned : ureal_t<MAX(R1,R2)+1, MIN(P1,P2), DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>.
      */
     template <typename T1, typename T2=T1, bool B1=is_open<T1>::value, bool B2=is_open<T2>::value >
     struct add_result
@@ -2733,8 +2921,7 @@ namespace boost
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct add_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
-      typedef
-      real_t<
+      typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename default_type<RP1,RP2>::type,
@@ -2771,8 +2958,7 @@ namespace boost
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct add_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
-      typedef
-      ureal_t<
+      typedef ureal_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
       typename default_type<RP1,RP2>::type,
@@ -2784,7 +2970,10 @@ namespace boost
 #endif
 
     /**
-     * signed + int -> signed.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,an @c int}
+     *
      * @Returns <c>lhs+AT(rhs)</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1>
@@ -2797,7 +2986,10 @@ namespace boost
       return lhs + arg_type(rhs);
     }
     /**
-     * unsigned + unsigned int -> signed.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,an <c>unsigned int</c>}
+     *
      * @Returns <c>lhs+AT(rhs)</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1>
@@ -2826,9 +3018,13 @@ namespace boost
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
     }
 #endif
+
     /**
-     * signed + signed -> signed.
-     * @Returns <c>RT(index(RT(lhs).count()+RT(rhs).count())</c>.
+     * @Params
+     * @Param{lhs,a @c real_t}
+     * @Param{rhs,a @c real_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() + RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2842,8 +3038,11 @@ namespace boost
     }
 
     /**
-     * unsigned + signed -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,a @c real_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() + RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2856,8 +3055,11 @@ namespace boost
       return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
     }
     /**
-     * signed + unsigned -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c real_t}
+     * @Param{rhs,a @c ureal_t}
+     *
+     * @Returns <c>rhs + lhs</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2868,8 +3070,11 @@ namespace boost
       return rhs+lhs;
     }
     /**
-     * unsigned + unsigned -> unsigned.
-     * @Returns a unsigned fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,a @c ureal_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() + RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2883,8 +3088,11 @@ namespace boost
     }
 
     /**
-     * signed - signed -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c real_t}
+     * @Param{rhs,a @c real_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() - RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2898,8 +3106,11 @@ namespace boost
     }
 
     /**
-     * unsigned - signed -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,a @c real_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() - RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2913,8 +3124,11 @@ namespace boost
     }
 
     /**
-     * signed - unsigned -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c real_t}
+     * @Param{rhs,a @c ureal_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() - RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2928,8 +3142,11 @@ namespace boost
     }
 
     /**
-     * unsigned - unsigned -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,a @c ureal_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() - RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -2942,11 +3159,14 @@ namespace boost
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
     }
 
-    /*****************************************************************
+    /**
      * Multiply type metafunction.
      *
-     * The result type depends on whether the types are open/closed.
-     * The specializations must define a nested typedef type.
+     * The result type depends on whether the types are open/closed:
+     * - Both are closed: The nested typedef type is only defined if @c is_same<T1,T2> and is @c T1.
+     * - One of them is Open:
+     *   - if one of them is signed : real_t<R1+R2, P1+P2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
+     *   - if both are unsigned : ureal_t<R1+R2, P1+P2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
      */
     template <typename T1, typename T2=T1, bool B1=is_open<T1>::value, bool B2=is_open<T2>::value >
     struct multiply_result
@@ -2970,10 +3190,7 @@ namespace boost
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
-      typedef
-      real_t<
-      R1+R2,
-      P1+P2,
+      typedef real_t< R1+R2, P1+P2,
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
@@ -2987,16 +3204,8 @@ namespace boost
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct multiply_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    : multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >
     {
-      typedef
-      real_t<
-      R1+R2,
-      P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      >
-      type;
     };
     /**
      * When one of them is open, the result is open
@@ -3005,16 +3214,8 @@ namespace boost
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    : multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >
     {
-      typedef
-      real_t<
-      R1+R2,
-      P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      >
-      type;
     };
     /**
      * When one of them is open, the result is open
@@ -3024,10 +3225,7 @@ namespace boost
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
-      typedef
-      ureal_t<
-      R1+R2,
-      P1+P2,
+      typedef ureal_t< R1+R2, P1+P2,
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
@@ -3035,9 +3233,13 @@ namespace boost
       type;
     };
 #endif
+
     /**
-     * signed * signed -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c real_t}
+     * @Param{rhs,a @c real_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() * RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3052,8 +3254,11 @@ namespace boost
     }
 
     /**
-     * signed * unsigned -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c real_t}
+     * @Param{rhs,a @c ureal_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() * RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3068,8 +3273,11 @@ namespace boost
     }
 
     /**
-     * unsigned * signed -> signed.
-     * @Returns a signed fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,a @c real_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() * RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3084,8 +3292,11 @@ namespace boost
     }
 
     /**
-     * unsigned * unsigned -> unsigned.
-     * @Returns a unsigned fixed point enough large to avoid overflow.
+     * @Params
+     * @Param{lhs,a @c ureal_t}
+     * @Param{rhs,a @c ureal_t}
+     *
+     * @Returns <c>RT(index(RT(lhs).count() * RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3100,8 +3311,8 @@ namespace boost
     }
 
     /**
-     * fixed point division giving the expected result type.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
+     * Fixed point division giving the expected result type.
+     * @Returns <c>DT(lhs) / DT(rhs)</c> taking in account the rounding policy of the result type @c Res.
      */
     template <
     typename Res,
@@ -3126,8 +3337,8 @@ namespace boost
     }
 
     /**
-     * fixed point division giving the expected result type.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
+     * Fixed point division giving the expected result type.
+     * @Returns <c>DT(lhs) / DT(rhs)</c> taking in account the rounding policy of the result type @c Res.
      */
     template <
     typename Res,
@@ -3152,7 +3363,7 @@ namespace boost
 
     /**
      * fixed point division giving the expected result type.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
+     * @Returns <c>DT(lhs) / DT(rhs)</c> taking in account the rounding policy of the result type @c Res.
      */
     template <
     typename Res,
@@ -3177,7 +3388,7 @@ namespace boost
 
     /**
      * fixed point division giving the expected result type.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the expected result.
+     * @Returns <c>DT(lhs) / DT(rhs)</c> taking in account the rounding policy of the result type @c Res.
      */
     template <
     typename Res,
@@ -3200,11 +3411,14 @@ namespace boost
       return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
 
-    /*****************************************************************
+    /**
      * Divide type metafunction.
      *
      * The result type depends on whether the types are open/closed.
-     * The specializations must define a nested typedef type.
+     * - Both are closed: The nested typedef type is only defined if @c is_same<T1,T2> and is @c T1.
+     * - One of them is open:
+     *   - if one of them is signed : <c>real_t<R1-P2, P1-R2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)></c>
+     *   - if both are unsigned : <c>ureal_t<R1-P2, P1-R2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)></c>
      */
     template <typename T1, typename T2=T1, bool B1=is_open<T1>::value, bool B2=is_open<T2>::value >
     struct divide_result
@@ -3228,9 +3442,7 @@ namespace boost
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct divide_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
-      typedef real_t<
-      R1-P2,
-      P1-R2,
+      typedef real_t< R1-P2, P1-R2,
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
@@ -3244,15 +3456,8 @@ namespace boost
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct divide_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    : divide_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >
     {
-      typedef real_t<
-      R1-P2,
-      P1-R2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      >
-      type;
     };
     /**
      * When one of them is open, the result is open
@@ -3261,15 +3466,8 @@ namespace boost
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct divide_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    : divide_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >
     {
-      typedef real_t<
-      R1-P2,
-      P1-R2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      >
-      type;
     };
     /**
      * When one of them is open, the result is open
@@ -3279,9 +3477,7 @@ namespace boost
     int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
     struct divide_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
-      typedef ureal_t<
-      R1-P2,
-      P1-R2,
+      typedef ureal_t< R1-P2, P1-R2,
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
@@ -3292,7 +3488,7 @@ namespace boost
 
     /**
      * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * @Returns <c>divide<RT>(lhs,rhs)</c> taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3307,7 +3503,7 @@ namespace boost
 
     /**
      * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * @Returns <c>divide<RT>(lhs,rhs)</c> taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3321,7 +3517,7 @@ namespace boost
 
     /**
      * fixed point division deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * @Returns <c>divide<RT>(lhs,rhs)</c> taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3335,7 +3531,7 @@ namespace boost
 
     /**
      * fixed point division deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * @Returns <c>divide<RT>(lhs,rhs)</c> taking in account the rounding policy of the result type.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3495,11 +3691,6 @@ namespace boost
       return !(lhs < rhs);
     }
 
-    /**
-     * fixed point number cast.
-     *
-     * @Returns the conversion with possible reduced range and loss of resolution.
-     */
     template <typename To, typename From>
     BOOST_CONSTEXPR
     To number_cast(From const& f)
