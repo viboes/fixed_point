@@ -858,8 +858,8 @@ namespace boost
           (
               (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
               ? To(index(
-                  OP2::template on_negative_overflow<To,underlying_type>(
-                      ((underlying_type(rhs.count()) << (P1-P2)))
+                      OP2::template on_negative_overflow<To,underlying_type>(
+                          ((underlying_type(rhs.count()) << (P1-P2)))
                       )
                   ))
               : To(index(underlying_type(rhs.count()) << (P1-P2)))
@@ -896,15 +896,15 @@ namespace boost
           (
               (((underlying_type(rhs.count()) << (P1-P2))) > To::max_index)
               ? To(index(
-                  OP2::template on_positive_overflow<To,underlying_type>(
-                      ((underlying_type(rhs.count()) << (P1-P2)))
+                      OP2::template on_positive_overflow<To,underlying_type>(
+                          ((underlying_type(rhs.count()) << (P1-P2)))
                       )
                   ))
               : (
                   (((underlying_type(rhs.count()) << (P1-P2))) < To::min_index)
                   ? To(index(
-                      OP2::template on_negative_overflow<To,underlying_type>(
-                          ((underlying_type(rhs.count()) << (P1-P2)))
+                          OP2::template on_negative_overflow<To,underlying_type>(
+                              ((underlying_type(rhs.count()) << (P1-P2)))
                           )
                       ))
                   : To(index(((underlying_type(rhs.count()) << (P1-P2)))))
@@ -1104,12 +1104,12 @@ namespace boost
           (
               (rhs.count() > (typename From::underlying_type(To::max_index)<<(P2-P1)))
               ? To(index(
-                  OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))
+                      OP2::template on_positive_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))
                   ))
               : (
                   (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
                   ? To(index(
-                      OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))
+                          OP2::template on_negative_overflow<To,underlying_type>((((rhs.count()) >> (P2-P1))))
                       ))
                   : To((index(RP2::template round<From,To>(rhs))))
               )
@@ -2788,7 +2788,7 @@ namespace boost
      * @Returns <c>lhs+AT(rhs)</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<real_t<R1,P1,RP1,OP1,F1> >::type
     operator+(real_t<R1,P1,RP1,OP1,F1> const& lhs, int rhs)
     {
@@ -2801,7 +2801,7 @@ namespace boost
      * @Returns <c>lhs+AT(rhs)</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<ureal_t<R1,P1,RP1,OP1,F1> >::type
     operator+(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, unsigned int rhs)
     {
@@ -2810,27 +2810,29 @@ namespace boost
       return lhs + arg_type(rhs);
     }
 
+#if 0
     /**
      * signed + signed -> signed.
      * @Returns <c>RT(index(RT(lhs).count()+RT(rhs).count())</c>.
      */
-    //    template <typename T, int R1, int P1, typename RP1, typename OP1, typename F1,
-    //    int R2, int P2, typename RP2, typename OP2, typename F2>
-    //    inline
-    //    T
-    //    add(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
-    //    {
-    //      typedef T result_type;
-    //
-    //      return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
-    //    }
+    template <typename T, int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    inline
+    T
+    add(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
+    {
+      typedef T result_type;
+
+      return result_type(index(result_type(lhs).count()+result_type(rhs).count()));
+    }
+#endif
     /**
      * signed + signed -> signed.
      * @Returns <c>RT(index(RT(lhs).count()+RT(rhs).count())</c>.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<real_t<R1,P1,RP1,OP1,F1> , real_t<R2,P2,RP2,OP2,F2> >::type
     operator+(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2845,7 +2847,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<ureal_t<R1,P1,RP1,OP1,F1> , real_t<R2,P2,RP2,OP2,F2> >::type
     operator+(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2859,7 +2861,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type
     operator+(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2871,7 +2873,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type
     operator+(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2886,7 +2888,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type
     operator-(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2901,7 +2903,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type
     operator-(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2916,7 +2918,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type
     operator-(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2931,7 +2933,7 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
+    inline BOOST_CONSTEXPR
     typename add_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type
     operator-(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
@@ -2940,35 +2942,110 @@ namespace boost
       return result_type(index(result_type(lhs).count()-result_type(rhs).count()));
     }
 
+    /*****************************************************************
+     * Multiply type metafunction.
+     *
+     * The result type depends on whether the types are open/closed.
+     * The specializations must define a nested typedef type.
+     */
+    template <typename T1, typename T2=T1, bool B1=is_open<T1>::value, bool B2=is_open<T2>::value >
+    struct multiply_result
+    {
+    };
+#if ! defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+    /**
+     * When of of them is close, both must be the same and the result is itself.
+     */
+    template <typename T>
+    struct multiply_result<T, T, false, false >
+    {
+      typedef T type;
+    };
+
+    /**
+     * When one of them is open, the result is open
+     * real_t<R1+R2, P1+P2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    {
+      typedef
+      real_t<
+      R1+R2,
+      P1+P2,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      >
+      type;
+    };
+    /**
+     * When one of them is open, the result is open
+     * real_t<R1+R2, P1+P2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct multiply_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    {
+      typedef
+      real_t<
+      R1+R2,
+      P1+P2,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      >
+      type;
+    };
+    /**
+     * When one of them is open, the result is open
+     * real_t<R1+R2, P1+P2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    {
+      typedef
+      real_t<
+      R1+R2,
+      P1+P2,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      >
+      type;
+    };
+    /**
+     * When one of them is open, the result is open
+     * real_t<R1+R2, P1+P2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
+    {
+      typedef
+      ureal_t<
+      R1+R2,
+      P1+P2,
+      typename default_type<RP1,RP2>::type,
+      typename default_type<OP1,OP2>::type,
+      typename default_type<F1,F2>::type
+      >
+      type;
+    };
+#endif
     /**
      * signed * signed -> signed.
      * @Returns a signed fixed point enough large to avoid overflow.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    real_t<
-    R1+R2,
-    P1+P2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
+    inline BOOST_CONSTEXPR
+    typename multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type
     operator*(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef real_t<
-      R1+R2,
-      P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > result_type;
+      typedef typename multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -2980,29 +3057,11 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    real_t<
-    R1+R2,
-    P1+P2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
+    inline BOOST_CONSTEXPR
+    typename multiply_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type
     operator*(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef real_t<
-      R1+R2,
-      P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > result_type;
+      typedef typename multiply_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -3014,29 +3073,11 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    real_t<
-    R1+R2,
-    P1+P2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
+    inline BOOST_CONSTEXPR
+    typename multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type
     operator*(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef real_t<
-      R1+R2,
-      P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > result_type;
+      typedef typename multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -3048,29 +3089,11 @@ namespace boost
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    ureal_t<
-    R1+R2,
-    P1+P2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
+    inline BOOST_CONSTEXPR
+    typename multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type
     operator*(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef ureal_t<
-      R1+R2,
-      P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > result_type;
+      typedef typename multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type result_type;
       typedef typename result_type::underlying_type underlying_type;
 
       return result_type(index(underlying_type(lhs.count()) * rhs.count()));
@@ -3177,27 +3200,33 @@ namespace boost
       return result_type(index(rounding_type::template round_divide<Res>(DT(lhs), DT(rhs))));
     }
 
+    /*****************************************************************
+     * Divide type metafunction.
+     *
+     * The result type depends on whether the types are open/closed.
+     * The specializations must define a nested typedef type.
+     */
+    template <typename T1, typename T2=T1, bool B1=is_open<T1>::value, bool B2=is_open<T2>::value >
+    struct divide_result
+    {
+    };
+#if ! defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
     /**
-     * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * When of of them is close, both must be the same and the result is itself.
+     */
+    template <typename T>
+    struct divide_result<T, T, false, false >
+    {
+      typedef T type;
+    };
+
+    /**
+     * When one of them is open, the result is open
+     * real_t<R1-P2, P1-R2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    real_t<
-    R1-P2,
-    P1-R2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
-    operator/(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct divide_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef real_t<
       R1-P2,
@@ -3205,32 +3234,16 @@ namespace boost
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
-      > result_type;
-
-      return divide<result_type>(lhs,rhs);
-    }
-
+      >
+      type;
+    };
     /**
-     * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * When one of them is open, the result is open
+     * real_t<R1-P2, P1-R2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    real_t<
-    R1-P2,
-    P1-R2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
-    operator/(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct divide_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef real_t<
       R1-P2,
@@ -3238,32 +3251,16 @@ namespace boost
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
-      > result_type;
-
-      return divide<result_type>(lhs,rhs);
-    }
-
+      >
+      type;
+    };
     /**
-     * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * When one of them is open, the result is open
+     * real_t<R1-P2, P1-R2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    real_t<
-    R1-P2,
-    P1-R2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
-    operator/(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct divide_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef real_t<
       R1-P2,
@@ -3271,32 +3268,16 @@ namespace boost
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
-      > result_type;
-
-      return divide<result_type>(lhs,rhs);
-    }
-
+      >
+      type;
+    };
     /**
-     * fixed point division  deducing the result type as <R1-P2, P1,R2>.
-     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     * When one of them is open, the result is open
+     * real_t<R1-P2, P1-R2, DT(RP1,RP2), DT(OP1,OP2), DT(F1,F2)>
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    inline
-    ureal_t<
-    R1-P2,
-    P1-R2,
-#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    DT(RP1,RP2),
-    DT(OP1,OP2),
-    DT(F1,F2)
-#else
-    typename default_type<RP1,RP2>::type,
-    typename default_type<OP1,OP2>::type,
-    typename default_type<F1,F2>::type
-#endif
-    >
-    operator/(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
+    int R2, int P2, typename RP2, typename OP2, typename F2, bool B1, bool B2>
+    struct divide_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef ureal_t<
       R1-P2,
@@ -3304,7 +3285,65 @@ namespace boost
       typename default_type<RP1,RP2>::type,
       typename default_type<OP1,OP2>::type,
       typename default_type<F1,F2>::type
-      > result_type;
+      >
+      type;
+    };
+#endif
+
+    /**
+     * fixed point division  deducing the result type as <R1-P2, P1,R2>.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    inline
+    typename divide_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type
+    operator/(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
+    {
+      typedef typename divide_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type result_type;
+
+      return divide<result_type>(lhs,rhs);
+    }
+
+    /**
+     * fixed point division  deducing the result type as <R1-P2, P1,R2>.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    typename divide_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type
+    operator/(real_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
+    {
+      typedef typename divide_result<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type result_type;
+
+      return divide<result_type>(lhs,rhs);
+    }
+
+    /**
+     * fixed point division deducing the result type as <R1-P2, P1,R2>.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    typename divide_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type
+    operator/(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
+    {
+      typedef typename divide_result<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type result_type;
+
+      return divide<result_type>(lhs,rhs);
+    }
+
+    /**
+     * fixed point division deducing the result type as <R1-P2, P1,R2>.
+     * @Returns DT(lhs) / DT(rhs) taking in account the rounding policy of the result type.
+     */
+    template <int R1, int P1, typename RP1, typename OP1, typename F1,
+    int R2, int P2, typename RP2, typename OP2, typename F2>
+    inline
+    typename divide_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type
+    operator/(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
+    {
+      typedef typename divide_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type result_type;
 
       return divide<result_type>(lhs,rhs);
     }
@@ -3312,7 +3351,7 @@ namespace boost
     // comparisons
 
     /**
-     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the default_type of the parameters..
+     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the default_type of the parameters.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
