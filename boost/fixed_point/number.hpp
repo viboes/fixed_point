@@ -26,6 +26,7 @@
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
@@ -34,13 +35,16 @@
 #include <boost/integer/static_log2.hpp>
 #include <boost/ratio/detail/mpl/abs.hpp>
 #include <limits>
+#include <stdexcept>
 #include <cmath>
 #include <boost/integer_traits.hpp>
 
 #include <boost/config.hpp>
 //#include <boost/fixed_point/config.hpp>
+//#include <boost/fixed_point/number_fwd.hpp>
 //#include <boost/fixed_point/round/nearest_odd.hpp>
 //#include <boost/fixed_point/overflow/exception.hpp>
+//#include <boost/fixed_point/detail/helpers.hpp>
 
 #include <limits>
 
@@ -48,6 +52,7 @@ namespace boost
 {
   namespace fixed_point
   {
+    //#include <boost/fixed_point/detail/helpers.hpp>
     namespace detail
     {
 
@@ -129,26 +134,71 @@ namespace boost
 
     }
 
+    //#include <boost/fixed_point/overflow/exceptions.hpp>
     /**
      * Exception throw when there is a positive overflow.
      */
-    struct positive_overflow
+    class positive_overflow: public std::overflow_error
     {
-    };
-    /**
-     * Exception throw when there is a negative overflow.
-     */
-    struct negative_overflow
-    {
+    public:
+      positive_overflow() :
+        std::overflow_error("FixedPoint: positive overflow")
+      {
+      }
+      explicit positive_overflow(const std::string& what_arg) :
+        std::overflow_error(what_arg)
+      {
+      }
+      explicit positive_overflow(const char* what_arg) :
+        std::overflow_error(what_arg)
+      {
+      }
     };
 
     /**
-     * Namespace for rounding policies.
+     * Exception throw when there is a negative overflow.
      */
+    class negative_overflow: public std::underflow_error
+    {
+    public:
+      negative_overflow() :
+        std::underflow_error("FixedPoint: negative overflow")
+      {
+      }
+      explicit negative_overflow(const std::string& what_arg) :
+        std::underflow_error(what_arg)
+      {
+      }
+      explicit negative_overflow(const char* what_arg) :
+        std::underflow_error(what_arg)
+      {
+      }
+    };
+
     namespace round
     {
+#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
       /**
-       * Use the fastest rounding.
+       * When the computation is not exact, rounding will be to one of the two nearest representable values.
+       * The algorithm for choosing between these values is the rounding mode.
+       * Different applications desire different modes, so programmers may specify its own rounding mode.
+       * However the library provides the usual rounding policies.
+       * All of them follwos the following this stereotype
+       *
+       */
+
+      struct stereotype
+      {
+        BOOST_STATIC_CONSTEXPR
+        std::float_round_style round_style;
+        template <typename From, typename To>
+        static typename To::underlying_type round(From const& rhs);
+        template <typename To, typename From>
+        static typename To::underlying_type round_divide(From const& lhs, From const& rhs);
+      };
+#endif
+      /**
+       *  Speed is more important than the choice in value.
        */
       struct fastest
       {
@@ -158,11 +208,31 @@ namespace boost
 
       /**
        * Rounds toward negative infinity.
+       *
+       * This mode is useful in interval arithmetic.
        */
       struct negative
       {
         BOOST_STATIC_CONSTEXPR
         std::float_round_style round_style = std::round_toward_neg_infinity;
+
+        template <typename From, typename To>
+        static typename To::underlying_type round_integral(From const& rhs)
+        {
+          BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp;
+          typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
+          BOOST_STATIC_ASSERT(d < (8 * sizeof(tmp_type)));
+
+          tmp_type res = tmp_type(rhs) >> d;
+          return res;
+        }
+
+        template <typename From, typename To>
+        static typename To::underlying_type round_float_point(From const& rhs)
+        {
+          return To::integer_part(rhs / To::template factor<From>());
+        }
+
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -207,11 +277,34 @@ namespace boost
       };
       /**
        * Rounds toward zero.
+       *
+       * This mode is useful in implementing integral arithmetic.
        */
       struct truncated
       {
         BOOST_STATIC_CONSTEXPR
         std::float_round_style round_style = std::round_toward_zero;
+
+        template <typename From, typename To>
+        static typename To::underlying_type round_integral(From const& rhs)
+        {
+          BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp;
+          typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
+          BOOST_STATIC_ASSERT(d < (8 * sizeof(tmp_type)));
+
+          tmp_type m( ( (rhs > 0) ? rhs : -rhs));
+          tmp_type s( ( (rhs > 0) ? +1 : -1));
+
+          tmp_type res = s * (m >> d);
+          return res;
+        }
+
+        template <typename From, typename To>
+        static typename To::underlying_type round_float_point(From const& rhs)
+        {
+          return To::integer_part(rhs / To::template factor<From>());
+        }
+
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -239,11 +332,36 @@ namespace boost
       };
       /**
        * Rounds toward positive infinity.
+       *
+       * This mode is useful in interval arithmetic.
        */
       struct positive
       {
         BOOST_STATIC_CONSTEXPR
         std::float_round_style round_style = std::round_toward_infinity;
+
+        template <typename From, typename To>
+        static typename To::underlying_type round_integral(From const& rhs)
+        {
+          BOOST_STATIC_CONSTEXPR boost::uintmax_t d = To::resolution_exp;
+          typedef typename detail::max_type<is_signed<typename To::underlying_type>::value>::type tmp_type;
+          BOOST_STATIC_ASSERT(d < (8 * sizeof(tmp_type)));
+
+          BOOST_STATIC_CONSTEXPR tmp_type w = (1<<d)-1;
+          tmp_type i = rhs;
+
+          BOOST_ASSERT(i <= (integer_traits<tmp_type>::const_max - w));
+
+          tmp_type res = (i + w) >> d;
+          return res;
+        }
+
+        template <typename From, typename To>
+        static typename To::underlying_type round_float_point(From const& rhs)
+        {
+          return To::integer_part(rhs / To::template factor<From>());
+        }
+
         template <typename From, typename To>
         static typename To::underlying_type round(From const& rhs)
         {
@@ -291,7 +409,9 @@ namespace boost
         }
       };
       /**
-       * Rounds to nearest half up.
+       * Round towards the nearest value, but exactly-half values are rounded towards maximum magnitude.
+       *
+       * This mode is the standard school algorithm.
        */
       struct nearest_half_up
       {
@@ -307,7 +427,8 @@ namespace boost
         std::float_round_style round_style = std::round_to_nearest;
       };
       /**
-       * Rounds to nearest even.
+       * Round towards the nearest value, but exactly-half values are rounded towards even values.
+       * This mode has more balance than the classic mode.
        */
       struct nearest_even
       {
@@ -315,7 +436,8 @@ namespace boost
         std::float_round_style round_style = std::round_to_nearest;
       };
       /**
-       * Rounds to nearest odd.
+       * Round towards the nearest value, but exactly-half values are rounded towards odd values.
+       * This mode has as much balance as the near_even mode, but preserves more information.
        */
       struct nearest_odd
       {
@@ -324,13 +446,39 @@ namespace boost
       };
     }
 
-    /**
-     * Namespace for overflow policies.
-     */
     namespace overflow
     {
+
+#if defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
       /**
-       * Overflow is impossible and ensured by the user.
+       * Since the range of intermediate values grow to hold all possible values, and variables have a static range and
+       * resolution, construction and assignment may need to reduce the range and resolution.
+       * Reducing the resolution is done with a rounding mode associated with the variable.
+       * When the dynamic value exceeds the range of variable, the assignment overflows.
+       *
+       * When an overflow does occur, the desirable behavior depends on the application, so programmers may specify the
+       * overflow mode with his own specific overflow policy. The library provides however the usual ones.
+       * All of them follows the following stereotype
+       */
+      struct stereotype
+      {
+        BOOST_STATIC_CONSTEXPR
+        bool is_modulo;
+
+        template <typename T, typename U>
+        static BOOST_CONSTEXPR
+        typename T::underlying_type
+        on_negative_overflow(U value);
+
+        template <typename T, typename U>
+        static BOOST_CONSTEXPR
+        typename T::underlying_type
+        on_positive_overflow(U value);
+      };
+#endif
+      /**
+       * Programmer analysis of the program has determined that overflow cannot occur.
+       * Uses of this mode should be accompanied by an argument supporting the conclusion.
        *
        * An assertion is raised on debug mode.
        */
@@ -358,9 +506,7 @@ namespace boost
         }
       };
       /**
-       * Overflow is undefined.
-       *
-       * Usually uses the fastest overflow approach.
+       * Programmers are willing to accept undefined behavior in the event of an overflow.
        */
       struct undefined
       {
@@ -379,6 +525,7 @@ namespace boost
           return value;
         }
       };
+#if ! defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
       namespace detail
       {
         template <typename T, typename U, bool TisSigned = T::is_signed>
@@ -422,8 +569,11 @@ namespace boost
           }
         };
       }
+#endif
+
       /**
-       * Overflow results are wrapped.
+       * The assigned value is the dynamic value @c mod the range of the variable.
+       * This mode makes sense only with unsigned numbers. It is useful for angular measures.
        */
       struct modulus
       {
@@ -443,7 +593,7 @@ namespace boost
         }
       };
       /**
-       * On overflow the results is the nearest.
+       * If the dynamic value exceeds the range of the variable, assign the nearest representable value.
        */
       struct saturate
       {
@@ -464,7 +614,7 @@ namespace boost
 
       };
       /**
-       * On overflow an exception is thrown.
+       * If the dynamic value exceeds the range of the variable, throw an exception of derived from std::overflow_error.
        */
       struct exception
       {
@@ -489,6 +639,27 @@ namespace boost
      */
     namespace storage
     {
+
+      /**
+       * Every storage policy must define two meta-functions <c>signed_integer_type<Range, Resolution>::type</c> and
+       * <c>unsigned_integer_type<Range, Resolution>::type</c>.
+       */
+      struct stereotype
+      {
+        /**
+         * Gets the signed integer type with enough bits to manage with
+         * the Range and Resolution.
+         */
+        template <int Range, int Resolution>
+        struct signed_integer_type;
+
+        /**
+         * Gets the unsigned integer type with enough bits to manage with
+         * the Range and Resolution
+         */
+        template <int Range, int Resolution>
+        struct unsigned_integer_type;
+      };
 
       /**
        * The storage is undefined.
@@ -551,13 +722,33 @@ namespace boost
     }
 
     /**
-     * Namespace for conversion policies.
+     * Since fixed points have different range and resolution the user needs to convert from one type to another.
+     *
+     * When the target type has a larger range and a more precise resolution than the source type, the conversion is implicit.
+     * Otherwise, as the conversion could loss information, the conversion should be explicit to be safe.
+     * Anyway some domains could consider that working with fixed-points should mimic the builtin and expect this conversion to be implicit.
+     * If for this reason that the library manage with both cases via the conversion policy.
+     *
+     * The conversion from builtins arithmetic types suffer from the same loss of information issue but
+     * some users could find an implicit conversion more natural.
+     *
+     * Conversions to builtins arithmetic types is a different concern.
+     * There is no know way to enable conversions operator subject to conditions on the type.
+     * The library has taken a conservative approach and only explicit conversions are provided.
+     * The user could always wrap the type and provide implicit conversion.
+     *
      */
     namespace conversion
     {
+      /**
+       * Used to state that a conversion needs to be explicit.
+       */
       struct explicitly
       {
       };
+      /**
+       * Used to state that a conversion needs to be implicit.
+       */
       struct implicitly
       {
       };
@@ -568,9 +759,37 @@ namespace boost
      */
     namespace arithmetic
     {
+      /*
+       * The range and resolution of the result of basic operations are deduced to try to hold the mathematical results.
+       * This deduction depends on the bound policy.
+       *
+       * - unbounded: The range and resolution of the result of basic operations are large enough to hold the mathematical results.
+       *
+       * Overflow in template argument computation is undefined behavior.
+       * In practice, overflow is unlikely to be a significant problem because even small machines can represent
+       * numbers with thousands of bits and because compiler can diagnose overflow in template arguments.
+       *
+       * The special case in the operations is division, where the mathematical result may require an infinite
+       * number of bits. The actual value must be rounded to a representable value.
+       * The above resolution is sufficient to ensure that if the mathematical result is not zero, the fixed-point
+       * result is not zero.
+       * Furthermore, assuming values have an error of one-half ULP, the defined resolution is close to the error
+       * bound in the computation.
+       *
+       * - bounded: As far as the result type is large enough to hold mathematical results it behaves as the unbounded one.
+       * When the bounding type is not enough large the operation is undefined.
+       * The user need to use functions that have the expected result type as parameter.
+       *
+       * Overflow while computing the arithmetic operations can be detected in this bounded cases.
+       *
+       */
       struct open
       {
       };
+      /*
+       * The range and resolution of the result is the one of the argument operations.
+       * In order to mix different fixed points, the user could be forced to convert explicitly the arguments to the expected type.
+       */
       struct closed
       {
       };
@@ -581,9 +800,19 @@ namespace boost
      */
     namespace bound
     {
+      /**
+       * Bounded fixed points types are closed, that is that the result of an arithmetic operations will be
+       * closed only if both arguments are closed.
+       * The range and resolution are bounded by the larger integral type provided by the compiler.
+       *
+       */
       struct bounded
       {
       };
+
+      /**
+       * The range and resolution of the result of basic operations are large enough to hold the mathematical results.
+       */
       struct unbounded
       {
       };
@@ -748,6 +977,7 @@ namespace boost
     template <class From, class To>
     To number_cast(From const& from);
 
+    //#include <boost/fixed_point/detail/helpers.hpp>
     namespace detail
     {
       template <typename T, int Range, int Resolution >
@@ -1678,47 +1908,48 @@ namespace boost
       typename default_type<F1,F2>::type
       > type;
     };
-#endif
+#endif // BOOST_FIXED_POINT_DOXYGEN_INVOKED
+    namespace detail
+    {
+      template <typename T, typename U>
+      struct is_more_precisse;
 
-    template <typename T, typename U>
-    struct is_more_precisse;
+      template <
+      int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2
+      >
+      struct is_more_precisse<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> > :
+      mpl::and_ <
+      mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
+      mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
+      >
+      {};
 
-#if ! defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    template <
-    int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2
-    >
-    struct is_more_precisse<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> > :
-    mpl::and_ <
-    mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
-    mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
-    >
-    {};
+      template <
+      int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2
+      >
+      struct is_more_precisse<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> > :
+      mpl::and_ <
+      mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
+      mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
+      >
+      {};
 
-    template <
-    int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2
-    >
-    struct is_more_precisse<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> > :
-    mpl::and_ <
-    mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
-    mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
-    >
-    {};
-
-    template <
-    int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2
-    >
-    struct is_more_precisse<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> > :
-    mpl::and_ <
-    mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
-    mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
-    >
-    {};
+      template <
+      int R1, int P1, typename RP1, typename OP1, typename F1,
+      int R2, int P2, typename RP2, typename OP2, typename F2
+      >
+      struct is_more_precisse<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> > :
+      mpl::and_ <
+      mpl::less_equal < mpl::int_<R2>, mpl::int_<R1> >,
+      mpl::greater_equal < mpl::int_<P2>, mpl::int_<P1> >
+      >
+      {};
+    }
 
     template <typename S, typename T>
-    struct is_convertible : is_more_precisse<T,S>
+    struct is_convertible : detail::is_more_precisse<T,S>
     {};
 
     template <typename S, typename T, bool IsArithmetic=is_arithmetic<S>::value >
@@ -1727,7 +1958,7 @@ namespace boost
     struct is_explicitly_convertible<S,T,false> :
     mpl::and_<
     mpl::not_<allows_implicit_conversion_from_fp<T> >,
-    mpl::not_<is_more_precisse<T,S> >
+    mpl::not_<detail::is_more_precisse<T,S> >
     >
     {};
 
@@ -1742,7 +1973,7 @@ namespace boost
     struct is_implicitly_convertible<S,T,false> :
     mpl::and_<
     allows_implicit_conversion_from_fp<T>,
-    mpl::not_<is_more_precisse<T,S> >
+    mpl::not_<detail::is_more_precisse<T,S> >
     >
     {};
 
@@ -1750,7 +1981,6 @@ namespace boost
     struct is_implicitly_convertible<S,T,true> :
     allows_implicit_conversion_from_builtin<T>
     {};
-#endif
 
     /**
      * @brief Signed fixed point number.
@@ -1771,8 +2001,10 @@ namespace boost
       BOOST_MPL_ASSERT_MSG(Range>=Resolution,
           RANGE_MUST_BE_GREATER_EQUAL_THAN_RESOLUTION, (mpl::int_<Range>,mpl::int_<Resolution>));
 #endif
-    public:
 
+    public:
+      //! this type
+      typedef real_t self_type;
       // name the template parameters
       //! the Range parameter.
       BOOST_STATIC_CONSTEXPR int range_exp = Range;
@@ -1839,7 +2071,7 @@ namespace boost
        *
        * @Effects Adapt the resolution of @c rhs to this resolution.
        * @Throws Nothing.
-       * @Notes This overload participates in overload resolution only if the source @c is_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_convertible to the target.
        */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(real_t<R,P,RP,OP,F> const& rhs
@@ -1847,7 +2079,7 @@ namespace boost
           , typename boost::enable_if<is_convertible<real_t<R,P,RP,OP,F>, real_t > >::type* = 0
 #endif
       )
-      : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
+      : value_(fixed_point::detail::fxp_number_cast<real_t<R,P,RP,OP,F>, real_t>()(rhs).count())
       {
       }
       /**
@@ -1858,7 +2090,7 @@ namespace boost
        *
        * @Effects Adapt the resolution of @c rhs to this resolution.
        * @Throws Nothing.
-       * @Notes This overload participates in overload resolution only if the source @c is_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_convertible to the target.
        */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(ureal_t<R,P,RP,OP,F> const& rhs
@@ -1866,7 +2098,7 @@ namespace boost
           , typename boost::enable_if<is_convertible<ureal_t<R,P,RP,OP,F>, real_t > >::type* = 0
 #endif
       )
-      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t, true, true>()(rhs).count())
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, real_t>()(rhs).count())
       {
       }
 
@@ -1878,7 +2110,7 @@ namespace boost
        *
        * @Effects Rounds and check overflow if needed.
        * @Throws Whatever the target overflow policy can throw.
-       * @Notes This overload participates in overload resolution only if the source @c is_explicitly_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_explicitly_convertible to the target.
        */
       template <int R, int P, typename RP, typename OP, typename F>
       explicit real_t(real_t<R,P,RP,OP,F> const& rhs
@@ -1901,7 +2133,7 @@ namespace boost
        *
        * @Effects Rounds and check overflow if needed.
        * @Throws Whatever the target overflow policy can throw.
-       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
        */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(real_t<R,P,RP,OP,F> const& rhs
@@ -1924,7 +2156,7 @@ namespace boost
        *
        * @Throws Whatever the target overflow policy can throw.
        * @Effects Rounds and check overflow if needed.
-       * @Notes This overload participates in overload resolution only if the source @c is_explicitly_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_explicitly_convertible to the target.
        */
       template <int R, int P, typename RP, typename OP, typename F>
       explicit real_t(ureal_t<R,P,RP,OP,F> const& rhs
@@ -1947,7 +2179,7 @@ namespace boost
        *
        * @Effects Rounds and check overflow if needed.
        * @Throws Whatever the target overflow policy can throw.
-       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
        */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(ureal_t<R,P,RP,OP,F> const& rhs
@@ -1970,7 +2202,7 @@ namespace boost
        *
        * @Effects Rounds and check overflow if needed.
        * @Throws Whatever the target overflow policy can throw.
-       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
        */
 
       template <int R, int P, typename RP, typename OP, typename F>
@@ -1989,7 +2221,7 @@ namespace boost
        *
        * @Effects Rounds and check overflow if needed.
        * @Throws Whatever the target overflow policy can throw.
-       * @Notes This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
+       * @Remark This overload participates in overload resolution only if the source @c is_implicitly_convertible to the target.
        */
       template <int R, int P, typename RP, typename OP, typename F>
       real_t(convert_tag<ureal_t<R,P,RP,OP,F> > rhs)
@@ -2140,33 +2372,53 @@ namespace boost
       {
         return underlying_type(std::floor(x));
       }
+      template <typename I>
+      static underlying_type classify(I i
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+          , typename boost::enable_if<is_integral<I> >::type* = 0
+#endif
+      )
+      {
+        // Round
+        underlying_type indx = rounding_type::template round_integral<I, self_type>(i);
+        // Overflow
+        if (indx > max_index)
+        {
+          return overflow_type::template on_positive_overflow<self_type,underlying_type>(indx);
+        }
+        if (indx < min_index)
+        {
+          return overflow_type::template on_negative_overflow<self_type,underlying_type>(indx);
+        }
+
+        return indx;
+      }
+
       template <typename FP>
-      static underlying_type classify(FP x)
+      static underlying_type classify(FP x
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+          , typename boost::enable_if<is_floating_point<FP> >::type* = 0
+#endif
+      )
       {
 
-        //        underlying_type indx = rounding_type::template round<To>(x)
-        //        // Overflow
-        //        if (x>max().as<FP>())
-        //        {
-        //          return overflow_type::template on_positive_overflow<To,underlying_type>(indx)));
-        //        }
-        //        if (rhs.count() < (typename From::underlying_type(To::min_index)<<(P2-P1)))
-        //        {
-        //          return To(index(OP2::template on_negative_overflow<To,underlying_type>(indx)));
-        //        }
-        //
-        //        // Round
-        //        return To(index(RP2::template round<From,To>(rhs)));
+        // Round
+        underlying_type indx = rounding_type::template round_float_point<FP,self_type>(x);
+        // Overflow
+        if (indx > max_index)
+        {
+          return overflow_type::template on_positive_overflow<self_type,underlying_type>(indx);
+        }
+        if (indx < min_index)
+        {
+          return overflow_type::template on_negative_overflow<self_type,underlying_type>(indx);
+        }
 
-        if (x<min().as<FP>())
-        return min_index;
-        if (x>max().as<FP>())
-        return max_index;
-        return integer_part(x/factor<FP>());
+        return indx;
       }
 
       /**
-       * Implicit conversion from arithmetic @T.
+       * Implicit conversion from arithmetic @c T.
        */
       template <typename T>
       real_t(T x
@@ -2175,7 +2427,7 @@ namespace boost
 #endif
       ) : value_(fixed_point::detail::arthm_number_cast<T, real_t>()(x).count())
       {}
-      //! explicit conversion from arithmetic @T.
+      //! explicit conversion from arithmetic @c T.
       template <typename T>
       explicit real_t(T x
 #if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
@@ -2380,6 +2632,8 @@ namespace boost
 #endif
 
     public:
+      //! this type
+      typedef ureal_t self_type;
 
       // name the template parameters
       //! the Range parameter.
@@ -2443,7 +2697,7 @@ namespace boost
       ureal_t(ureal_t<R,P,RP,OP,F> const& rhs
           , typename boost::enable_if<is_convertible<ureal_t<R,P,RP,OP,F>, ureal_t > >::type* = 0
       )
-      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, ureal_t, true, true>()(rhs).count())
+      : value_(fixed_point::detail::fxp_number_cast<ureal_t<R,P,RP,OP,F>, ureal_t>()(rhs).count())
       {
       }
 
@@ -2561,12 +2815,46 @@ namespace boost
 
         return k*factor<FP>();
       }
-      template <typename FP>
-      static underlying_type classify(FP x)
+
+      template <typename I>
+      static underlying_type classify(I i
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+          , typename boost::enable_if<is_integral<I> >::type* = 0
+#endif
+      )
       {
-        if (x<min().as<FP>()) return min_index;
-        if (x>max().as<FP>()) return max_index;
-        return integer_part(x/factor<FP>());
+        if (i<0)
+          return overflow_type::template on_negative_overflow<self_type,underlying_type>(0);
+        // Round
+        underlying_type indx = rounding_type::template round_integral<I, self_type>(i);
+        // Overflow
+        if (indx > max_index)
+        {
+          return overflow_type::template on_positive_overflow<self_type,underlying_type>(indx);
+        }
+
+        return indx;
+      }
+
+      template <typename FP>
+      static underlying_type classify(FP x
+#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
+          , typename boost::enable_if<is_floating_point<FP> >::type* = 0
+#endif
+      )
+      {
+        if (x<0)
+          return overflow_type::template on_negative_overflow<self_type,underlying_type>(0);
+
+        // Round
+        underlying_type indx = rounding_type::template round_float_point<FP,self_type>(x);
+        // Overflow
+        if (indx > max_index)
+        {
+          return overflow_type::template on_positive_overflow<self_type,underlying_type>(indx);
+        }
+
+        return indx;
       }
 
       //! implicit conversion from int
@@ -2827,7 +3115,7 @@ namespace boost
 #else
     ureal_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>
 #endif
-    to_unsigned_number()
+    to_ureal_t()
     {
       return ureal_t<
       static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution
@@ -2850,7 +3138,7 @@ namespace boost
 #else
     real_t< static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution>
 #endif
-    to_signed_number()
+    to_real_t()
     {
       return real_t<
       static_log2<mpl::abs<mpl::int_<Times+1> >::type::value>::value+Resolution, Resolution

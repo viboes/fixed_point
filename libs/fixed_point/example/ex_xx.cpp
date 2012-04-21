@@ -16,17 +16,17 @@ struct pixel
 
 pixel blend(pixel a, pixel b)
 {
-  BOOST_AUTO(scale, (to_unsigned_number<255, 0> ()));
+  BOOST_AUTO(scale, (to_ureal_t<255, 0> ()));
   BOOST_AUTO(a_r, a.r / scale);
   BOOST_AUTO(b_r, b.r / scale);
   (void) a_r;
   (void) b_r;
-  BOOST_AUTO(aia, b.a * (to_unsigned_number<1, 0> () - a.a));
+  BOOST_AUTO(aia, b.a * (to_ureal_t<1, 0> () - a.a));
   BOOST_AUTO(c_a, a.a + aia);
   BOOST_AUTO(c_r, (a.r * a.a + b.r * aia) / c_a);
   pixel c;
-  c.a = number_cast<ureal_t<8, 0> > (c_a * to_unsigned_number<255, 0> ());
-  c.r = number_cast<ureal_t<8, 0> > (c_r * to_unsigned_number<255, 0> ());
+  c.a = number_cast<ureal_t<8, 0> > (c_a * to_ureal_t<255, 0> ());
+  c.r = number_cast<ureal_t<8, 0> > (c_r * to_ureal_t<255, 0> ());
   return c;
 }
 
@@ -55,7 +55,7 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    ureal_t<2, -2, round::negative> n = to_unsigned_number<1, 0> (); //
+    ureal_t<2, -2, round::negative> n = to_ureal_t<1, 0> (); //
     std::cout << int(n.count()) << std::endl;
     BOOST_TEST(n.count() == 4);
   }
@@ -405,7 +405,7 @@ int main()
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    ureal_t<4, -1> n1(-0.5f);
+    ureal_t<4, -1, round::negative, ::overflow::saturate> n1(-0.5f);
     BOOST_TEST(n1.count() == 0);
     BOOST_TEST(n1.as_float() == 0.0f);
   }
@@ -1045,27 +1045,27 @@ int main()
   //  }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    BOOST_AUTO(scale, (to_unsigned_number<255, 0> ()));
+    BOOST_AUTO(scale, (to_ureal_t<255, 0> ()));
     BOOST_TEST(scale.count() == 255);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    BOOST_AUTO(scale, (to_signed_number<255, 0> ()));
+    BOOST_AUTO(scale, (to_real_t<255, 0> ()));
     BOOST_TEST(scale.count() == 255);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    BOOST_AUTO(scale, (to_unsigned_number<1, -12> ()));
+    BOOST_AUTO(scale, (to_ureal_t<1, -12> ()));
     BOOST_TEST(scale.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    BOOST_AUTO(scale, (to_signed_number<1, -12> ()));
+    BOOST_AUTO(scale, (to_real_t<1, -12> ()));
     BOOST_TEST(scale.count() == 1);
   }
   {
     std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-    BOOST_AUTO(scale, (to_unsigned_number<3, 10> ()));
+    BOOST_AUTO(scale, (to_ureal_t<3, 10> ()));
     BOOST_TEST(scale.count() == 3);
   }
   {
