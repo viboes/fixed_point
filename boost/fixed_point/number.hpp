@@ -22,6 +22,7 @@
 #include <boost/mpl/max.hpp>
 #include <boost/mpl/min.hpp>
 #include <boost/mpl/assert.hpp>
+#include <boost/type_traits/common_type.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
@@ -633,6 +634,26 @@ namespace boost
 
       };
     }
+  } // namespace fixed_point
+
+  template <>
+  struct common_type<fixed_point::round::truncated, fixed_point::round::truncated>
+  {
+    typedef fixed_point::round::truncated type;
+  };
+  template <typename Round>
+  struct common_type<Round, fixed_point::round::truncated>
+  {
+    typedef fixed_point::round::truncated type;
+  };
+  template <typename Round>
+  struct common_type<fixed_point::round::truncated, Round>
+  {
+    typedef fixed_point::round::truncated type;
+  };
+
+  namespace fixed_point
+  {
 
     /**
      * Namespace for storage policies.
@@ -720,7 +741,74 @@ namespace boost
 
       };
     }
+  } // namespace fixed_point
 
+  template <>
+  struct common_type<fixed_point::overflow::undefined, fixed_point::overflow::modulus>
+  {
+    typedef fixed_point::overflow::modulus type;
+  };
+  template <>
+  struct common_type<fixed_point::overflow::modulus, fixed_point::overflow::undefined>
+  {
+    typedef fixed_point::overflow::modulus type;
+  };
+
+  template <>
+  struct common_type<fixed_point::overflow::saturate, fixed_point::overflow::undefined>
+  {
+    typedef fixed_point::overflow::saturate type;
+  };
+  template <>
+  struct common_type<fixed_point::overflow::undefined, fixed_point::overflow::saturate>
+  {
+    typedef fixed_point::overflow::saturate type;
+  };
+
+  template <>
+  struct common_type<fixed_point::overflow::saturate, fixed_point::overflow::modulus>
+  {
+    typedef fixed_point::overflow::exception type;
+  };
+  template <>
+  struct common_type<fixed_point::overflow::modulus, fixed_point::overflow::saturate>
+  {
+    typedef fixed_point::overflow::exception type;
+  };
+  template <>
+  struct common_type<fixed_point::overflow::exception, fixed_point::overflow::exception>
+  {
+    typedef fixed_point::overflow::exception type;
+  };
+  template <typename Overflow>
+  struct common_type<fixed_point::overflow::exception, Overflow>
+  {
+    typedef fixed_point::overflow::exception type;
+  };
+  template <typename Overflow>
+  struct common_type<Overflow, fixed_point::overflow::exception>
+  {
+    typedef fixed_point::overflow::exception type;
+  };
+
+  template <>
+  struct common_type<fixed_point::overflow::impossible, fixed_point::overflow::impossible>
+  {
+    typedef fixed_point::overflow::impossible type;
+  };
+  template <typename Overflow>
+  struct common_type<fixed_point::overflow::impossible, Overflow>
+  {
+    typedef Overflow type;
+  };
+  template <typename Overflow>
+  struct common_type<Overflow, fixed_point::overflow::impossible>
+  {
+    typedef Overflow type;
+  };
+
+  namespace fixed_point
+  {
     /**
      * Since fixed points have different range and resolution the user needs to convert from one type to another.
      *
@@ -736,6 +824,8 @@ namespace boost
      * There is no know way to enable conversions operator subject to conditions on the type.
      * The library has taken a conservative approach and only explicit conversions are provided.
      * The user could always wrap the type and provide implicit conversion.
+     *
+     * Note that there is no common_type between explicitly and implicitly.
      *
      */
     namespace conversion
@@ -753,9 +843,14 @@ namespace boost
       {
       };
     }
+  } // namespace fixed_point
 
+  namespace fixed_point
+  {
     /**
      * Namespace for arithmetic operations policies.
+     *
+     * The common_type is open if one of the is closed, open otherwise.
      */
     namespace arithmetic
     {
@@ -794,9 +889,26 @@ namespace boost
       {
       };
     }
+  } // namespace fixed_point
 
+  template <>
+  struct common_type<fixed_point::arithmetic::open, fixed_point::arithmetic::closed>
+  {
+    typedef fixed_point::arithmetic::open type;
+  };
+  template <>
+  struct common_type<fixed_point::arithmetic::closed, fixed_point::arithmetic::open>
+  {
+    typedef fixed_point::arithmetic::open type;
+  };
+
+  namespace fixed_point
+  {
     /**
      * Namespace for bounding policies.
+     *
+     * The common_type is unbounded if one of them is unbounded, bounded otherwise.
+     *
      */
     namespace bound
     {
@@ -817,22 +929,56 @@ namespace boost
       {
       };
     }
+  } // namespace fixed_point
 
+  template <>
+  struct common_type<fixed_point::bound::unbounded, fixed_point::bound::bounded>
+  {
+    typedef fixed_point::bound::unbounded type;
+  };
+  template <>
+  struct common_type<fixed_point::bound::bounded, fixed_point::bound::unbounded>
+  {
+    typedef fixed_point::bound::unbounded type;
+  };
+
+  namespace fixed_point
+  {
     /**
      * Namespace for bounding policies.
      */
-    namespace family
-    {
-      struct f1
-      {
-        typedef storage::space storage_type;
-        typedef conversion::explicitly conversion_from_fixed_point_type;
-        typedef conversion::explicitly conversion_from_builtin_type;
-        typedef arithmetic::open arithmetic_type;
-        typedef bound::bounded bound_type;
-      };
-    }
 
+    template <typename Storage = storage::space, typename ConversionFp = conversion::explicitly,
+        typename ConversionBuilt = conversion::explicitly, typename Arithmetic = arithmetic::open,
+        typename Bound = bound::bounded>
+    struct family
+    {
+      typedef Storage storage_type;
+      typedef ConversionFp conversion_from_fixed_point_type;
+      typedef ConversionBuilt conversion_from_builtin_type;
+      typedef Arithmetic arithmetic_type;
+      typedef Bound bound_type;
+
+    };
+  } // namespace fixed_point
+
+  //  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  //  int R2, int P2, typename RP2, typename OP2, typename F2>
+  //  struct common_type<
+  //  fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
+  //  fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
+  //  {
+  //    typedef fixed_point::ureal_t<
+  //    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+  //    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+  //    typename common_type<RP1,RP2>::type,
+  //    typename common_type<OP1,OP2>::type,
+  //    typename common_type<F1,F2>::type
+  //    > type;
+  //  };
+
+  namespace fixed_point
+  {
     template <typename F>
     struct allows_explicit_conversion_from_fp: public is_same<typename F::conversion_from_fixed_point_type,
         conversion::explicitly>
@@ -867,11 +1013,11 @@ namespace boost
     };
 
     template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
-        typename Family = family::f1>
+        typename Family = family<> >
     class ureal_t;
 
     template <int Range, int Resolution, typename Rounding = round::negative, typename Overflow = overflow::exception,
-        typename Family = family::f1>
+        typename Family = family<> >
     class real_t;
 
     template <typename Res, int R1, int P1, typename RP1, typename OP1, typename F1, int R2, int P2, typename RP2,
@@ -1747,168 +1893,82 @@ namespace boost
       > struct number_cast<From,To,false>: public fxp_number_cast<From,To>
       {};
 
-      template <typename T, typename U >
-      struct default_type_impl;
-      template <typename T>
-      struct default_type_impl<T,T>
-      {
-        typedef T type;
-      };
-
     } // namespace detail
+  } // namespace fixed_point
 
-    /**
-     * @c common_type alike allowing to have a different type as result.
-     *
-     *
-     */
-    template <typename T, typename U >
-    struct default_type
-    {
-      typedef typename detail::default_type_impl<T,U>::type type;
-    };
+  /**
+   * common_type specialization for ureal_t and ureal_t.
+   */
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct common_type<
+  fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
+  {
+    typedef fixed_point::ureal_t<
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<F1,F2>::type
+    > type;
+  };
 
-#if !defined(BOOST_FIXED_POINT_DOXYGEN_INVOKED)
-    // default_type trait specializations
+  /**
+   * common_type specialization for real_t and real_t.
+   */
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct common_type<
+  fixed_point::real_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::real_t<R2,P2,RP2,OP2,F2> >
+  {
+    typedef fixed_point::real_t<
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<F1,F2>::type
+    > type;
+  };
+  /**
+   * common_type specialization for real_t and ureal_t.
+   */
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct common_type<
+  fixed_point::real_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
+  {
+    typedef fixed_point::real_t<
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<F1,F2>::type
+    > type;
+  };
 
-    template <>
-    struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::modulus>
-    {
-      typedef fixed_point::overflow::modulus type;
-    };
-    template <>
-    struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::undefined>
-    {
-      typedef fixed_point::overflow::modulus type;
-    };
+  /**
+   * common_type specialization for ureal_t and real_t.
+   */
+  template <int R1, int P1, typename RP1, typename OP1, typename F1,
+  int R2, int P2, typename RP2, typename OP2, typename F2>
+  struct common_type<
+  fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
+  fixed_point::real_t<R2,P2,RP2,OP2,F2> >
+  {
+    typedef fixed_point::real_t<
+    mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
+    mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
+    typename common_type<RP1,RP2>::type,
+    typename common_type<OP1,OP2>::type,
+    typename common_type<F1,F2>::type
+    > type;
+  };
 
-    template <>
-    struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::undefined>
-    {
-      typedef fixed_point::overflow::saturate type;
-    };
-    template <>
-    struct default_type<fixed_point::overflow::undefined, fixed_point::overflow::saturate>
-    {
-      typedef fixed_point::overflow::saturate type;
-    };
-
-    template <>
-    struct default_type<fixed_point::overflow::saturate, fixed_point::overflow::modulus>
-    {
-      typedef fixed_point::overflow::exception type;
-    };
-    template <>
-    struct default_type<fixed_point::overflow::modulus, fixed_point::overflow::saturate>
-    {
-      typedef fixed_point::overflow::exception type;
-    };
-    template <>
-    struct default_type<fixed_point::overflow::exception, fixed_point::overflow::exception>
-    {
-      typedef fixed_point::overflow::exception type;
-    };
-    template <typename Overflow>
-    struct default_type<fixed_point::overflow::exception, Overflow>
-    {
-      typedef fixed_point::overflow::exception type;
-    };
-    template <typename Overflow>
-    struct default_type<Overflow,fixed_point::overflow::exception>
-    {
-      typedef fixed_point::overflow::exception type;
-    };
-
-    template <>
-    struct default_type<fixed_point::overflow::impossible, fixed_point::overflow::impossible>
-    {
-      typedef fixed_point::overflow::impossible type;
-    };
-    template <typename Overflow>
-    struct default_type<fixed_point::overflow::impossible, Overflow>
-    {
-      typedef Overflow type;
-    };
-    template <typename Overflow>
-    struct default_type<Overflow,fixed_point::overflow::impossible>
-    {
-      typedef Overflow type;
-    };
-
-    template <>
-    struct default_type<fixed_point::round::truncated,fixed_point::round::truncated>
-    {
-      typedef fixed_point::round::truncated type;
-    };
-    template <typename Round>
-    struct default_type<Round,fixed_point::round::truncated>
-    {
-      typedef fixed_point::round::truncated type;
-    };
-    template <typename Round>
-    struct default_type<fixed_point::round::truncated,Round>
-    {
-      typedef fixed_point::round::truncated type;
-    };
-
-    template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    struct default_type<
-    fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
-    fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
-    {
-      typedef fixed_point::ureal_t<
-      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > type;
-    };
-
-    template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    struct default_type<
-    fixed_point::real_t<R1,P1,RP1,OP1,F1>,
-    fixed_point::real_t<R2,P2,RP2,OP2,F2> >
-    {
-      typedef fixed_point::real_t<
-      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > type;
-    };
-    template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    struct default_type<
-    fixed_point::real_t<R1,P1,RP1,OP1,F1>,
-    fixed_point::ureal_t<R2,P2,RP2,OP2,F2> >
-    {
-      typedef fixed_point::real_t<
-      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > type;
-    };
-    template <int R1, int P1, typename RP1, typename OP1, typename F1,
-    int R2, int P2, typename RP2, typename OP2, typename F2>
-    struct default_type<
-    fixed_point::ureal_t<R1,P1,RP1,OP1,F1>,
-    fixed_point::real_t<R2,P2,RP2,OP2,F2> >
-    {
-      typedef fixed_point::real_t<
-      mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value,
-      mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
-      > type;
-    };
-#endif // BOOST_FIXED_POINT_DOXYGEN_INVOKED
+  namespace fixed_point
+  {
     namespace detail
     {
       template <typename T, typename U>
@@ -2824,7 +2884,7 @@ namespace boost
       )
       {
         if (i<0)
-          return overflow_type::template on_negative_overflow<self_type,underlying_type>(0);
+        return overflow_type::template on_negative_overflow<self_type,underlying_type>(0);
         // Round
         underlying_type indx = rounding_type::template round_integral<I, self_type>(i);
         // Overflow
@@ -2844,7 +2904,7 @@ namespace boost
       )
       {
         if (x<0)
-          return overflow_type::template on_negative_overflow<self_type,underlying_type>(0);
+        return overflow_type::template on_negative_overflow<self_type,underlying_type>(0);
 
         // Round
         underlying_type indx = rounding_type::template round_float_point<FP,self_type>(x);
@@ -3212,9 +3272,9 @@ namespace boost
       typedef real_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<F1,F2>::type
       >
       type;
     };
@@ -3249,9 +3309,9 @@ namespace boost
       typedef ureal_t<
       mpl::max<mpl::int_<R1>,mpl::int_<R2> >::type::value+1,
       mpl::min<mpl::int_<P1>,mpl::int_<P2> >::type::value,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<F1,F2>::type
       >
       type;
     };
@@ -3479,9 +3539,9 @@ namespace boost
     struct multiply_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef real_t< R1+R2, P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<F1,F2>::type
       >
       type;
     };
@@ -3514,9 +3574,9 @@ namespace boost
     struct multiply_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef ureal_t< R1+R2, P1+P2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<F1,F2>::type
       >
       type;
     };
@@ -3613,7 +3673,7 @@ namespace boost
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
 
-      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
       //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
@@ -3638,7 +3698,7 @@ namespace boost
     {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
-      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
       //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
@@ -3663,7 +3723,7 @@ namespace boost
     {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
-      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<real_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
       //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
@@ -3688,7 +3748,7 @@ namespace boost
     {
       typedef Res result_type;
       typedef typename result_type::underlying_type underlying_type;
-      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<ureal_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
       //BOOST_STATIC_CONSTEXPR int P = Res::resolution_exp;
 
       //BOOST_STATIC_ASSERT((Res::digits>=(DT::digits-P)));
@@ -3731,9 +3791,9 @@ namespace boost
     struct divide_result<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef real_t< R1-P2, P1-R2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<F1,F2>::type
       >
       type;
     };
@@ -3766,9 +3826,9 @@ namespace boost
     struct divide_result<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2>, B1, B2 >
     {
       typedef ureal_t< R1-P2, P1-R2,
-      typename default_type<RP1,RP2>::type,
-      typename default_type<OP1,OP2>::type,
-      typename default_type<F1,F2>::type
+      typename common_type<RP1,RP2>::type,
+      typename common_type<OP1,OP2>::type,
+      typename common_type<F1,F2>::type
       >
       type;
     };
@@ -3835,7 +3895,7 @@ namespace boost
     // comparisons
 
     /**
-     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the default_type of the parameters.
+     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the common_type of the parameters.
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3843,12 +3903,12 @@ namespace boost
     bool
     operator==(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
       return DT(lhs).count() == DT(rhs).count();
     }
 
     /**
-     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the default_type of the parameters..
+     * @Returns As if <c>DT(lhs).count() == DT(rhs).count()</c> where DT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3856,12 +3916,12 @@ namespace boost
     bool
     operator==(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
       return DT(lhs).count() == DT(rhs).count();
     }
 
     /**
-     * @Returns <c>DT(lhs).count() != DT(rhs).count()</c> where DT is the default_type of the parameters..
+     * @Returns <c>DT(lhs).count() != DT(rhs).count()</c> where DT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3873,7 +3933,7 @@ namespace boost
     }
 
     /**
-     * @Returns <c>DT(lhs).count() != DT(rhs).count()</c> where DT is the default_type of the parameters..
+     * @Returns <c>DT(lhs).count() != DT(rhs).count()</c> where DT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3885,7 +3945,7 @@ namespace boost
     }
 
     /**
-     * @Returns <c>DT(lhs).count() < DT(rhs).count()</c> where DT is the default_type of the parameters..
+     * @Returns <c>DT(lhs).count() < DT(rhs).count()</c> where DT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3893,12 +3953,12 @@ namespace boost
     bool
     operator<(real_t<R1,P1,RP1,OP1,F1> const& lhs, real_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename default_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<real_t<R1,P1,RP1,OP1,F1>, real_t<R2,P2,RP2,OP2,F2> >::type DT;
       return DT(lhs).count() < DT(rhs).count();
     }
 
     /**
-     * @Returns <c>DT(lhs).count() < DT(rhs).count()</c> where DT is the default_type of the parameters..
+     * @Returns <c>DT(lhs).count() < DT(rhs).count()</c> where DT is the common_type of the parameters..
      */
     template <int R1, int P1, typename RP1, typename OP1, typename F1,
     int R2, int P2, typename RP2, typename OP2, typename F2>
@@ -3906,7 +3966,7 @@ namespace boost
     bool
     operator<(ureal_t<R1,P1,RP1,OP1,F1> const& lhs, ureal_t<R2,P2,RP2,OP2,F2> const& rhs)
     {
-      typedef typename default_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
+      typedef typename common_type<ureal_t<R1,P1,RP1,OP1,F1>, ureal_t<R2,P2,RP2,OP2,F2> >::type DT;
       return DT(lhs).count() < DT(rhs).count();
     }
 
