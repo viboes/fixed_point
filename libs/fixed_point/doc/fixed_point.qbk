@@ -30,6 +30,11 @@
 [import ../../../boost/fixed_point/boost/chrono_time_point_to_posix_time_ptime.hpp]
 ]
 
+[def __fxp_uint [funcref boost::fixed_point::uint_t uint_t]]
+[def __fxp_int [funcref boost::fixed_point::int_t int_t]]
+[def __fxp_ufract [funcref boost::fixed_point::ureal_t ureal_t]]
+[def __fxp_fract [funcref boost::fixed_point::real_t real_t]]
+
 [/
 [section Preface]
 

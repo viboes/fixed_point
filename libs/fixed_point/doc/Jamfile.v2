@@ -175,7 +175,7 @@ using quickbook ;
 
 doxygen core
    :
-      [ glob ../../../boost/fixed_point/number.hpp ]
+      [ glob ../include/boost/fixed_point/number.hpp ]
    :
         <xsl:param>"boost.doxygen.reftitle=Core"
    ;
