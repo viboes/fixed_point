@@ -6,7 +6,7 @@
 project
     :   requirements
         #<library>/boost/test//boost_test_exec_monitor/<link>static
-        <include>../../..
+        <include>../include
         <define>BOOST_ALL_NO_LIB=1
 
         <warnings>all
