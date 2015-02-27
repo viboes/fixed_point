@@ -1,5 +1,5 @@
 [/
- / Copyright (c) 2012 Vicente J. Botet Escriba
+ / Copyright (c) 2012,2015 Vicente J. Botet Escriba
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,10 +30,16 @@
 [import ../../../boost/fixed_point/boost/chrono_time_point_to_posix_time_ptime.hpp]
 ]
 
-[def __fxp_uint [funcref boost::fixed_point::uint_t uint_t]]
-[def __fxp_int [funcref boost::fixed_point::int_t int_t]]
-[def __fxp_ufract [funcref boost::fixed_point::ureal_t ureal_t]]
-[def __fxp_fract [funcref boost::fixed_point::real_t real_t]]
+[def __fxp_uint [typeref boost::fixed_point::uint_t uint_t]]
+[def __fxp_int [typeref boost::fixed_point::int_t int_t]]
+[def __fxp_ufract [typeref boost::fixed_point::ureal_t ureal_t]]
+[def __fxp_fract [typeref boost::fixed_point::real_t real_t]]
+
+[def __to_fxp_uint [funcref boost::fixed_point::to_uint_t to_uint_t]]
+[def __to_fxp_int [funcref boost::fixed_point::to_int_t to_int_t]]
+[def __to_fxp_ufract [funcref boost::fixed_point::to_ureal_t to_ureal_t]]
+[def __to_fxp_fract [funcref boost::fixed_point::to_real_t to_real_t]]
+
 
 [/
 [section Preface]
@@ -458,7 +464,10 @@ In general, these modes get slower but safer working down the list.
 
 [section:literals Literals]
 
-There exists no mechanism in C++11 to specify literals for the template types above. However, we can get close with template functions that yield the appropriate fixed-point value based on an template int parameter. For example, the expression to_fxp_uint<24>() will produce a fxp_uint constant with a range just sufficient to hold the value 24. Likewise, the expression to_fxp_ufract<2884,-4>() will produce a fxp_ufract constant with a range and resolution just sufficient to hold the value 2884*2^(-4).
+There exists no mechanism in C++11 to specify literals for the template types above. However, we can get close with 
+template functions that yield the appropriate fixed-point value based on an template int parameter. 
+For example, the expression __to_fxp_uint<24>() will produce a __fxp_uint constant with a range just sufficient to hold the value 24. 
+Likewise, the expression __to_fxp_ufract<2884,-4>() will produce a __fxp_ufract constant with a range and resolution just sufficient to hold the value 2884*2^(-4).
 
 [endsect]
 
