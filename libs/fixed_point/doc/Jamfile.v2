@@ -1,0 +1,245 @@
+#  Boost.FixedPoint library documentation Jamfile  ---------------------------------
+#
+#  Copyright Vicente J. Botet Escriba 2012. Use, modification and
+#  distribution is subject to the Boost Software License, Version
+#  1.0. (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+#
+#  See http://www.boost.org for updates, documentation, and revision history.
+
+#import quickbook ;
+path-constant nav_images :  html/images/ ; # png and svg images for home, next, note, tip...
+path-constant images_location : html ; # location of SVG and PNG images referenced by Quickbook.
+
+echo "images_location" $(images_location) ; 
+echo "nav_images" $(nav_images) ;
+
+import modules ;
+
+if --enable-index in  [ modules.peek : ARGV ]
+{
+   ECHO "Building the FixedPoint docs with automatic index generation enabled." ;
+   using auto-index ;
+   project : requirements
+         # <auto-index>on turns on index (or off).
+        <auto-index>on
+                
+        # Choose indexing method (separately for html and pdf):
+        <format>html:<auto-index-internal>on  # on (or off) to use internally generated indexes.
+        # <format>html:<xsl:param>generate.index=0 # Don't let the XSL stylesheets generate indexes.
+        
+        <format>pdf:<auto-index-internal>off # on (or off) to use internally generated indexes.
+        # <auto-index-type>index  # Use <index>...</index> as the XML wrapper.
+        
+        <format>pdf:<xsl:param>index.on.type=1 # For the native stylesheets to generate the different indexes.
+        # PDF native index support is probably better for PDFs as then you actually get page numbers.
+
+        <auto-index-script>index.idx # Specifies the name of the script to load. 
+        # <auto-index-prefix>../../../ # Path to /fixed_point so index.idx !scan-path can use boost/ and libs/doc.
+        <auto-index-prefix>../../.. 
+        
+        <quickbook-define>enable_index
+        
+        # <auto-index-verbose>on
+
+	#doxygen common parameters
+        <doxygen:param>"PREDEFINED=\"BOOST_FIXED_POINT_DOXYGEN_INVOKED=1\" \\
+                                   \"BOOST_STATIC_CONSTEXPR=constexpr\" \\
+                                   \"BOOST_DEDUCED_TYPENAME=typename\" \\
+                                   \"BOOST_EXPLICIT=explicit\" \\
+                                   \"BOOST_PREVENT_MACRO_SUBSTITUTION=\" \\
+                                   \"BOOST_STATIC_CONSTANT(x,y)=static x const y\" \\
+                                   \"BOOST_STATIC_ASSERT(cnd)=\" \\
+                                   \"BOOST_FIXED_POINT_REQUIRES(CND) \" \\
+                                   \"BOOST_CONSTEXPR=constexpr\""
+
+
+
+        <doxygen:param>ALIASES=" Effects=\"<p><b>Effects:</b>\" \\ 
+                                 Example=\"<p><b>Example:</b>\" \\ 
+                                 TParams=\"<p><b>Template Parameters:</b>\" \\ 
+                                 Params=\"<p><b>Parameters:</b>\" \\ 
+                                 Param{2}=\"<p> - <b><c>\\1</c></b>: \\2.\" \\
+                                 Returns=\"<p><b>Returns:</b>\" \\
+                                 Result=\"<p><b>Result:</b>\" \\
+                                 Throws=\"<p><b>Throws:</b>\" \\
+                                 Pre=\"<p><b>Requires:</b>\" \\
+                                 Requires=\"<p><b>Requires:</b>\" \\
+                                 Post=\"<p><b>Post-conditions:</b>\" \\
+                                 Condition=\"<p><b>Condition:</b>\" \\
+                                 Remark=\"<p><b>Remark(s):</b>\" \\
+                                 Note=\"<p><b>Note(s):</b>\" \\
+                                 See=\"<p><b>See:</b>\" \\
+                                 ThreadSafe=\"<p><b>ThreadSafe:</b> Yes.\" \\
+                                 Basic=\"<p><b>Exception Safety:</b> basic guarantee\" \\
+                                 Strong=\"<p><b>Exception Safety:</b> strong guarantee\" \\
+                                 NoThrow=\"<p><b>Exception Safety:</b> no-throw guarantee\" \\
+                                 RefSect{1}=\"\\xmlonly<link linkend='boost_opaque.\\1'>\\1</link>\\endxmlonly\" \\
+                                 RefSect2{2}=\"\\xmlonly<link linkend='boost_opaque.\\1'>\\2</link>\\endxmlonly\" \\
+                                 RefClass{1}=\"\\xmlonly<computeroutput><classname alt='\\1'>\\1</classname></computeroutput>\\endxmlonly\" \\
+                                 RefMacro{1}=\"\\xmlonly<computeroutput><macroname alt='\\1'>\\1</macroname></computeroutput>\\endxmlonly\" "
+
+
+        <doxygen:param>SORT_MEMBER_DOCS=NO
+        <doxygen:param>SHOW_USED_FILES=YES
+
+        <doxygen:param>SHOW_INCLUDE_FILES=YES
+        <doxygen:param>WARNINGS=YES # Default NO, but useful to see warnings, especially in a logfile.
+        # It is also wise to to set a warnings logfile like this:
+        <doxygen:param>WARN_LOGFILE=AutoDoxywarnings.log # This may not be empty (usually not a good sign!), depending on options chosen.
+        # Much better to send message to a logfile than the default stderr.
+        # and make sure that there are no Doxygen errors or significant warnings in the log file.
+        <doxygen:param>RECURSIVE=NO # Search recursively down subdirectories.
+        <doxygen:param>EXTRACT_ALL=YES
+        <doxygen:param>ENABLE_PREPROCESSING=YES
+        <doxygen:param>MACRO_EXPANSION=YES
+
+        <doxygen:param>HIDE_UNDOC_MEMBERS=NO
+        <doxygen:param>EXTRACT_PRIVATE=NO
+        <doxygen:param>EXPAND_ONLY_PREDEF=YES
+        #<doxygen:param>EXPAND_STATIC=YES
+        <doxygen:param>SEARCH_INCLUDES=YES
+        <doxygen:param>INCLUDE_PATH=$(BOOST)
+        
+        ;
+}
+else
+{
+   ECHO "Building the FixedPoint docs with automatic index generation disabled. To get an auto-index, try building with --enable-index." ;
+
+   project : requirements
+	#doxygen common parameters
+        <doxygen:param>"PREDEFINED=\"BOOST_FIXED_POINT_DOXYGEN_INVOKED=1\" \\
+                                   \"BOOST_STATIC_CONSTEXPR=constexpr\" \\
+                                   \"BOOST_DEDUCED_TYPENAME=typename\" \\
+                                   \"BOOST_EXPLICIT=explicit\" \\
+                                   \"BOOST_PREVENT_MACRO_SUBSTITUTION=\" \\
+                                   \"BOOST_STATIC_CONSTANT(x,y)=static x const y\" \\
+                                   \"BOOST_STATIC_ASSERT(cnd)=\" \\
+                                   \"BOOST_FIXED_POINT_REQUIRES(CND) \" \\
+                                  \"BOOST_CONSTEXPR=constexpr\""
+
+#                                   \"BOOST_FIXED_POINT_REQUIRES(CND) , typename enable_if_c< CND >::type\" \\
+
+        <doxygen:param>ALIASES=" Effects=\"<p><b>Effects:</b>\" \\ 
+                                 Example=\"<p><b>Example:</b>\" \\ 
+                                 TParams=\"<p><b>Template Parameters:</b>\" \\ 
+                                 Params=\"<p><b>Parameters:</b>\" \\ 
+                                 Param{2}=\"<p> - <b><c>\\1</c></b>: \\2.\" \\
+                                 Returns=\"<p><b>Returns:</b>\" \\
+                                 Result=\"<p><b>Result:</b>\" \\
+                                 Throws=\"<p><b>Throws:</b>\" \\
+                                 Pre=\"<p><b>Requires:</b>\" \\
+                                 Requires=\"<p><b>Requires:</b>\" \\
+                                 Condition=\"<p><b>Condition:</b>\" \\
+                                 Post=\"<p><b>Post-conditions:</b>\" \\
+                                 Remark=\"<p><b>Remark(s):</b>\" \\
+                                 Note=\"<p><b>Note(s):</b>\" \\
+                                 See=\"<p><b>See:</b>\" \\
+                                 ThreadSafe=\"<p><b>ThreadSafe:</b> Yes.\" \\
+                                 Basic=\"<p><b>Exception Safety:</b> basic guarantee\" \\
+                                 Strong=\"<p><b>Exception Safety:</b> strong guarantee\" \\
+                                 NoThrow=\"<p><b>Exception Safety:</b> no-throw guarantee\" \\
+                                 RefSect{1}=\"\\xmlonly<link linkend='boost_opaque.\\1'>\\1</link>\\endxmlonly\" \\
+                                 RefSect2{2}=\"\\xmlonly<link linkend='boost_opaque.\\1'>\\2</link>\\endxmlonly\" \\
+                                 RefClass{1}=\"\\xmlonly<computeroutput><classname alt='\\1'>\\1</classname></computeroutput>\\endxmlonly\" \\
+                                 RefMacro{1}=\"\\xmlonly<computeroutput><macroname alt='\\1'>\\1</macroname></computeroutput>\\endxmlonly\" "
+
+
+        <doxygen:param>SORT_MEMBER_DOCS=NO
+        <doxygen:param>SHOW_USED_FILES=YES
+
+        <doxygen:param>SHOW_INCLUDE_FILES=YES
+        #<doxygen:param>WARNINGS=YES # Default NO, but useful to see warnings, especially in a logfile.
+        # It is also wise to set a warnings logfile like this:
+        #<doxygen:param>WARN_LOGFILE=AutoDoxywarnings.log # This may not be empty (usually not a good sign!), depending on options chosen.
+        # Much better to send message to a logfile than the default stderr.
+        # and make sure that there are no Doxygen errors or significant warnings in the log file.
+        <doxygen:param>RECURSIVE=NO # Search recursively down subdirectories.
+        <doxygen:param>EXTRACT_ALL=YES
+        <doxygen:param>ENABLE_PREPROCESSING=YES
+        <doxygen:param>MACRO_EXPANSION=YES
+
+        <doxygen:param>HIDE_UNDOC_MEMBERS=NO
+        <doxygen:param>EXTRACT_PRIVATE=NO
+        <doxygen:param>EXPAND_ONLY_PREDEF=YES
+        #<doxygen:param>EXPAND_STATIC=YES
+        <doxygen:param>SEARCH_INCLUDES=YES
+        <doxygen:param>INCLUDE_PATH=$(BOOST)
+
+        ;
+}
+
+using doxygen ;  # Required if you want to use Doxygen.
+using quickbook ;
+
+doxygen core
+   :
+      [ glob ../../../boost/fixed_point/number.hpp ]
+   :
+        <xsl:param>"boost.doxygen.reftitle=Core"
+   ;
+
+
+xml fixed_point : fixed_point.qbk ;
+
+boostbook standalone
+   :
+      fixed_point
+   :
+        # HTML options first:
+        # Use graphics not text for navigation:
+        <xsl:param>navig.graphics=1
+        # How far down we chunk nested sections, basically all of them:
+        <xsl:param>chunk.section.depth=1
+        # Don't put the first section on the same page as the TOC:
+        <xsl:param>chunk.first.sections=1
+        # How far down sections get TOC's
+        <xsl:param>toc.section.depth=4
+        # Max depth in each TOC:
+        <xsl:param>toc.max.depth=2
+        # How far down we go with TOC's
+        <xsl:param>generate.section.toc.level=10
+        # Path for links to Boost:
+        <xsl:param>boost.root=../../../..
+        # Path for libraries index:
+        <xsl:param>boost.libraries=../../../../libs/libraries.htm
+        # Use the main Boost stylesheet:
+        #<xsl:param>html.stylesheet=../../../../doc/src/boostbook.css
+        <xsl:param>html.stylesheet=./boostbook.css
+        # PDF Options:
+        # TOC Generation: this is needed for FOP-0.9 and later:
+        <format>pdf:<xsl:param>fop1.extensions=0
+        # Or enable this if you're using XEP:
+        <format>pdf:<xsl:param>xep.extensions=1
+        # TOC generation: this is needed for FOP 0.2, but must not be set to zero for FOP-0.9!
+        <format>pdf:<xsl:param>fop.extensions=0
+        # No indent on body text:
+        <xsl:param>body.start.indent=0pt
+        # Margin size:
+        <xsl:param>page.margin.inner=0.5in
+        # Margin size:
+        <xsl:param>page.margin.outer=0.5in
+        # Yes, we want graphics for admonishments:
+        <xsl:param>admon.graphics=1
+        # Set this one for PDF generation *only*:
+        # default pnd graphics are awful in PDF form,
+        # better use SVG's instead:
+        <format>pdf:<xsl:param>admon.graphics.extension=".svg"
+        <format>pdf:<xsl:param>admon.graphics.path=$(boost-images)/
+        <format>pdf:<xsl:param>boost.url.prefix=http://www.boost.org/doc/libs/release/libs/fixed_point_ext/doc/html
+
+
+        <dependency>core
+   ;
+
+path-constant boost-root : [ modules.peek : BOOST ] ;
+install css-install : $(boost-root)/doc/src/boostbook.css : <location>html ;
+
+install png-install : [ glob $(boost-root)/doc/src/images/*.png ] : <location>html/images ;
+install svg-install : [ glob $(boost-root)/doc/src/images/*.svg ] : <location>html/images ;
+
+install pdf-install : standalone : <install-type>PDF <location>. <name>fixed_point.pdf ;
+
+install fixed_point-png-install : [ glob images/*.png ] : <location>html/images ;
+install fixed_point-svg-install : [ glob images/*.svg ] : <location>html/images ;

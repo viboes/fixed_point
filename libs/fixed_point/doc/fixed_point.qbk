@@ -1,0 +1,650 @@
+[/
+ / Copyright (c) 2012 Vicente J. Botet Escriba
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[article Toward Boost.FixedPoint
+    [quickbook 1.5]
+    [version 0.1.0]
+    [authors [Botet Escriba, Vicente J.]]
+    [copyright 2012 Vicente J. Botet Escriba]
+    [id boost.fixed_point]
+    [/dirname fixed_point]
+    [/purpose Fixed Point Arithmetic]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+]
+
+[def __Boost_FixedPoint__  *Boost.FixedPoint*]
+
+[/
+[def __explicit_convert_to [funcref boost::fixed_point::explicit_convert_to explicit_convert_to]]
+
+[def __convertible_to [classref boost::fixed_point::convertible_to convertible_to]]
+
+[import ../../../boost/fixed_point/boost/chrono_time_point_to_posix_time_ptime.hpp]
+]
+
+[/
+[section Preface]
+
+[:[".]]
+[:[*['-- ]]]
+
+[endsect]
+/]
+
+[warning FixedPoint is not a part of the Boost libraries.]
+
+[/========================]
+[section Overview]
+[/========================]
+
+[/====================================]
+[heading How to Use This Documentation]
+[/====================================]
+
+This documentation makes use of the following naming and formatting conventions.
+
+* Code is in `fixed width font` and is syntax-highlighted.
+* Replaceable text that you will need to supply is in [~italics].
+* If a name refers to a free function, it is specified like this:
+  `free_function()`; that is, it is in code font and its name is followed by `()`   to indicate that it is a free function.
+* If a name refers to a class template, it is specified like this:   `class_template<>`; that is, it is in code font and its name is followed by `<>`   to indicate that it is a class template.
+* If a name refers to a function-like macro, it is specified like this: `MACRO()`;
+  that is, it is uppercase in code font and its name is followed by `()` to   indicate that it is a function-like macro. Object-like macros appear without the   trailing `()`.
+* Names that refer to /concepts/ in the generic programming sense are   specified in CamelCase.
+
+[note In addition, notes such as this one specify non-essential information that provides additional background or rationale.]
+
+Finally, you can mentally add the following to any code fragments in this document:
+
+    // Include all of the core FixedPoint files
+    #include <boost/fixed_point.hpp>
+
+    using namespace boost::fixed_point;
+
+[/==================]
+[section Scope]
+[/==================]
+
+C++ supports integer arithmetic and floating-point arithmetic, but it does not support fixed-point arithmetic. This library propose support for fixed-point arithmetic.
+ 
+[endsect]
+
+
+[section Motivation]
+
+[heading Fixed-Point versus Integer]
+
+In C and C++, the basic integer types have several problematic behaviors.
+
+* Signed integer arithmetic overflow results in undefined behavior. Preemptively checking for overflow is challenging and tedious, so programmers very rarely do so. As a result, most programmers simply assume it will not happen.
+
+* Unsigned integer arithmetic overflow results in well-defined behavior, but that behavior is not always desirable. Again, preemptively checking for overflow is challenging and tedious.
+
+* C/C++ signed integers promote to unsigned integers, which is the exact opposite of the relationship between the their mathematical analogs; (unsigned) cardinal numbers are a strict subset of (signed) integral numbers. Because of this promotion, it is difficult to prevent signed numbers from being used in places where they are not intended.
+
+* C/C++ integer ranges are platform-specific, which generally either binds programs to a platform or requires considerable care in production of portable code.
+
+[heading Fixed-Point versus Floating-Point]
+
+Fixed-point arithmetic is better than floating-point arithmetic in several domains.
+
+* Problems with a constrained range can use bits for resolution that would otherwise have gone to an exponent. Examples include Mandelbrot set computation and angular position.
+
+* Problems with a constrained resolution can use smaller representation than a single-precision floating-point. An example is a pixel color value.
+
+* Low-cost or low-power systems may not provide floating-point hardware. For these systems, fixed-point arithmetic provides a much higher performance alternative to software-implemented floating-point arithmetic for many problems.
+
+[heading Prior Art]
+
+The popular computing literature abounds with articles on how to use integers to implement fixed-point arithmetic. However, manually writing fixed-point arithmetic with integer arithmetic is tedious and prone to error. Direct support is desirable.
+
+ISO/IEC TR 18037 provides fixed-point support in the C programming language. However, this support is not general; only a few possible radix positions are supported. The feature is essentially limited to the digital signal processing domain.
+
+Likewise, software implementations of fixed-point arithmetic in C and C++, e.g. libfixmath, are also not general as the support only a limited number of radix positions.
+
+The programming languages Ada, COBOL, CORAL 66, JOVIAL, and PL/I provide direct support for fixed-point arithmetic. 
+
+
+[heading Primary Objective]
+
+The primary objective of this implementation is zero performance overhead compared to using integer arithmetic with manually-inserted scaling.  
+This is because performance is important in many applications of fixed-point arithmetic and it really isn't very hard to do ad-hoc fixed-point arithmetic using integers and 
+shifts.  
+Users will therefore not be attracted to this library unless it can offer this feature.
+
+[heading Secondary Objectives]
+
+Secondary objectives are:
+
+* To behave in as many respects as possible in the same was as the built-in 
+numeric types (integer and floating-point).  The motivation for this is to give 
+the user the behavior that they are already familiar with from those types.
+
+[heading Hardware Support]
+
+The objective of this implementation is to work efficiently with conventional processors' integer arithmetic instructions.  
+It is worth noting, however, that some processors have hardware support for fixed-point operations.  These include:
+
+* DSP processors.
+* Intel's MMX instruction set (also implemented in other x86-compatible processors).
+* The PowerPC's AltiVec instruction set.
+* The ARM Piccolo instruction set.
+ 
+Support for any of these instruction sets would require either use of architecture-specific assembly language or a very smart compiler.  
+These are considered outside the scope of the current work; however, it is worthwhile to see what these instruction sets offer in order to avoid unintentionally implementing 
+something that is incompatible.
+
+For example, it seems that these instruction sets could more easily support fixed<16,15> than fixed<15,16>.  
+It may be that the user would be happy with either of these formats.  
+So we should consider offering a way to get the "best" format with at least a certain number of bits of integer and fractional parts for a particular instruction set.
+
+[heading Related Work]
+
+"Embedded C" (see ISO/IEC [draft] technical report 18037:2004) proposes fixed 
+point types for C.  It defines 
+new keywords _Fract and _Accum which modify the built-in short, int and long 
+types; _Fract makes the value entirely fractional while _Accum gives it 4 
+integer bits.
+
+It requires saturating arithmetic (controlled by an _Sat keyword or a #pragma), 
+and does not require wrap-around behaviour.  
+
+Fixed-point constants can be written using letter suffixes, e.g. 3.1415uhk.
+
+It looks very much as if this proposal is motivated by one particular category of 
+applications (i.e. digital signal processing).  The requirement for saturating 
+arithmetic imposes a significant overhead on processors that do not have support 
+for it, and the lack of support for values with more than 4 integer bits makes it 
+useless for the author's latitude/longitude application.
+
+[endsect]
+
+
+[/==================]
+[section Description]
+[/==================]
+
+
+[*Boost.FixedPoint] provides:
+
+* general purpose binary fixed-point arithmetic. 
+
+The design relies on generally 'safe' defaults, but with additional explicit controls to match particular application domains or to enable more efficient execution.
+
+The library doesn't makes use of specific hardware architecture, and is implemented as a pure library. However, some operations could be substantially faster with direct hardware support. Future versions of the library could make use of specific hardware to achieve maximum efficiency.
+
+For background information about fixed-point arithmetic, see for example this Wikipedia article: [@http://en.wikipedia.org/wiki/Fixed-point_arithmetic Fixed-point Arithmetic].  Note in particular that this is binary arithmetic, not binary coded decimal.
+
+[endsect]
+
+
+[endsect]
+
+[/==============================]
+[section:users_guide Users' Guide]
+[/==============================]
+
+[/======================================]
+[section:getting_started Getting Started]
+[/======================================]
+
+[/======================================]
+[section:install Installing FixedPoint]
+[/======================================]
+
+[/=================================]
+[heading Getting Boost.FixedPoint]
+[/=================================]
+
+You can get the last stable release of Boost.FixedPoint by downloading [^fixed_point.zip] from the
+
+
+You can also access the latest (unstable?) state from the [@https://svn.boost.org/svn/boost/sandbox/fixed_point Boost Sandbox].
+
+[/=================================]
+[heading Building Boost.FixedPoint]
+[/=================================]
+
+There is no need to compile [*Boost.FixedPoint], since it's a header only library. Just include your Boost header directory in your compiler include path.
+
+[/=========================]
+[heading Requirements]
+[/=========================]
+
+[*Boost.FixedPoint] depends on *Boost.Config*, *Boost.MPL*, *Boost.TypeTraits*, *Boost.Assert*, *Boost.Integer*, *Boost.Utility/EnableIf*, *Boost.Ratio/mpl::abs*.
+
+
+[/========================]
+[heading Exceptions safety]
+[/========================]
+
+All functions in the library are exception-neutral and provide strong guarantee of exception safety as long as the underlying parameters provide it.
+
+[/====================]
+[heading Thread safety]
+[/====================]
+
+All functions in the library are thread-unsafe except when noted explicitly.
+
+[/=======================]
+[heading Tested compilers]
+[/=======================]
+
+[*Boost.FixedPoint] is known to work on the following platforms/compilers (lack of some C++/C++0X language support disables some functionality). The needed C++/C++0X language support is:
+
+* SFINAE on expressions
+
+Currently, [*Boost.FixedPoint] has been tested on the following compilers/platforms using the trunk (Boost 1.50):
+
+Windows with
+
+* MSVC 10.0
+
+MinGW with
+
+* GCC 4.5.0
+* GCC 4.5.0 -std=c++0x
+* GCC 4.5.2
+* GCC 4.5.2 -std=c++0x
+* GCC 4.6.0
+* GCC 4.6.0 -std=c++0x
+* GCC 4.6.3
+* GCC 4.6.3 -std=c++0x
+* GCC 4.7.0
+* GCC 4.7.0 -std=c++0x
+
+[/
+Cygwin 1.7 with
+
+* GCC 4.3.4
+
+Ubuntu 10.10
+
+* GCC 4.4.5
+* GCC 4.4.5 -std=c++0x
+* GCC 4.5.1
+* GCC 4.5.1 -std=c++0x
+* clang 2.8
+]
+
+MacOs X 10.6.8
+
+* GCC 4.1.2 
+* clang 1.6 
+* clang 2.8
+* clang 2.9
+* clang 2.9 -std=c++0x
+* clang 3.0
+* clang 3.0 -std=c++0x
+* darwin 4.6.2 
+* darwin 4.6.2 -std=c++0x
+* darwin 4.7.0 
+* darwin 4.7.0 -std=c++0x
+
+
+[note Please let us know how this works on other platforms/compilers.]
+
+[note Please send any questions, comments and bug reports to boost <at> lists <dot> boost <dot> org.]
+
+[endsect]
+
+[/=============================]
+[section Hello World! ]
+[/=============================]
+
+
+Here's a very quick illustration of how the class can be used.
+
+ 
+  #include <boost/fixed_point.hpp>
+
+  using namesapce boost::fixed_point; 
+  void test() 
+  {
+     real_t<15,-16> f1, f2;  // Signed fixed-point values with 15 bits of integer part 
+                         // and 16 bits of fractional part.
+     f1 = convert(1.2345);   // Conversion from floating point.
+     f2 = convert(f1 - 2);   // Mixed arithmetic with integers.
+     f2 = convert(f1 / f2);  // Arithmetic on fixed-point values.
+  }
+
+
+[endsect]
+
+[endsect]
+
+[/====================================]
+[section Tutorial]
+[/====================================]
+
+[section:basic Range and resolution]
+
+The fixed-point library contains two class templates. They are __fxp_uint and __fxp_int for integer arithmetic, and __fxp_ufract and __fxp_fract for fractional arithmetic.
+
+These types have a range specified by an integer. The range of an unsigned number `n` is `0 <= n < 2^g` where `g` is the range parameter. The range of an signed number `n` is `2^g < n < 2^g`. Note that the range interval is half-open for unsigned numbers and open for signed numbers. For example, `__fxp_uint<8>` has values `n` such that `0 <= n < 256` and `__fxp_int<8>` has values `n` such that `-256 < n < 256`.
+
+  __fxp_uint<8> a;
+
+The fractional types have a resolution specified by an integer. The resolution of a fractional number `n` is `2^s`, where `s` is the resolution parameter. For example, `__fxp_fract<8,-4>` has values `n` such that `-256 < n < 256` in increments of `2^(-4) = 1/16`.
+
+
+  __fxp_fract<8,-4> a;
+
+Both range and resolution parameters may be either positive or negative. The number of significant bits or precision is `g-s`. This specification enables representing both very small and very large values with few bits. In any event, the range must be greater than the resolution, that is `g>s`. 
+
+  __fxp_ufract<-24,-32> a; // small number with a precision of 8 bits 
+
+[endsect]
+[section:ope Initialization from an index]
+
+By default a fixed point instance is not initialized, so its value is undefined.
+
+Every fixed point instance can be initialized from the index.
+
+  __fxp_fract<8,-4> a=index(2);
+
+The value represented is `2*2^(-4)=1/8`.
+ 
+[endsect]
+[section:conversions Implicit conversions]
+
+Implicit conversion is provided between fixed points as far as there is no loss of data. Thus, `__fxp_uint` types will promote to the other types, and the other types will promote to `fxp_fract` type. The effect is that unsigned fixed-point types promote to signed fixed-point types. 
+
+  __fxp_uint<8> u;
+  __fxp_int<8> i=u;
+  __fxp_uint<8> v=i; // Compile error
+
+  __fxp_ufract<8,-4> a;
+  __fxp_fract<8,-4> b=a; // OK
+  __fxp_ufract<8,-4> c=b;  // Compile error
+
+  __fxp_ufract<8,-4> d=i; // OK
+  __fxp_ufract<8,-4> e=u; // Compile error
+
+fixed points types promotes to fixed points types larger range and with more precise resolution (i.e. lower).
+ 
+  __fxp_fract<8,-4> a;
+  __fxp_fract<9,-4> b=a; // OK
+  __fxp_fract<8,-5> c=a; // OK
+  __fxp_fract<5,-4> d=a; // Compile error
+  __fxp_fract<8,-2> e=a; // Compile error
+
+
+[endsect]
+[section:ope Mixed Arithmetic]
+
+The basic arithmetic operations are addition, subtraction, multiplication and division. 
+
+
+
+When mixing operands of different template class types (only allowed for mixed arithmetic), implicit fixed point conversion will apply. 
+
+  __fxp_ufract<8,-4> a,b;
+  __fxp_ufract<9,-4> c=a+b;
+  __fxp_ufract<9,-4> d=a-b;
+  __fxp_ufract<9,-4> d=a-b;
+
+There are notable exceptions. Negation and subtraction on unsigned types yields a signed type. Comparison across types is direct; there is no conversion beforehand.
+
+  __fxp_ufract<8,-4> a;
+  __fxp_fract<8,-4> b=-a; // OK
+  __fxp_ufract<8,-4> c=-a; // Compile error
+
+
+In general, the range and resolution of the result of basic operations are large enough to hold the mathematical results. The following table shows the range and resolution for the results of basic operations on fractional types. The $ operator returns the range parameter. The @ operator returns the resolution parameter. 
+
+Overflow in template argument computation is undefined behavior. In practice, overflow is unlikely to be a significant problem because even small machines can represent numbers with thousands of bits and because compiler can diagnose overflow in template arguments.
+
+The special case in the operations above is division, where the mathematical result may require an infinite number of bits. The actual value must be rounded to a representable value. The above resolution is sufficient to ensure that if the mathematical result is not zero, the fixed-point result is not zero. Furthermore, assuming values have an error of one-half ULP, the defined resolution is close to the error bound in the computation. 
+
+[endsect]
+[section:round Rounding]
+
+When the computation is not exact, rounding will be to one of the two nearest representable values. The algorithm for choosing between these values is the rounding mode. Different applications desire different modes, so programmers may specify the rounding mode with a round policy class. 
+The provided round policy classes are: 
+
+fastest
+    Speed is more important than the choice in value.
+negative
+    Round towards negative infinity. This mode is useful in interval arithmetic.
+truncated
+    Round towards zero. This mode is useful in implementing integral arithmetic.
+positive
+    Round towards positive infinity. This mode is useful in interval arithmetic.
+classic
+    Round towards the nearest value, but exactly-half values are rounded towards maximum magnitude. This mode is the standard school algorithm.
+near_even
+    Round towards the nearest value, but exactly-half values are rounded towards even values. This mode has more balance than the classic mode.
+near_odd
+    Round towards the nearest value, but exactly-half values are rounded towards odd values. This mode has as much balance as the near_even mode, but preserves more information.
+
+In general, these modes get slower but more accurate working down the list. 
+
+
+[endsect]
+[section:overflow Overflow]
+
+Since the range of intermediate values grow to hold all possible values, and variables have a static range and resolution, construction and assignment may need to reduce the range and resolution. Reducing the resolution is done with a rounding mode associated with the variable. When the dynamic value exceeds the range of variable, the assignment overflows.
+
+When an overflow does occur, the desirable behavior depends on the application, so programmers may specify the overflow mode with an overflow policy. The provided overflow policy classes are: 
+
+impossible
+    Programmer analysis of the program has determined that overflow cannot occur. Uses of this mode should be accompanied by an argument supporting the conclusion.
+undefined
+    Programmers are willing to accept undefined behavior in the event of an overflow.
+modulus
+    The assigned value is the dynamic value mod the range of the variable. This mode makes sense only with unsigned numbers. It is useful for angular measures.
+saturate
+    If the dynamic value exceeds the range of the variable, assign the nearest representable value.
+exception
+    If the dynamic value exceeds the range of the variable, throw an exception of type std::overflow_error.
+
+In general, these modes get slower but safer working down the list. 
+
+[endsect]
+
+[section:literals Literals]
+
+There exists no mechanism in C++11 to specify literals for the template types above. However, we can get close with template functions that yield the appropriate fixed-point value based on an template int parameter. For example, the expression to_fxp_uint<24>() will produce a fxp_uint constant with a range just sufficient to hold the value 24. Likewise, the expression to_fxp_ufract<2884,-4>() will produce a fxp_ufract constant with a range and resolution just sufficient to hold the value 2884*2^(-4).
+
+[endsect]
+
+[section:family Family]
+[section:closed Closed arithmetic]
+
+[endsect]
+
+[section:storage Storage]
+
+[endsect]
+[section:arth Open versus Closed arithmetic]
+
+[endsect]
+[section:bound Bounded versus unbounded fixed points]
+
+[endsect]
+[section:conv Conversions]
+[section:fp Conversion from floating point]
+
+[endsect]
+[section:builtin Conversion from builtin]
+
+[endsect]
+[section:number_cast Fixed point cast]
+
+[endsect]
+[section:convert Forcing explicit conversion]
+
+[endsect]
+
+[endsect]
+
+[endsect]
+
+[endsect]
+
+[/====================================]
+[section Examples]
+[/====================================]
+
+[section:alfa  Alfa blending]
+
+Consider the alpha blending of two RGBA pixels, a and b. 
+To avoid redundancy, we will only show computation for the red color. 
+The algorithm is somewhat complicated by the need to convert the [0-255] range of color representation to the [0-1] range of color values.
+
+  #include <boost/fixed_point.hpp>
+
+  using namespace boost::fixed_point;
+
+  struct pixel
+  {
+    ureal_t<8, 0> r, g, b, a;
+  };
+
+  pixel blend(pixel a, pixel b)
+  {
+    BOOST_AUTO(scale, (to_ureal_t<255, 0> ()));
+    BOOST_AUTO(a_r, a.r / scale);
+    BOOST_AUTO(b_r, b.r / scale);
+    (void) a_r;
+    (void) b_r;
+    BOOST_AUTO(aia, b.a * (to_ureal_t<1, 0> () - a.a));
+    BOOST_AUTO(c_a, a.a + aia);
+    BOOST_AUTO(c_r, (a.r * a.a + b.r * aia) / c_a);
+    pixel c;
+    c.a = number_cast<ureal_t<8, 0> > (c_a * to_ureal_t<255, 0> ());
+    c.r = number_cast<ureal_t<8, 0> > (c_r * to_ureal_t<255, 0> ());
+    return c;
+  }
+
+[endsect]
+[endsect]
+
+
+[/====================================]
+[section:ext_references External Resources]
+[/====================================]
+[variablelist
+[
+    [[@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3352.html [*N3352 - C++ Binary Fixed-Point Arithmetic]]]
+    [Lawrence Crowl]
+]
+
+]
+
+[endsect]
+
+[endsect]
+[section Reference]
+
+[heading Notation]
+
+In order to simplify the reference documentation, some shortcuts have been used:
+
+* RT stands for the return type of an operation.
+* CT stands for the common_type of the parameter's type of an operation.
+* CT(A,B) stands for common_type<A,B>::type with typename if needed.
+
+[xinclude core.xml]
+
+[endsect]
+
+
+[/=================]
+[section Appendices]
+[/=================]
+
+[/====================================]
+[section:history Appendix: History]
+[/====================================]
+[section [*Version 0.1.0, April 30, 2012] ]
+
+['Announcement of FixedPoints]
+
+[*Features:]
+
+* generic fixed_point numbers.
+
+[endsect]
+[endsect]
+
+
+[/====================================]
+[section:rationale Appendix: Design Rationale]
+[/====================================]
+
+[heading Why the library adds a specific parameter for overflow?]
+
+Phil Endecott wrote "Some people conflate fixed point with features like saturation, which I would prefer to decouple. Fixed-point arithmetic without saturation is useful, as is integer arithmetic with saturation.  So I'd prefer to make them orthogonal, but compatible, concepts."
+
+[heading Meaning of ++ and --]
+
+Phil Endecott wrote "It could be argued that the meaning of ++ and -- is unclear: do they add/subtract 
+1, or do they add/subtract the type's delta?.  Note that the built-in floating point types 
+add and subtract 1, as does the proposed "Embedded C" fixed-point type."  
+
+[heading 'Math library' functions]
+
+
+[heading Fixed Point Constants]
+
+Phil Endecott wrote "It would be ideal if code such as
+
+constexpr ureal_t<??,-14> pi = 3.1415926;
+
+could have no run-time overhead."  
+
+I don't know if this could be provided with user defined literals 
+
+constexpr ureal_t<2,-14> pi = 3.1415926ufxp;
+
+The library could provide an alternative form
+
+constexpr auto pi(ratio<<31415926,10000000> >);
+
+[endsect]
+
+[section:implementation Appendix: Implementation Notes]
+
+[heading Why?]
+
+
+[endsect]
+[/====================================]
+[section:acknowledgements Appendix: Acknowledgements]
+[/====================================]
+
+Thanks to 
+
+
+[endsect]
+
+[/=====================================]
+[section:todo  Appendix : Future plans]
+[/=====================================]
+
+[heading Tasks to do before review]
+
+* Do the the doc.
+
+[heading Tasks to do if the library is accepted]
+
+* Split the tests.
+* Add .
+
+[heading For later releases]
+
+* Analyze
+
+[endsect]
+[endsect]
+
