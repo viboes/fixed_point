@@ -18,5 +18,6 @@ $(boost-path)/libs/foo/build//boost_foo
 Note that if your project does not specify a Jamroot file, then a default one is provided for you,
 and that this file will automatically add $(BOOST)/ to your include path.
 
+The doc is accessible via https://htmlpreview.github.io/?https://github.com/viboes/fixed_point/blob/master/libs/fixed_point/doc/html/index.html
 
 
