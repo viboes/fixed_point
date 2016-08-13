@@ -4076,9 +4076,12 @@ namespace std
     //BOOST_STATIC_CONSTEXPR int digits10 = rep::digits10;
     //BOOST_STATIC_CONSTEXPR int max_digits10 = rep::max_digits10;
     BOOST_STATIC_CONSTEXPR
-    bool is_signed = true;BOOST_STATIC_CONSTEXPR
-    bool is_integer = false;BOOST_STATIC_CONSTEXPR
-    bool is_exact = true;BOOST_STATIC_CONSTEXPR
+    bool is_signed = true;
+    BOOST_STATIC_CONSTEXPR
+    bool is_integer = false;
+    BOOST_STATIC_CONSTEXPR
+    bool is_exact = true;
+    BOOST_STATIC_CONSTEXPR
     int radix = 2;
     //inline static rep epsilon() { return rep::epsilon(); }
     //inline static rep round_error() { return rep::round_error(); }
@@ -4087,8 +4090,10 @@ namespace std
     //BOOST_STATIC_CONSTEXPR int max_exponent = rep::max_exponent;
     //BOOST_STATIC_CONSTEXPR int max_exponent10 = rep::max_exponent10;
     BOOST_STATIC_CONSTEXPR
-    bool has_infinity = false;BOOST_STATIC_CONSTEXPR
-    bool has_quiet_NaN = false;BOOST_STATIC_CONSTEXPR
+    bool has_infinity = false;
+    BOOST_STATIC_CONSTEXPR
+    bool has_quiet_NaN = false;
+    BOOST_STATIC_CONSTEXPR
     bool has_signaling_NaN = false;
     //BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
     //BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
@@ -4098,8 +4103,10 @@ namespace std
     //inline static rep denorm_min() { return rep::denorm_min<Q>(); }
     //BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
     BOOST_STATIC_CONSTEXPR
-    bool is_bounded = true;BOOST_STATIC_CONSTEXPR
-    bool is_modulo = RP::is_modulo;BOOST_STATIC_CONSTEXPR
+    bool is_bounded = true;
+    BOOST_STATIC_CONSTEXPR
+    bool is_modulo = RP::is_modulo;
+    BOOST_STATIC_CONSTEXPR
     bool traps = true;
     //BOOST_STATIC_CONSTEXPR bool tinyness_before = rep::tinyness_before;
     BOOST_STATIC_CONSTEXPR
