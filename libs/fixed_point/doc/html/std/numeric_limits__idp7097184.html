@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Struct template numeric_limits&lt;boost::fixed_point::real_t&lt; R, P, RP, OP, F &gt;&gt;</title>
+<link rel="stylesheet" href=".././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="../boost/fixed_point/reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">
+<link rel="prev" href="../boost/common_type_fix_idp5942816.html" title="Struct template common_type&lt;fixed_point::ureal_t&lt; R1, P1, RP1, OP1, F1 &gt;, fixed_point::real_t&lt; R2, P2, RP2, OP2, F2 &gt;&gt;">
+<link rel="next" href="../boost/fixed_point/appendices.html" title="Appendices">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../boost/common_type_fix_idp5942816.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../boost/fixed_point/reference.html#header.boost.fixed_point.number_hpp"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../boost/fixed_point/appendices.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="std.numeric_limits__idp7097184"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Struct template numeric_limits&lt;boost::fixed_point::real_t&lt; R, P, RP, OP, F &gt;&gt;</span></h2>
+<p>std::numeric_limits&lt;boost::fixed_point::real_t&lt; R, P, RP, OP, F &gt;&gt; &#8212; numeric limits trait specializations </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../boost/fixed_point/reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">boost/fixed_point/number.hpp</a>&gt;
+
+</span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+<span class="keyword">struct</span> <a class="link" href="numeric_limits__idp7097184.html" title="Struct template numeric_limits&lt;boost::fixed_point::real_t&lt; R, P, RP, OP, F &gt;&gt;">numeric_limits</a><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">fixed_point</span><span class="special">::</span><span class="identifier">real_t</span><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span><span class="special">&gt;</span> <span class="special">{</span>
+  <span class="comment">// types</span>
+  <span class="keyword">typedef</span> <a class="link" href="../boost/fixed_point/real_t.html" title="Class template real_t">boost::fixed_point::real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <a name="std.numeric_limits__idp7097184.rep"></a><span class="identifier">rep</span><span class="special">;</span>
+
+  <span class="comment">// <a class="link" href="numeric_limits__idp7097184.html#idp7114048-bb">public static functions</a></span>
+  <span class="keyword">static</span> <span class="identifier">rep</span> <a class="link" href="numeric_limits__idp7097184.html#idp7114576-bb"><span class="identifier">min</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">static</span> <span class="identifier">rep</span> <a class="link" href="numeric_limits__idp7097184.html#idp7115600-bb"><span class="identifier">max</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">static</span> <span class="identifier">rep</span> <a class="link" href="numeric_limits__idp7097184.html#idp7116624-bb"><span class="identifier">lowest</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// public data members</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_specialized</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="identifier">digits</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_signed</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_integer</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_exact</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="identifier">radix</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">has_infinity</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">has_quiet_NaN</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">has_signaling_NaN</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_bounded</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_modulo</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">traps</span><span class="special">;</span>
+  <span class="keyword">constexpr</span> <span class="identifier">float_round_style</span> <span class="identifier">round_style</span><span class="special">;</span>
+<span class="special">}</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp22426496"></a><h2>Description</h2>
+<div class="refsect2">
+<a name="idp22426896"></a><h3>
+<a name="idp7114048-bb"></a><code class="computeroutput">numeric_limits</code> public static functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem"><pre class="literallayout"><span class="keyword">static</span> <span class="identifier">rep</span> <a name="idp7114576-bb"></a><span class="identifier">min</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">static</span> <span class="identifier">rep</span> <a name="idp7115600-bb"></a><span class="identifier">max</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">static</span> <span class="identifier">rep</span> <a name="idp7116624-bb"></a><span class="identifier">lowest</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre></li>
+</ol></div>
+</div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../boost/common_type_fix_idp5942816.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../boost/fixed_point/reference.html#header.boost.fixed_point.number_hpp"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="../boost/fixed_point/appendices.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Overview</title>
+<link rel="stylesheet" href="../.././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="prev" href="../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="next" href="users_guide.html" title="Users' Guide">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="users_guide.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost.fixed_point.overview"></a><a class="link" href="overview.html" title="Overview">Overview</a>
+</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="overview.html#boost.fixed_point.overview.scope">Scope</a></span></dt>
+<dt><span class="section"><a href="overview.html#boost.fixed_point.overview.motivation">Motivation</a></span></dt>
+<dt><span class="section"><a href="overview.html#boost.fixed_point.overview.description">Description</a></span></dt>
+</dl></div>
+<h4>
+<a name="boost.fixed_point.overview.h0"></a>
+      <span><a name="boost.fixed_point.overview.how_to_use_this_documentation"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.how_to_use_this_documentation">How to Use
+      This Documentation</a>
+    </h4>
+<p>
+      This documentation makes use of the following naming and formatting conventions.
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          Code is in <code class="computeroutput"><span class="identifier">fixed</span> <span class="identifier">width</span>
+          <span class="identifier">font</span></code> and is syntax-highlighted.
+        </li>
+<li class="listitem">
+          Replaceable text that you will need to supply is in <em class="replaceable"><code>italics</code></em>.
+        </li>
+<li class="listitem">
+          If a name refers to a free function, it is specified like this: <code class="computeroutput"><span class="identifier">free_function</span><span class="special">()</span></code>;
+          that is, it is in code font and its name is followed by <code class="computeroutput"><span class="special">()</span></code>
+          to indicate that it is a free function.
+        </li>
+<li class="listitem">
+          If a name refers to a class template, it is specified like this: <code class="computeroutput"><span class="identifier">class_template</span><span class="special">&lt;&gt;</span></code>;
+          that is, it is in code font and its name is followed by <code class="computeroutput"><span class="special">&lt;&gt;</span></code>
+          to indicate that it is a class template.
+        </li>
+<li class="listitem">
+          If a name refers to a function-like macro, it is specified like this:
+          <code class="computeroutput"><span class="identifier">MACRO</span><span class="special">()</span></code>;
+          that is, it is uppercase in code font and its name is followed by <code class="computeroutput"><span class="special">()</span></code> to indicate that it is a function-like
+          macro. Object-like macros appear without the trailing <code class="computeroutput"><span class="special">()</span></code>.
+        </li>
+<li class="listitem">
+          Names that refer to <span class="emphasis"><em>concepts</em></span> in the generic programming
+          sense are specified in CamelCase.
+        </li>
+</ul></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        In addition, notes such as this one specify non-essential information that
+        provides additional background or rationale.
+      </p></td></tr>
+</table></div>
+<p>
+      Finally, you can mentally add the following to any code fragments in this document:
+    </p>
+<pre class="programlisting"><span class="comment">// Include all of the core FixedPoint files</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">fixed_point</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">fixed_point</span><span class="special">;</span>
+</pre>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.overview.scope"></a><a class="link" href="overview.html#boost.fixed_point.overview.scope" title="Scope">Scope</a>
+</h3></div></div></div>
+<p>
+        C++ supports integer arithmetic and floating-point arithmetic, but it does
+        not support fixed-point arithmetic. This library propose support for fixed-point
+        arithmetic.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.overview.motivation"></a><a class="link" href="overview.html#boost.fixed_point.overview.motivation" title="Motivation">Motivation</a>
+</h3></div></div></div>
+<h5>
+<a name="boost.fixed_point.overview.motivation.h0"></a>
+        <span><a name="boost.fixed_point.overview.motivation.fixed_point_versus_integer"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.motivation.fixed_point_versus_integer">Fixed-Point
+        versus Integer</a>
+      </h5>
+<p>
+        In C and C++, the basic integer types have several problematic behaviors.
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Signed integer arithmetic overflow results in undefined behavior. Preemptively
+            checking for overflow is challenging and tedious, so programmers very
+            rarely do so. As a result, most programmers simply assume it will not
+            happen.
+          </li>
+<li class="listitem">
+            Unsigned integer arithmetic overflow results in well-defined behavior,
+            but that behavior is not always desirable. Again, preemptively checking
+            for overflow is challenging and tedious.
+          </li>
+<li class="listitem">
+            C/C++ signed integers promote to unsigned integers, which is the exact
+            opposite of the relationship between the their mathematical analogs;
+            (unsigned) cardinal numbers are a strict subset of (signed) integral
+            numbers. Because of this promotion, it is difficult to prevent signed
+            numbers from being used in places where they are not intended.
+          </li>
+<li class="listitem">
+            C/C++ integer ranges are platform-specific, which generally either binds
+            programs to a platform or requires considerable care in production of
+            portable code.
+          </li>
+</ul></div>
+<h5>
+<a name="boost.fixed_point.overview.motivation.h1"></a>
+        <span><a name="boost.fixed_point.overview.motivation.fixed_point_versus_floating_point"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.motivation.fixed_point_versus_floating_point">Fixed-Point
+        versus Floating-Point</a>
+      </h5>
+<p>
+        Fixed-point arithmetic is better than floating-point arithmetic in several
+        domains.
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Problems with a constrained range can use bits for resolution that would
+            otherwise have gone to an exponent. Examples include Mandelbrot set computation
+            and angular position.
+          </li>
+<li class="listitem">
+            Problems with a constrained resolution can use smaller representation
+            than a single-precision floating-point. An example is a pixel color value.
+          </li>
+<li class="listitem">
+            Low-cost or low-power systems may not provide floating-point hardware.
+            For these systems, fixed-point arithmetic provides a much higher performance
+            alternative to software-implemented floating-point arithmetic for many
+            problems.
+          </li>
+</ul></div>
+<h5>
+<a name="boost.fixed_point.overview.motivation.h2"></a>
+        <span><a name="boost.fixed_point.overview.motivation.prior_art"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.motivation.prior_art">Prior
+        Art</a>
+      </h5>
+<p>
+        The popular computing literature abounds with articles on how to use integers
+        to implement fixed-point arithmetic. However, manually writing fixed-point
+        arithmetic with integer arithmetic is tedious and prone to error. Direct
+        support is desirable.
+      </p>
+<p>
+        ISO/IEC TR 18037 provides fixed-point support in the C programming language.
+        However, this support is not general; only a few possible radix positions
+        are supported. The feature is essentially limited to the digital signal processing
+        domain.
+      </p>
+<p>
+        Likewise, software implementations of fixed-point arithmetic in C and C++,
+        e.g. libfixmath, are also not general as the support only a limited number
+        of radix positions.
+      </p>
+<p>
+        The programming languages Ada, COBOL, CORAL 66, JOVIAL, and PL/I provide
+        direct support for fixed-point arithmetic.
+      </p>
+<h5>
+<a name="boost.fixed_point.overview.motivation.h3"></a>
+        <span><a name="boost.fixed_point.overview.motivation.primary_objective"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.motivation.primary_objective">Primary
+        Objective</a>
+      </h5>
+<p>
+        The primary objective of this implementation is zero performance overhead
+        compared to using integer arithmetic with manually-inserted scaling. This
+        is because performance is important in many applications of fixed-point arithmetic
+        and it really isn't very hard to do ad-hoc fixed-point arithmetic using integers
+        and shifts. Users will therefore not be attracted to this library unless
+        it can offer this feature.
+      </p>
+<h5>
+<a name="boost.fixed_point.overview.motivation.h4"></a>
+        <span><a name="boost.fixed_point.overview.motivation.secondary_objectives"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.motivation.secondary_objectives">Secondary
+        Objectives</a>
+      </h5>
+<p>
+        Secondary objectives are:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+            To behave in as many respects as possible in the same was as the built-in
+            numeric types (integer and floating-point). The motivation for this is
+            to give the user the behavior that they are already familiar with from
+            those types.
+          </li></ul></div>
+<h5>
+<a name="boost.fixed_point.overview.motivation.h5"></a>
+        <span><a name="boost.fixed_point.overview.motivation.hardware_support"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.motivation.hardware_support">Hardware
+        Support</a>
+      </h5>
+<p>
+        The objective of this implementation is to work efficiently with conventional
+        processors' integer arithmetic instructions. It is worth noting, however,
+        that some processors have hardware support for fixed-point operations. These
+        include:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            DSP processors.
+          </li>
+<li class="listitem">
+            Intel's MMX instruction set (also implemented in other x86-compatible
+            processors).
+          </li>
+<li class="listitem">
+            The PowerPC's AltiVec instruction set.
+          </li>
+<li class="listitem">
+            The ARM Piccolo instruction set.
+          </li>
+</ul></div>
+<p>
+        Support for any of these instruction sets would require either use of architecture-specific
+        assembly language or a very smart compiler. These are considered outside
+        the scope of the current work; however, it is worthwhile to see what these
+        instruction sets offer in order to avoid unintentionally implementing something
+        that is incompatible.
+      </p>
+<p>
+        For example, it seems that these instruction sets could more easily support
+        fixed&lt;16,15&gt; than fixed&lt;15,16&gt;. It may be that the user would
+        be happy with either of these formats. So we should consider offering a way
+        to get the "best" format with at least a certain number of bits
+        of integer and fractional parts for a particular instruction set.
+      </p>
+<h5>
+<a name="boost.fixed_point.overview.motivation.h6"></a>
+        <span><a name="boost.fixed_point.overview.motivation.related_work"></a></span><a class="link" href="overview.html#boost.fixed_point.overview.motivation.related_work">Related
+        Work</a>
+      </h5>
+<p>
+        "Embedded C" (see ISO/IEC [draft] technical report 18037:2004)
+        proposes fixed point types for C. It defines new keywords _Fract and _Accum
+        which modify the built-in short, int and long types; _Fract makes the value
+        entirely fractional while _Accum gives it 4 integer bits.
+      </p>
+<p>
+        It requires saturating arithmetic (controlled by an _Sat keyword or a #pragma),
+        and does not require wrap-around behaviour.
+      </p>
+<p>
+        Fixed-point constants can be written using letter suffixes, e.g. 3.1415uhk.
+      </p>
+<p>
+        It looks very much as if this proposal is motivated by one particular category
+        of applications (i.e. digital signal processing). The requirement for saturating
+        arithmetic imposes a significant overhead on processors that do not have
+        support for it, and the lack of support for values with more than 4 integer
+        bits makes it useless for the author's latitude/longitude application.
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.overview.description"></a><a class="link" href="overview.html#boost.fixed_point.overview.description" title="Description">Description</a>
+</h3></div></div></div>
+<p>
+        <span class="bold"><strong>Boost.FixedPoint</strong></span> provides:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+            general purpose binary fixed-point arithmetic.
+          </li></ul></div>
+<p>
+        The design relies on generally 'safe' defaults, but with additional explicit
+        controls to match particular application domains or to enable more efficient
+        execution.
+      </p>
+<p>
+        The library doesn't makes use of specific hardware architecture, and is implemented
+        as a pure library. However, some operations could be substantially faster
+        with direct hardware support. Future versions of the library could make use
+        of specific hardware to achieve maximum efficiency.
+      </p>
+<p>
+        For background information about fixed-point arithmetic, see for example
+        this Wikipedia article: <a href="http://en.wikipedia.org/wiki/Fixed-point_arithmetic" target="_top">Fixed-point
+        Arithmetic</a>. Note in particular that this is binary arithmetic, not
+        binary coded decimal.
+      </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../../index.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="users_guide.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

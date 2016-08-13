@@ -1,0 +1,65 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Struct exception</title>
+<link rel="stylesheet" href="../../.././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="../reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">
+<link rel="prev" href="saturate.html" title="Struct saturate">
+<link rel="next" href="../storage/stereotype.html" title="Struct stereotype">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="saturate.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html#header.boost.fixed_point.number_hpp"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../storage/stereotype.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="boost.fixed_point.overflow.exception"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Struct exception</span></h2>
+<p>boost::fixed_point::overflow::exception</p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">boost/fixed_point/number.hpp</a>&gt;
+
+</span>
+<span class="keyword">struct</span> <a class="link" href="exception.html" title="Struct exception">exception</a> <span class="special">{</span>
+
+  <span class="comment">// <a class="link" href="exception.html#idp6549072-bb">public static functions</a></span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">,</span> <span class="keyword">typename</span> U<span class="special">&gt;</span> 
+    <span class="keyword">static</span> <span class="identifier">T</span><span class="special">::</span><span class="identifier">underlying_type</span> <a class="link" href="exception.html#idp6549600-bb"><span class="identifier">on_negative_overflow</span></a><span class="special">(</span><span class="identifier">U</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">,</span> <span class="keyword">typename</span> U<span class="special">&gt;</span> 
+    <span class="keyword">static</span> <span class="identifier">T</span><span class="special">::</span><span class="identifier">underlying_type</span> <a class="link" href="exception.html#idp6552592-bb"><span class="identifier">on_positive_overflow</span></a><span class="special">(</span><span class="identifier">U</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// public data members</span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_modulo</span><span class="special">;</span>
+<span class="special">}</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp16865040"></a><h2>Description</h2>
+<p>If the dynamic value exceeds the range of the variable, throw an exception of derived from std::overflow_error. </p>
+<div class="refsect2">
+<a name="idp16865824"></a><h3>
+<a name="idp6549072-bb"></a><code class="computeroutput">exception</code> public static functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem"><pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">,</span> <span class="keyword">typename</span> U<span class="special">&gt;</span> 
+  <span class="keyword">static</span> <span class="identifier">T</span><span class="special">::</span><span class="identifier">underlying_type</span> <a name="idp6549600-bb"></a><span class="identifier">on_negative_overflow</span><span class="special">(</span><span class="identifier">U</span><span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">,</span> <span class="keyword">typename</span> U<span class="special">&gt;</span> 
+  <span class="keyword">static</span> <span class="identifier">T</span><span class="special">::</span><span class="identifier">underlying_type</span> <a name="idp6552592-bb"></a><span class="identifier">on_positive_overflow</span><span class="special">(</span><span class="identifier">U</span><span class="special">)</span><span class="special">;</span></pre></li>
+</ol></div>
+</div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="saturate.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html#header.boost.fixed_point.number_hpp"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../storage/stereotype.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

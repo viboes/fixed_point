@@ -1,0 +1,49 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Struct template common_type&lt;fixed_point::ureal_t&lt; R1, P1, RP1, OP1, F1 &gt;, fixed_point::ureal_t&lt; R2, P2, RP2, OP2, F2 &gt;&gt;</title>
+<link rel="stylesheet" href=".././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="fixed_point/reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">
+<link rel="prev" href="common_type_fix_idp5896816.html" title="Struct common_type&lt;fixed_point::bound::bounded, fixed_point::bound::unbounded&gt;">
+<link rel="next" href="common_type_fix_idp5909664.html" title="Struct template common_type&lt;fixed_point::real_t&lt; R1, P1, RP1, OP1, F1 &gt;, fixed_point::real_t&lt; R2, P2, RP2, OP2, F2 &gt;&gt;">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="common_type_fix_idp5896816.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="fixed_point/reference.html#header.boost.fixed_point.number_hpp"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="common_type_fix_idp5909664.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="boost.common_type_fix_idp5898928"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Struct template common_type&lt;fixed_point::ureal_t&lt; R1, P1, RP1, OP1, F1 &gt;, fixed_point::ureal_t&lt; R2, P2, RP2, OP2, F2 &gt;&gt;</span></h2>
+<p>boost::common_type&lt;fixed_point::ureal_t&lt; R1, P1, RP1, OP1, F1 &gt;, fixed_point::ureal_t&lt; R2, P2, RP2, OP2, F2 &gt;&gt;</p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="fixed_point/reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">boost/fixed_point/number.hpp</a>&gt;
+
+</span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R1<span class="special">,</span> <span class="keyword">int</span> P1<span class="special">,</span> <span class="keyword">typename</span> RP1<span class="special">,</span> <span class="keyword">typename</span> OP1<span class="special">,</span> <span class="keyword">typename</span> F1<span class="special">,</span> <span class="keyword">int</span> R2<span class="special">,</span> 
+         <span class="keyword">int</span> P2<span class="special">,</span> <span class="keyword">typename</span> RP2<span class="special">,</span> <span class="keyword">typename</span> OP2<span class="special">,</span> <span class="keyword">typename</span> F2<span class="special">&gt;</span> 
+<span class="keyword">struct</span> <a class="link" href="common_type_fix_idp5898928.html" title="Struct template common_type&lt;fixed_point::ureal_t&lt; R1, P1, RP1, OP1, F1 &gt;, fixed_point::ureal_t&lt; R2, P2, RP2, OP2, F2 &gt;&gt;">common_type</a><span class="special">&lt;</span><span class="identifier">fixed_point</span><span class="special">::</span><span class="identifier">ureal_t</span><span class="special">&lt;</span> <span class="identifier">R1</span><span class="special">,</span> <span class="identifier">P1</span><span class="special">,</span> <span class="identifier">RP1</span><span class="special">,</span> <span class="identifier">OP1</span><span class="special">,</span> <span class="identifier">F1</span> <span class="special">&gt;</span><span class="special">,</span> <span class="identifier">fixed_point</span><span class="special">::</span><span class="identifier">ureal_t</span><span class="special">&lt;</span> <span class="identifier">R2</span><span class="special">,</span> <span class="identifier">P2</span><span class="special">,</span> <span class="identifier">RP2</span><span class="special">,</span> <span class="identifier">OP2</span><span class="special">,</span> <span class="identifier">F2</span> <span class="special">&gt;</span><span class="special">&gt;</span> <span class="special">{</span>
+  <span class="comment">// types</span>
+  <span class="keyword">typedef</span> <a class="link" href="fixed_point/ureal_t.html" title="Class template ureal_t">fixed_point::ureal_t</a><span class="special">&lt;</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">max</span><span class="special">&lt;</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span> <span class="identifier">R1</span> <span class="special">&gt;</span><span class="special">,</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span> <span class="identifier">R2</span> <span class="special">&gt;</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span><span class="special">::</span><span class="identifier">value</span><span class="special">,</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">min</span><span class="special">&lt;</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span> <span class="identifier">P1</span> <span class="special">&gt;</span><span class="special">,</span> <span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span> <span class="identifier">P2</span> <span class="special">&gt;</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span><span class="special">::</span><span class="identifier">value</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">common_type</span><span class="special">&lt;</span> <span class="identifier">RP1</span><span class="special">,</span> <span class="identifier">RP2</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">common_type</span><span class="special">&lt;</span> <span class="identifier">OP1</span><span class="special">,</span> <span class="identifier">OP2</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">common_type</span><span class="special">&lt;</span> <span class="identifier">F1</span><span class="special">,</span> <span class="identifier">F2</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span> <span class="special">&gt;</span> <a name="boost.common_type_fix_idp5898928.type"></a><span class="identifier">type</span><span class="special">;</span>
+<span class="special">}</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp22063504"></a><h2>Description</h2>
+<p>common_type specialization for ureal_t and ureal_t. </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="common_type_fix_idp5896816.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="fixed_point/reference.html#header.boost.fixed_point.number_hpp"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="common_type_fix_idp5909664.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

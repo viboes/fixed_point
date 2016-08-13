@@ -1,0 +1,178 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Appendices</title>
+<link rel="stylesheet" href="../.././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="prev" href="../../std/numeric_limits__idp7099904.html" title="Struct template numeric_limits&lt;boost::fixed_point::real_t&lt; R, P, RP, OP, F &gt;&gt;">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../../std/numeric_limits__idp7099904.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost.fixed_point.appendices"></a><a class="link" href="appendices.html" title="Appendices">Appendices</a>
+</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="appendices.html#boost.fixed_point.appendices.history">Appendix: History</a></span></dt>
+<dd><dl><dt><span class="section"><a href="appendices.html#boost.fixed_point.appendices.history.__version_0_1_0__april_30__2012__"><span class="bold"><strong>Version 0.1.0, April 30, 2012</strong></span> </a></span></dt></dl></dd>
+<dt><span class="section"><a href="appendices.html#boost.fixed_point.appendices.rationale">Appendix: Design
+      Rationale</a></span></dt>
+<dt><span class="section"><a href="appendices.html#boost.fixed_point.appendices.implementation">Appendix:
+      Implementation Notes</a></span></dt>
+<dt><span class="section"><a href="appendices.html#boost.fixed_point.appendices.acknowledgements">Appendix:
+      Acknowledgements</a></span></dt>
+<dt><span class="section"><a href="appendices.html#boost.fixed_point.appendices.todo">Appendix : Future
+      plans</a></span></dt>
+</dl></div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.appendices.history"></a><a class="link" href="appendices.html#boost.fixed_point.appendices.history" title="Appendix: History">Appendix: History</a>
+</h3></div></div></div>
+<div class="toc"><dl><dt><span class="section"><a href="appendices.html#boost.fixed_point.appendices.history.__version_0_1_0__april_30__2012__"><span class="bold"><strong>Version 0.1.0, April 30, 2012</strong></span> </a></span></dt></dl></div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="boost.fixed_point.appendices.history.__version_0_1_0__april_30__2012__"></a><a class="link" href="appendices.html#boost.fixed_point.appendices.history.__version_0_1_0__april_30__2012__" title="Version 0.1.0, April 30, 2012"><span class="bold"><strong>Version 0.1.0, April 30, 2012</strong></span> </a>
+</h4></div></div></div>
+<p>
+          <span class="emphasis"><em>Announcement of FixedPoints</em></span>
+        </p>
+<p>
+          <span class="bold"><strong>Features:</strong></span>
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+              generic fixed_point numbers.
+            </li></ul></div>
+</div>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.appendices.rationale"></a><a class="link" href="appendices.html#boost.fixed_point.appendices.rationale" title="Appendix: Design Rationale">Appendix: Design
+      Rationale</a>
+</h3></div></div></div>
+<h5>
+<a name="boost.fixed_point.appendices.rationale.h0"></a>
+        <span><a name="boost.fixed_point.appendices.rationale.why_the_library_adds_a_specific_parameter_for_overflow_"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.rationale.why_the_library_adds_a_specific_parameter_for_overflow_">Why
+        the library adds a specific parameter for overflow?</a>
+      </h5>
+<p>
+        Phil Endecott wrote "Some people conflate fixed point with features
+        like saturation, which I would prefer to decouple. Fixed-point arithmetic
+        without saturation is useful, as is integer arithmetic with saturation. So
+        I'd prefer to make them orthogonal, but compatible, concepts."
+      </p>
+<h5>
+<a name="boost.fixed_point.appendices.rationale.h1"></a>
+        <span><a name="boost.fixed_point.appendices.rationale.meaning_of____and___"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.rationale.meaning_of____and___">Meaning
+        of ++ and --</a>
+      </h5>
+<p>
+        Phil Endecott wrote "It could be argued that the meaning of ++ and --
+        is unclear: do they add/subtract 1, or do they add/subtract the type's delta?.
+        Note that the built-in floating point types add and subtract 1, as does the
+        proposed "Embedded C" fixed-point type."
+      </p>
+<h5>
+<a name="boost.fixed_point.appendices.rationale.h2"></a>
+        <span><a name="boost.fixed_point.appendices.rationale._math_library__functions"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.rationale._math_library__functions">'Math
+        library' functions</a>
+      </h5>
+<h5>
+<a name="boost.fixed_point.appendices.rationale.h3"></a>
+        <span><a name="boost.fixed_point.appendices.rationale.fixed_point_constants"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.rationale.fixed_point_constants">Fixed
+        Point Constants</a>
+      </h5>
+<p>
+        Phil Endecott wrote "It would be ideal if code such as
+      </p>
+<p>
+        constexpr ureal_t&lt;??,-14&gt; pi = 3.1415926;
+      </p>
+<p>
+        could have no run-time overhead."
+      </p>
+<p>
+        I don't know if this could be provided with user defined literals
+      </p>
+<p>
+        constexpr ureal_t&lt;2,-14&gt; pi = 3.1415926ufxp;
+      </p>
+<p>
+        The library could provide an alternative form
+      </p>
+<p>
+        constexpr auto pi(ratio&lt;&lt;31415926,10000000&gt; &gt;);
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.appendices.implementation"></a><a class="link" href="appendices.html#boost.fixed_point.appendices.implementation" title="Appendix: Implementation Notes">Appendix:
+      Implementation Notes</a>
+</h3></div></div></div>
+<h5>
+<a name="boost.fixed_point.appendices.implementation.h0"></a>
+        <span><a name="boost.fixed_point.appendices.implementation.why_"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.implementation.why_">Why?</a>
+      </h5>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.appendices.acknowledgements"></a><a class="link" href="appendices.html#boost.fixed_point.appendices.acknowledgements" title="Appendix: Acknowledgements">Appendix:
+      Acknowledgements</a>
+</h3></div></div></div>
+<p>
+        Thanks to
+      </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost.fixed_point.appendices.todo"></a><a class="link" href="appendices.html#boost.fixed_point.appendices.todo" title="Appendix : Future plans">Appendix : Future
+      plans</a>
+</h3></div></div></div>
+<h5>
+<a name="boost.fixed_point.appendices.todo.h0"></a>
+        <span><a name="boost.fixed_point.appendices.todo.tasks_to_do_before_review"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.todo.tasks_to_do_before_review">Tasks
+        to do before review</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+            Do the the doc.
+          </li></ul></div>
+<h5>
+<a name="boost.fixed_point.appendices.todo.h1"></a>
+        <span><a name="boost.fixed_point.appendices.todo.tasks_to_do_if_the_library_is_accepted"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.todo.tasks_to_do_if_the_library_is_accepted">Tasks
+        to do if the library is accepted</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Split the tests.
+          </li>
+<li class="listitem">
+            Add .
+          </li>
+</ul></div>
+<h5>
+<a name="boost.fixed_point.appendices.todo.h2"></a>
+        <span><a name="boost.fixed_point.appendices.todo.for_later_releases"></a></span><a class="link" href="appendices.html#boost.fixed_point.appendices.todo.for_later_releases">For later
+        releases</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+            Analyze
+          </li></ul></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../../std/numeric_limits__idp7099904.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../index.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+</body>
+</html>

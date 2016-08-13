@@ -1,0 +1,390 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Class template real_t</title>
+<link rel="stylesheet" href="../.././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">
+<link rel="prev" href="ureal_t.html" title="Class template ureal_t">
+<link rel="next" href="index_tag.html" title="Struct template index_tag">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="ureal_t.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="reference.html#header.boost.fixed_point.number_hpp"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="index_tag.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="boost.fixed_point.real_t"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Class template real_t</span></h2>
+<p>boost::fixed_point::real_t &#8212; Signed fixed point number. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">boost/fixed_point/number.hpp</a>&gt;
+
+</span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> Range<span class="special">,</span> <span class="keyword">int</span> Resolution<span class="special">,</span> <span class="keyword">typename</span> Rounding <span class="special">=</span> <a class="link" href="round/negative.html" title="Struct negative">round::negative</a><span class="special">,</span> 
+         <span class="keyword">typename</span> Overflow <span class="special">=</span> <a class="link" href="overflow/exception.html" title="Struct exception">overflow::exception</a><span class="special">,</span> <span class="keyword">typename</span> Family <span class="special">=</span> <a class="link" href="family.html" title="Struct template family">family</a><span class="special">&lt;</span><span class="special">&gt;</span> <span class="special">&gt;</span> 
+<span class="keyword">class</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">{</span>
+<span class="keyword">public</span><span class="special">:</span>
+  <span class="comment">// types</span>
+  <span class="keyword">typedef</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a>                                                                <a name="boost.fixed_point.real_t.self_type"></a><span class="identifier">self_type</span><span class="special">;</span>                         <span class="comment">// this type </span>
+  <span class="keyword">typedef</span> <span class="identifier">Rounding</span>                                                              <a name="boost.fixed_point.real_t.rounding_type"></a><span class="identifier">rounding_type</span><span class="special">;</span>                     <span class="comment">// the Rounding parameter. </span>
+  <span class="keyword">typedef</span> <span class="identifier">Overflow</span>                                                              <a name="boost.fixed_point.real_t.overflow_type"></a><span class="identifier">overflow_type</span><span class="special">;</span>                     <span class="comment">// the Overflow parameter. </span>
+  <span class="keyword">typedef</span> <span class="identifier">Family</span>                                                                <a name="boost.fixed_point.real_t.family_type"></a><span class="identifier">family_type</span><span class="special">;</span>                       <span class="comment">// the Family parameter. </span>
+  <span class="keyword">typedef</span> <span class="identifier">family_type</span><span class="special">::</span><span class="identifier">storage_type</span>                                             <a name="boost.fixed_point.real_t.storage_type"></a><span class="identifier">storage_type</span><span class="special">;</span>                      <span class="comment">// the storage policy </span>
+  <span class="keyword">typedef</span> <span class="identifier">family_type</span><span class="special">::</span><span class="identifier">conversion_from_fixed_point_type</span>                         <a name="boost.fixed_point.real_t.conversion_from_idp6167536"></a><span class="identifier">conversion_from_fixed_point_type</span><span class="special">;</span>  <span class="comment">// the conversion policy </span>
+  <span class="keyword">typedef</span> <span class="identifier">family_type</span><span class="special">::</span><span class="identifier">conversion_from_builtin_type</span>                             <a name="boost.fixed_point.real_t.conversion_from_idp6168528"></a><span class="identifier">conversion_from_builtin_type</span><span class="special">;</span>    
+  <span class="keyword">typedef</span> <span class="identifier">family_type</span><span class="special">::</span><span class="identifier">arithmetic_type</span>                                          <a name="boost.fixed_point.real_t.arithmetic_type"></a><span class="identifier">arithmetic_type</span><span class="special">;</span>                   <span class="comment">// the arithmetic policy </span>
+  <span class="keyword">typedef</span> <span class="identifier">family_type</span><span class="special">::</span><span class="identifier">bound_type</span>                                               <a name="boost.fixed_point.real_t.bound_type"></a><span class="identifier">bound_type</span><span class="special">;</span>                        <span class="comment">// the arithmetic policy </span>
+  <span class="keyword">typedef</span> <span class="identifier">storage_type</span><span class="special">::</span><span class="keyword">template</span> <span class="identifier">signed_integer_type</span><span class="special">&lt;</span> <span class="identifier">Range</span><span class="special">,</span> <span class="identifier">Resolution</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span> <a name="boost.fixed_point.real_t.underlying_type"></a><span class="identifier">underlying_type</span><span class="special">;</span>                   <span class="comment">// The underlying integer type. </span>
+
+  <span class="comment">// <a class="link" href="real_t.html#boost.fixed_point.real_tconstruct-copy-destruct">construct/copy/destruct</a></span>
+  <a class="link" href="real_t.html#idp6244496-bb"><span class="identifier">real_t</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html#idp6245136-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <a class="link" href="real_t.html#idp6246640-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <a class="link" href="real_t.html#idp6257664-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6268688-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <a class="link" href="real_t.html#idp6279616-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6290320-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <a class="link" href="real_t.html#idp6301248-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <a class="link" href="real_t.html#idp6311952-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+    <a class="link" href="real_t.html#idp6324384-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> UT<span class="special">&gt;</span> <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6337424-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="index_tag.html" title="Struct template index_tag">index_tag</a><span class="special">&lt;</span> <span class="identifier">UT</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <a class="link" href="real_t.html#idp6343392-bb"><span class="identifier">real_t</span></a><span class="special">(</span><span class="identifier">T</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6345936-bb"><span class="identifier">real_t</span></a><span class="special">(</span><span class="identifier">T</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html#idp6348592-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">int</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html#idp6350064-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">float</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html#idp6351536-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">double</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html#idp6353024-bb"><span class="identifier">real_t</span></a><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">long</span> <span class="keyword">double</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a class="link" href="real_t.html#idp6354512-bb"><span class="keyword">operator</span><span class="special">=</span></a><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// <a class="link" href="real_t.html#idp6178272-bb">public member functions</a></span>
+  <span class="keyword">constexpr</span> <span class="identifier">underlying_type</span> <a class="link" href="real_t.html#idp6178752-bb"><span class="identifier">count</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="identifier">underlying_type</span> <a class="link" href="real_t.html#idp6180832-bb"><span class="identifier">integral_part</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="identifier">FP</span> <a class="link" href="real_t.html#idp6182656-bb"><span class="identifier">as</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">int</span> <a class="link" href="real_t.html#idp6186240-bb"><span class="identifier">as_int</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">float</span> <a class="link" href="real_t.html#idp6187456-bb"><span class="identifier">as_float</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">double</span> <a class="link" href="real_t.html#idp6188672-bb"><span class="identifier">as_double</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">long</span> <span class="keyword">double</span> <a class="link" href="real_t.html#idp6189888-bb"><span class="identifier">as_long_double</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6191104-bb"><span class="keyword">operator</span> <span class="keyword">int</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6192544-bb"><span class="keyword">operator</span> <span class="keyword">float</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6193984-bb"><span class="keyword">operator</span> <span class="keyword">double</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="real_t.html#idp6195424-bb"><span class="keyword">operator</span> <span class="keyword">long</span> <span class="keyword">double</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a class="link" href="real_t.html#idp6196864-bb"><span class="keyword">operator</span><span class="special">+</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a class="link" href="real_t.html#idp6198816-bb"><span class="keyword">operator</span><span class="special">-</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a class="link" href="real_t.html#idp6200832-bb"><span class="keyword">operator</span><span class="special">++</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a class="link" href="real_t.html#idp6203808-bb"><span class="keyword">operator</span><span class="special">++</span></a><span class="special">(</span><span class="keyword">int</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a class="link" href="real_t.html#idp6207264-bb"><span class="keyword">operator</span><span class="special">--</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a class="link" href="real_t.html#idp6210240-bb"><span class="keyword">operator</span><span class="special">--</span></a><span class="special">(</span><span class="keyword">int</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a class="link" href="real_t.html#idp6213696-bb"><span class="keyword">operator</span><span class="special">+=</span></a><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a class="link" href="real_t.html#idp6218272-bb"><span class="keyword">operator</span><span class="special">-=</span></a><span class="special">(</span><span class="keyword">const</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a class="link" href="real_t.html#idp6222976-bb"><span class="keyword">operator</span><span class="special">*=</span></a><span class="special">(</span><span class="keyword">const</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a class="link" href="real_t.html#idp6227680-bb"><span class="keyword">operator</span><span class="special">/=</span></a><span class="special">(</span><span class="keyword">const</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">unsigned</span> N<span class="special">&gt;</span> 
+    <a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">Range</span><span class="special">+</span><span class="identifier">N</span><span class="special">,</span> <span class="identifier">Resolution</span><span class="special">+</span><span class="identifier">N</span><span class="special">,</span> <span class="identifier">Rounding</span><span class="special">,</span> <span class="identifier">Overflow</span><span class="special">,</span> <span class="identifier">Family</span> <span class="special">&gt;</span> 
+    <a class="link" href="real_t.html#idp6232384-bb"><span class="identifier">virtual_scale</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">unsigned</span> N<span class="special">&gt;</span> <span class="keyword">void</span> <a class="link" href="real_t.html#idp6236272-bb"><span class="identifier">scale_up</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> N<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">&gt;</span> <span class="keyword">void</span> <a class="link" href="real_t.html#idp6239888-bb"><span class="identifier">scale</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// <a class="link" href="real_t.html#idp6357024-bb">public static functions</a></span>
+  <span class="keyword">static</span> <span class="keyword">constexpr</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a class="link" href="real_t.html#idp6357552-bb"><span class="identifier">zero</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">static</span> <span class="keyword">constexpr</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a class="link" href="real_t.html#idp6359776-bb"><span class="identifier">min</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">static</span> <span class="keyword">constexpr</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a class="link" href="real_t.html#idp6362016-bb"><span class="identifier">max</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">FP</span> <a class="link" href="real_t.html#idp6364256-bb"><span class="identifier">factor</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">FP</span> <a class="link" href="real_t.html#idp6366992-bb"><span class="identifier">reconstruct</span></a><span class="special">(</span><span class="identifier">underlying_type</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">underlying_type</span> <a class="link" href="real_t.html#idp6369888-bb"><span class="identifier">integer_part</span></a><span class="special">(</span><span class="identifier">FP</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> I<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">underlying_type</span> <a class="link" href="real_t.html#idp6372336-bb"><span class="identifier">classify</span></a><span class="special">(</span><span class="identifier">I</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">underlying_type</span> <a class="link" href="real_t.html#idp6374784-bb"><span class="identifier">classify</span></a><span class="special">(</span><span class="identifier">FP</span><span class="special">)</span><span class="special">;</span>
+
+  <span class="comment">// public data members</span>
+  <span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="identifier">range_exp</span><span class="special">;</span>  <span class="comment">// the Range parameter. </span>
+  <span class="keyword">constexpr</span> <span class="keyword">int</span> <span class="identifier">resolution_exp</span><span class="special">;</span>  <span class="comment">// the Resolution parameter. </span>
+  <span class="keyword">constexpr</span> <span class="keyword">bool</span> <span class="identifier">is_signed</span><span class="special">;</span>  <span class="comment">// whether the tyoe is signed (always true). </span>
+  <span class="keyword">constexpr</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">digits</span><span class="special">;</span>  <span class="comment">// The standard std::number_traits&lt;&gt;::digits. </span>
+  <span class="keyword">constexpr</span> <span class="identifier">underlying_type</span> <span class="identifier">min_index</span><span class="special">;</span>  <span class="comment">// The standard std::number_traits&lt;&gt;::min_index. </span>
+  <span class="keyword">constexpr</span> <span class="identifier">underlying_type</span> <span class="identifier">max_index</span><span class="special">;</span>  <span class="comment">// The standard std::number_traits&lt;&gt;::max_index. </span>
+<span class="special">}</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp18934176"></a><h2>Description</h2>
+<p><span class="bold"><strong>Template Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">Range</code></strong></span>: Range specified by an integer. The range of a signed number x is 2^Range &lt; x &lt; 2^Range. Note that the range interval is open for signed numbers. </p>
+<p>- <span class="bold"><strong><code class="computeroutput">Resolution</code></strong></span>: resolution specified by an integer. The resolution of a fractional number x is 2^Resolution. </p>
+<p>- <span class="bold"><strong><code class="computeroutput">Rounding</code></strong></span>: The rounding policy. </p>
+<p>- <span class="bold"><strong><code class="computeroutput">Overflow</code></strong></span>: The overflow policy. </p>
+<p>- <span class="bold"><strong><code class="computeroutput">Family</code></strong></span>: The family traits.</p>
+<p><span class="bold"><strong>Example:</strong></span> For example, <a class="link" href="real_t.html" title="Class template real_t">real_t</a>&lt;8,-4&gt; has values n such that -256 &lt; n &lt; 256 in increments of 2^(-4) = 1/16. </p>
+<div class="refsect2">
+<a name="idp18943728"></a><h3>
+<a name="boost.fixed_point.real_tconstruct-copy-destruct"></a><code class="computeroutput">real_t</code> 
+        public
+       construct/copy/destruct</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+<pre class="literallayout"><a name="idp6244496-bb"></a><span class="identifier">real_t</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p>Default constructor. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a name="idp6245136-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Copy constructor. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <a name="idp6246640-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Implicit constructor from a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> no larger range and no better resolution.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> with no larger range and no better resolution.</p>
+<p><span class="bold"><strong>Effects:</strong></span> Adapt the resolution of <code class="computeroutput">rhs</code> to this resolution. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Nothing. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_convertible.html" title="Struct template is_convertible">is_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <a name="idp6257664-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Implicit constructor from a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> with no larger range and no better resolution.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> with no larger range and no better resolution.</p>
+<p><span class="bold"><strong>Effects:</strong></span> Adapt the resolution of <code class="computeroutput">rhs</code> to this resolution. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Nothing. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_convertible.html" title="Struct template is_convertible">is_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <span class="keyword">explicit</span> <a name="idp6268688-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Explicit constructor from a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> with larger range or better resolution.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> with larger range and better resolution.</p>
+<p><span class="bold"><strong>Effects:</strong></span> Rounds and check overflow if needed. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Whatever the target overflow policy can throw. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_explicitly_convertible.html" title="Struct template is_explicitly_convertible">is_explicitly_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <a name="idp6279616-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Constructor from a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> with larger range or better resolution.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> with larger range and better resolution.</p>
+<p><span class="bold"><strong>Effects:</strong></span> Rounds and check overflow if needed. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Whatever the target overflow policy can throw. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_implicitly_convertible.html" title="Struct template is_implicitly_convertible">is_implicitly_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <span class="keyword">explicit</span> <a name="idp6290320-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Explicit constructor from a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> with larger range or better resolution.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> with larger range and better resolution.</p>
+<p><span class="bold"><strong>Throws:</strong></span> Whatever the target overflow policy can throw. </p>
+<p><span class="bold"><strong>Effects:</strong></span> Rounds and check overflow if needed. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_explicitly_convertible.html" title="Struct template is_explicitly_convertible">is_explicitly_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <a name="idp6301248-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Constructor from a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> with larger range or better resolution.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> with larger range and better resolution.</p>
+<p><span class="bold"><strong>Effects:</strong></span> Rounds and check overflow if needed. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Whatever the target overflow policy can throw. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_implicitly_convertible.html" title="Struct template is_implicitly_convertible">is_implicitly_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <a name="idp6311952-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="special">&gt;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Implicit constructor from a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> wrapped by a <code class="computeroutput"><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a></code>.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> wrapped by <code class="computeroutput"><code class="computeroutput"><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a></code></code> .</p>
+<p><span class="bold"><strong>Effects:</strong></span> Rounds and check overflow if needed. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Whatever the target overflow policy can throw. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_implicitly_convertible.html" title="Struct template is_implicitly_convertible">is_implicitly_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R<span class="special">,</span> <span class="keyword">int</span> P<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">,</span> <span class="keyword">typename</span> OP<span class="special">,</span> <span class="keyword">typename</span> F<span class="special">&gt;</span> 
+  <a name="idp6324384-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R</span><span class="special">,</span> <span class="identifier">P</span><span class="special">,</span> <span class="identifier">RP</span><span class="special">,</span> <span class="identifier">OP</span><span class="special">,</span> <span class="identifier">F</span> <span class="special">&gt;</span> <span class="special">&gt;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p>Implicit constructor from a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> wrapped by a <code class="computeroutput"><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a></code>.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">rhs</code></strong></span>: a <code class="computeroutput"><a class="link" href="ureal_t.html" title="Class template ureal_t">ureal_t</a></code> wrapped by <code class="computeroutput"><code class="computeroutput"><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a></code></code> .</p>
+<p><span class="bold"><strong>Effects:</strong></span> Rounds and check overflow if needed. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Whatever the target overflow policy can throw. </p>
+<p><span class="bold"><strong>Remark(s):</strong></span> This overload participates in overload resolution only if the source <code class="computeroutput"><code class="computeroutput"><a class="link" href="is_implicitly_convertible.html" title="Struct template is_implicitly_convertible">is_implicitly_convertible</a></code></code> to the target. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> UT<span class="special">&gt;</span> <span class="keyword">explicit</span> <a name="idp6337424-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="index_tag.html" title="Struct template index_tag">index_tag</a><span class="special">&lt;</span> <span class="identifier">UT</span> <span class="special">&gt;</span> i<span class="special">)</span><span class="special">;</span></pre>destructor <p>Explicit construction from an index.</p>
+<p><span class="bold"><strong>Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">i</code></strong></span>: the index.</p>
+<p><span class="bold"><strong>Requires:</strong></span> <code class="computeroutput">min_index&lt;=i&lt;=max_index</code>. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <a name="idp6343392-bb"></a><span class="identifier">real_t</span><span class="special">(</span><span class="identifier">T</span> x<span class="special">)</span><span class="special">;</span></pre>
+<p>Implicit conversion from arithmetic <code class="computeroutput">T</code>. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <span class="keyword">explicit</span> <a name="idp6345936-bb"></a><span class="identifier">real_t</span><span class="special">(</span><span class="identifier">T</span> x<span class="special">)</span><span class="special">;</span></pre>explicit conversion from arithmetic <code class="computeroutput">T</code>. </li>
+<li class="listitem">
+<pre class="literallayout"><a name="idp6348592-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">int</span> <span class="special">&gt;</span> x<span class="special">)</span><span class="special">;</span></pre>implicit conversion from int </li>
+<li class="listitem">
+<pre class="literallayout"><a name="idp6350064-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">float</span> <span class="special">&gt;</span> x<span class="special">)</span><span class="special">;</span></pre>implicit conversion from float </li>
+<li class="listitem">
+<pre class="literallayout"><a name="idp6351536-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">double</span> <span class="special">&gt;</span> x<span class="special">)</span><span class="special">;</span></pre>implicit conversion from double </li>
+<li class="listitem">
+<pre class="literallayout"><a name="idp6353024-bb"></a><span class="identifier">real_t</span><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="keyword">long</span> <span class="keyword">double</span> <span class="special">&gt;</span> x<span class="special">)</span><span class="special">;</span></pre>implicit conversion from long double </li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a name="idp6354512-bb"></a><span class="keyword">operator</span><span class="special">=</span><span class="special">(</span><a class="link" href="convert_tag.html" title="Struct template convert_tag">convert_tag</a><span class="special">&lt;</span> <span class="identifier">T</span> <span class="special">&gt;</span> v<span class="special">)</span><span class="special">;</span></pre></li>
+</ol></div>
+</div>
+<div class="refsect2">
+<a name="idp19264624"></a><h3>
+<a name="idp6178272-bb"></a><code class="computeroutput">real_t</code> public member functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">constexpr</span> <span class="identifier">underlying_type</span> <a name="idp6178752-bb"></a><span class="identifier">count</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<p>Underlying integer type observer.</p>
+<p><span class="bold"><strong>Returns:</strong></span> the underlying representation. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="identifier">underlying_type</span> <a name="idp6180832-bb"></a><span class="identifier">integral_part</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Returns:</strong></span> the integral part of the fixed point number. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="identifier">FP</span> <a name="idp6182656-bb"></a><span class="identifier">as</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<p>explicit conversion to FP. </p>
+<p><span class="bold"><strong>Returns:</strong></span> the <code class="computeroutput">FP</code> represented by <code class="computeroutput">*this</code>. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">int</span> <a name="idp6186240-bb"></a><span class="identifier">as_int</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to int. </li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">float</span> <a name="idp6187456-bb"></a><span class="identifier">as_float</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to float. </li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">double</span> <a name="idp6188672-bb"></a><span class="identifier">as_double</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to double. </li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">long</span> <span class="keyword">double</span> <a name="idp6189888-bb"></a><span class="identifier">as_long_double</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to long double. </li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp6191104-bb"></a><span class="keyword">operator</span> <span class="keyword">int</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to float. </li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp6192544-bb"></a><span class="keyword">operator</span> <span class="keyword">float</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to float. </li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp6193984-bb"></a><span class="keyword">operator</span> <span class="keyword">double</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to double. </li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp6195424-bb"></a><span class="keyword">operator</span> <span class="keyword">long</span> <span class="keyword">double</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>explicit conversion to long double. </li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a name="idp6196864-bb"></a><span class="keyword">operator</span><span class="special">+</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Returns:</strong></span> this instance. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a name="idp6198816-bb"></a><span class="keyword">operator</span><span class="special">-</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Returns:</strong></span> a new instance with the representation negated. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a name="idp6200832-bb"></a><span class="keyword">operator</span><span class="special">++</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> Pre-increase this instance as if <code class="computeroutput">*this+=1</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> this instance. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a name="idp6203808-bb"></a><span class="keyword">operator</span><span class="special">++</span><span class="special">(</span><span class="keyword">int</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> Post-increase this instance as if <code class="computeroutput">*this+=1</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> a copy of this instance before increasing it. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a name="idp6207264-bb"></a><span class="keyword">operator</span><span class="special">--</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> Pre-decrease this instance as if <code class="computeroutput">*this-=1</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> this instance. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a name="idp6210240-bb"></a><span class="keyword">operator</span><span class="special">--</span><span class="special">(</span><span class="keyword">int</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> Post-decrease this instance as if <code class="computeroutput">*this-=1</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> a copy of this instance before decreasing it. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a name="idp6213696-bb"></a><span class="keyword">operator</span><span class="special">+=</span><span class="special">(</span><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> As if <code class="computeroutput">number_cast&lt;real_t&gt;(*this+rhs)</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> this instance. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Any exception the Overflow policy can throw. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a name="idp6218272-bb"></a><span class="keyword">operator</span><span class="special">-=</span><span class="special">(</span><span class="keyword">const</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> As if <code class="computeroutput">number_cast&lt;real_t&gt;(*this-rhs)</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> this instance. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Any exception the Overflow policy can throw. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a name="idp6222976-bb"></a><span class="keyword">operator</span><span class="special">*=</span><span class="special">(</span><span class="keyword">const</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> As if <code class="computeroutput">number_cast&lt;real_t&gt;(*this*rhs)</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> this instance. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Any exception the Overflow policy can throw. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> <a name="idp6227680-bb"></a><span class="keyword">operator</span><span class="special">/=</span><span class="special">(</span><span class="keyword">const</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Effects:</strong></span> As if <code class="computeroutput">divide&lt;real_t&gt;(*this,rhs)</code> </p>
+<p><span class="bold"><strong>Returns:</strong></span> this instance. </p>
+<p><span class="bold"><strong>Throws:</strong></span> Any exception the Overflow policy can throw. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">unsigned</span> N<span class="special">&gt;</span> 
+  <a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">Range</span><span class="special">+</span><span class="identifier">N</span><span class="special">,</span> <span class="identifier">Resolution</span><span class="special">+</span><span class="identifier">N</span><span class="special">,</span> <span class="identifier">Rounding</span><span class="special">,</span> <span class="identifier">Overflow</span><span class="special">,</span> <span class="identifier">Family</span> <span class="special">&gt;</span> 
+  <a name="idp6232384-bb"></a><span class="identifier">virtual_scale</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<p>Virtual scaling.</p>
+<p><span class="bold"><strong>Returns:</strong></span> a new instance with the same data representation and with the range and resolution increased by <code class="computeroutput">N</code>. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">unsigned</span> N<span class="special">&gt;</span> <span class="keyword">void</span> <a name="idp6236272-bb"></a><span class="identifier">scale_up</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p>Scales up N bits.</p>
+<p><span class="bold"><strong>Effects:</strong></span> Scales up this instance as if <code class="computeroutput">(<span class="emphasis"><em>this)=(*this)</em></span>(2^N)</code> </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> N<span class="special">,</span> <span class="keyword">typename</span> RP<span class="special">&gt;</span> <span class="keyword">void</span> <a name="idp6239888-bb"></a><span class="identifier">scale</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p>Scales up/down depending on the sign of <code class="computeroutput">N</code>.</p>
+<p><span class="bold"><strong>Effects:</strong></span> Scales up this instance as if <code class="computeroutput">(<span class="emphasis"><em>this)</em></span>(2^N)</code> </p>
+</li>
+</ol></div>
+</div>
+<div class="refsect2">
+<a name="idp19448752"></a><h3>
+<a name="idp6357024-bb"></a><code class="computeroutput">real_t</code> public static functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">static</span> <span class="keyword">constexpr</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a name="idp6357552-bb"></a><span class="identifier">zero</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Returns:</strong></span> the absolute zero. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">static</span> <span class="keyword">constexpr</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a name="idp6359776-bb"></a><span class="identifier">min</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Returns:</strong></span> the minimal value that can be represented. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">static</span> <span class="keyword">constexpr</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a> <a name="idp6362016-bb"></a><span class="identifier">max</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Returns:</strong></span> the maximal value that can be represented. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">FP</span> <a name="idp6364256-bb"></a><span class="identifier">factor</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<p><span class="bold"><strong>Returns:</strong></span> the conversion factor. </p>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">FP</span> <a name="idp6366992-bb"></a><span class="identifier">reconstruct</span><span class="special">(</span><span class="identifier">underlying_type</span> k<span class="special">)</span><span class="special">;</span></pre>
+<p>Reconstructs a floating point type from the underlying type. </p>
+</li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">underlying_type</span> <a name="idp6369888-bb"></a><span class="identifier">integer_part</span><span class="special">(</span><span class="identifier">FP</span> x<span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> I<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">underlying_type</span> <a name="idp6372336-bb"></a><span class="identifier">classify</span><span class="special">(</span><span class="identifier">I</span> i<span class="special">)</span><span class="special">;</span></pre></li>
+<li class="listitem"><pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> FP<span class="special">&gt;</span> <span class="keyword">static</span> <span class="identifier">underlying_type</span> <a name="idp6374784-bb"></a><span class="identifier">classify</span><span class="special">(</span><span class="identifier">FP</span> x<span class="special">)</span><span class="special">;</span></pre></li>
+</ol></div>
+</div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="ureal_t.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="reference.html#header.boost.fixed_point.number_hpp"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="index_tag.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

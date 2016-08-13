@@ -1,0 +1,50 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Function template to_real_t</title>
+<link rel="stylesheet" href="../.././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">
+<link rel="prev" href="to_ureal_t.html" title="Function template to_ureal_t">
+<link rel="next" href="operator__idp6682704.html" title="Function template operator+">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="to_ureal_t.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="reference.html#header.boost.fixed_point.number_hpp"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="operator__idp6682704.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="boost.fixed_point.to_real_t"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Function template to_real_t</span></h2>
+<p>boost::fixed_point::to_real_t</p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">boost/fixed_point/number.hpp</a>&gt;
+
+</span>
+<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> Times<span class="special">,</span> <span class="keyword">int</span> Resolution<span class="special">&gt;</span> 
+  <span class="keyword">constexpr</span> <a class="link" href="real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">LOG2</span><span class="special">(</span><span class="identifier">ABS</span><span class="special">(</span><span class="identifier">Times</span><span class="special">+</span><span class="number">1</span><span class="special">)</span><span class="special">)</span><span class="special">,</span> <span class="identifier">Resolution</span> <span class="special">&gt;</span> <span class="identifier">to_real_t</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp20003456"></a><h2>Description</h2>
+<p><code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code> compile time factory. </p>
+<p><span class="bold"><strong>Template Parameters:</strong></span> </p>
+<p>- <span class="bold"><strong><code class="computeroutput">Times</code></strong></span>: an <code class="computeroutput">int</code> representing the number of times. </p>
+<p>- <span class="bold"><strong><code class="computeroutput">Resolution</code></strong></span>: the binary resolution.</p>
+<p><span class="bold"><strong>Returns:</strong></span> a <code class="computeroutput"><code class="computeroutput"><a class="link" href="real_t.html" title="Class template real_t">real_t</a></code></code> enough large to represent <code class="computeroutput">Times*(2^Resolution)</code>. </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="to_ureal_t.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="reference.html#header.boost.fixed_point.number_hpp"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="operator__idp6682704.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Function template operator/</title>
+<link rel="stylesheet" href="../../.././boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.0">
+<link rel="home" href="../../../index.html" title="Toward Boost.FixedPoint 0.1.0">
+<link rel="up" href="../reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">
+<link rel="prev" href="_idp6912528.html" title="Function template operator/">
+<link rel="next" href="_idp6936592.html" title="Function template operator/">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="_idp6912528.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html#header.boost.fixed_point.number_hpp"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="_idp6936592.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="boost.fixed_point.operator/_idp6924560"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Function template operator/</span></h2>
+<p>boost::fixed_point::operator/</p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../reference.html#header.boost.fixed_point.number_hpp" title="Header &lt;boost/fixed_point/number.hpp&gt;">boost/fixed_point/number.hpp</a>&gt;
+
+</span>
+<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">int</span> R1<span class="special">,</span> <span class="keyword">int</span> P1<span class="special">,</span> <span class="keyword">typename</span> RP1<span class="special">,</span> <span class="keyword">typename</span> OP1<span class="special">,</span> <span class="keyword">typename</span> F1<span class="special">,</span> <span class="keyword">int</span> R2<span class="special">,</span> 
+         <span class="keyword">int</span> P2<span class="special">,</span> <span class="keyword">typename</span> RP2<span class="special">,</span> <span class="keyword">typename</span> OP2<span class="special">,</span> <span class="keyword">typename</span> F2<span class="special">&gt;</span> 
+  <a class="link" href="../divide_result.html" title="Struct template divide_result">divide_result</a><span class="special">&lt;</span> <a class="link" href="../ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R1</span><span class="special">,</span> <span class="identifier">P1</span><span class="special">,</span> <span class="identifier">RP1</span><span class="special">,</span> <span class="identifier">OP1</span><span class="special">,</span> <span class="identifier">F1</span> <span class="special">&gt;</span><span class="special">,</span> <a class="link" href="../real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R2</span><span class="special">,</span> <span class="identifier">P2</span><span class="special">,</span> <span class="identifier">RP2</span><span class="special">,</span> <span class="identifier">OP2</span><span class="special">,</span> <span class="identifier">F2</span> <span class="special">&gt;</span> <span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span> 
+  <span class="keyword">operator</span><span class="special">/</span><span class="special">(</span><a class="link" href="../ureal_t.html" title="Class template ureal_t">ureal_t</a><span class="special">&lt;</span> <span class="identifier">R1</span><span class="special">,</span> <span class="identifier">P1</span><span class="special">,</span> <span class="identifier">RP1</span><span class="special">,</span> <span class="identifier">OP1</span><span class="special">,</span> <span class="identifier">F1</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> lhs<span class="special">,</span> 
+            <a class="link" href="../real_t.html" title="Class template real_t">real_t</a><span class="special">&lt;</span> <span class="identifier">R2</span><span class="special">,</span> <span class="identifier">P2</span><span class="special">,</span> <span class="identifier">RP2</span><span class="special">,</span> <span class="identifier">OP2</span><span class="special">,</span> <span class="identifier">F2</span> <span class="special">&gt;</span> <span class="keyword">const</span> <span class="special">&amp;</span> rhs<span class="special">)</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp21060048"></a><h2>Description</h2>
+<p>fixed point division deducing the result type as &lt;R1-P2, P1,R2&gt;. </p>
+<p><span class="bold"><strong>Returns:</strong></span> <code class="computeroutput">divide&lt;RT&gt;(lhs,rhs)</code> taking in account the rounding policy of the result type. </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2012 Vicente J. Botet Escriba<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="_idp6912528.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../reference.html#header.boost.fixed_point.number_hpp"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="_idp6936592.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
